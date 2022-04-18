@@ -7,6 +7,7 @@ use winapis::{direct3d::*, winapi::*, *};
 struct Application {
     winapp: WindowsApplication,
     d3dapp: D3DApplication,
+    idea: ModelBuffer,
 }
 
 impl Application {
@@ -20,7 +21,37 @@ impl Application {
             ask_yesno("Start with a fullscreen window?", "question"),
         )?;
         let d3dapp = D3DApplication::new(&winapp, 1280, 720)?;
-        Ok(Self { winapp, d3dapp })
+        let idea = {
+            let data_vtx = [
+                Vertex {
+                    pos: [-0.5, -0.5, 0.0],
+                    col: [1.0; 4],
+                    tex: [0.0, 1.0],
+                },
+                Vertex {
+                    pos: [-0.5, 0.5, 0.0],
+                    col: [1.0; 4],
+                    tex: [0.0, 0.0],
+                },
+                Vertex {
+                    pos: [0.5, 0.5, 0.0],
+                    col: [1.0; 4],
+                    tex: [1.0, 0.0],
+                },
+                Vertex {
+                    pos: [0.5, -0.5, 0.0],
+                    col: [1.0; 4],
+                    tex: [1.0, 1.0],
+                },
+            ];
+            let data_idx = [0, 1, 2, 0, 2, 3];
+            d3dapp.create_modelbuffer(4, &data_vtx, 6, &data_idx)?
+        };
+        Ok(Self {
+            winapp,
+            d3dapp,
+            idea,
+        })
     }
     /// **[Side Effect]**
     /// Run the game.
@@ -28,6 +59,7 @@ impl Application {
         while !self.winapp.do_event() {
             self.d3dapp.set_rtv();
             self.d3dapp.clear_rtv();
+            self.d3dapp.draw_model(&self.idea);
             self.d3dapp.swap()?;
         }
         Ok(())

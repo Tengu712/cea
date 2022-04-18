@@ -1,5 +1,5 @@
 use super::{winapi::WindowsApplication, *};
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, mem::size_of};
 use windows::{
     core::PCSTR,
     Win32::{
@@ -12,7 +12,20 @@ use windows::{
     },
 };
 
+pub struct Vertex {
+    pub pos: [f32; 3],
+    pub col: [f32; 4],
+    pub tex: [f32; 2],
+}
+
+pub struct ModelBuffer {
+    num_idx: u32,
+    vbuf: Option<ID3D11Buffer>,
+    ibuf: Option<ID3D11Buffer>,
+}
+
 pub struct D3DApplication {
+    device: ID3D11Device,
     context: ID3D11DeviceContext,
     swapchain: IDXGISwapChain,
     rtv_bbuf: Option<ID3D11RenderTargetView>,
@@ -93,15 +106,99 @@ impl D3DApplication {
         // Create shaders
         let (vshader, pshader, ilayout) = create_shader_coms(&device, winapp.get_cur_dir())?;
         // Set render configure
+        let viewport = D3D11_VIEWPORT {
+            TopLeftX: 0.0,
+            TopLeftY: 0.0,
+            Width: width as f32,
+            Height: height as f32,
+            MinDepth: 0.0,
+            MaxDepth: 1.0,
+        };
+        unsafe { context.RSSetViewports(1, &viewport) };
+        let blend_desc = {
+            let mut render_targets = [D3D11_RENDER_TARGET_BLEND_DESC::default(); 8];
+            render_targets[0] = D3D11_RENDER_TARGET_BLEND_DESC {
+                BlendEnable: BOOL(1),
+                SrcBlend: D3D11_BLEND_SRC_ALPHA,
+                DestBlend: D3D11_BLEND_INV_SRC_ALPHA,
+                BlendOp: D3D11_BLEND_OP_ADD,
+                SrcBlendAlpha: D3D11_BLEND_ONE,
+                DestBlendAlpha: D3D11_BLEND_ONE,
+                BlendOpAlpha: D3D11_BLEND_OP_ADD,
+                RenderTargetWriteMask: 0b1111,
+            };
+            D3D11_BLEND_DESC {
+                AlphaToCoverageEnable: BOOL(0),
+                IndependentBlendEnable: BOOL(0),
+                RenderTarget: render_targets,
+            }
+        };
+        let blend_state = unsafe {
+            device
+                .CreateBlendState(&blend_desc)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("BlendState")))?
+        };
+        unsafe { context.OMSetBlendState(blend_state, [1.0, 1.0, 1.0, 1.0].as_ptr(), 0xffffffff) };
         unsafe { context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) };
         unsafe { context.IASetInputLayout(ilayout) };
         unsafe { context.VSSetShader(vshader, std::ptr::null(), 0) };
         unsafe { context.PSSetShader(pshader, std::ptr::null(), 0) };
         // Finish
         Ok(Self {
+            device,
             context,
             swapchain,
             rtv_bbuf: Some(rtv_bbuf),
+        })
+    }
+    /// Create model buffer.
+    pub fn create_modelbuffer(
+        &self,
+        num_vtx: u32,
+        data_vtx: &[Vertex],
+        num_idx: u32,
+        data_idx: &[u32],
+    ) -> Result<ModelBuffer, MyErr> {
+        let vbuf = unsafe {
+            let vbuf_desc = D3D11_BUFFER_DESC {
+                ByteWidth: size_of::<Vertex>() as u32 * num_vtx,
+                Usage: D3D11_USAGE_DEFAULT,
+                BindFlags: 1,
+                CPUAccessFlags: 0,
+                MiscFlags: 0,
+                StructureByteStride: 0,
+            };
+            let vbuf_data = D3D11_SUBRESOURCE_DATA {
+                pSysMem: data_vtx as *const _ as *const ::core::ffi::c_void,
+                SysMemPitch: 0,
+                SysMemSlicePitch: 0,
+            };
+            self.device
+                .CreateBuffer(&vbuf_desc, &vbuf_data)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("Model vbuffer")))?
+        };
+        let ibuf = unsafe {
+            let ibuf_desc = D3D11_BUFFER_DESC {
+                ByteWidth: size_of::<u32>() as u32 * num_idx,
+                Usage: D3D11_USAGE_DEFAULT,
+                BindFlags: 2,
+                CPUAccessFlags: 0,
+                MiscFlags: 0,
+                StructureByteStride: 0,
+            };
+            let ibuf_data = D3D11_SUBRESOURCE_DATA {
+                pSysMem: data_idx as *const _ as *const ::core::ffi::c_void,
+                SysMemPitch: 0,
+                SysMemSlicePitch: 0,
+            };
+            self.device
+                .CreateBuffer(&ibuf_desc, &ibuf_data)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("Model ibuffer")))?
+        };
+        Ok(ModelBuffer {
+            num_idx,
+            vbuf: Some(vbuf),
+            ibuf: Some(ibuf),
         })
     }
     /// Set render target view.
@@ -122,6 +219,16 @@ impl D3DApplication {
                 .Present(1, 0)
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Runtime, String::from("Backbuffer swap failed")))
         }
+    }
+    /// Draw model.
+    pub fn draw_model(&self, mbuf: &ModelBuffer) {
+        unsafe {
+            self.context
+                .IASetVertexBuffers(0, 1, &mbuf.vbuf, &(size_of::<Vertex>() as u32), &0);
+            self.context
+                .IASetIndexBuffer(&mbuf.ibuf, DXGI_FORMAT_R32_UINT, 0);
+            self.context.DrawIndexed(mbuf.num_idx, 0, 0);
+        };
     }
 }
 
