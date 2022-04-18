@@ -1,5 +1,6 @@
 pub mod direct2d;
 pub mod direct3d;
+pub mod math;
 pub mod winapi;
 
 pub enum ErrKnd {

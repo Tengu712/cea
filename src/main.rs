@@ -1,7 +1,7 @@
 pub mod winapis;
 
 //use std::collections::HashMap;
-use winapis::{direct3d::*, winapi::*, *};
+use winapis::{direct3d::*, math::*, winapi::*, *};
 
 /// A struct for application and resource bank to run the game.
 struct Application {
@@ -56,10 +56,21 @@ impl Application {
     /// **[Side Effect]**
     /// Run the game.
     fn run(self) -> Result<(), MyErr> {
+        let cdata = CData {
+            mat_scl: Matrix4x4::new_scaling(1279.0, 718.0, 1.0),
+            mat_rtx: Matrix4x4::new_identity(),
+            mat_rty: Matrix4x4::new_identity(),
+            mat_rtz: Matrix4x4::new_identity(),
+            mat_trs: Matrix4x4::new_translation(0.0, 0.0, 0.0),
+            mat_view: Matrix4x4::new_identity(),
+            mat_proj: Matrix4x4::new_ortho(-640.0, 640.0, 360.0, -360.0, 0.0, 1.0),
+            vec_col: [1.0, 0.0, 0.0, 1.0],
+            vec_prm: [0.0; 4],
+        };
         while !self.winapp.do_event() {
             self.d3dapp.set_rtv();
             self.d3dapp.clear_rtv();
-            self.d3dapp.draw_model(&self.idea);
+            self.d3dapp.draw_model(&self.idea, &cdata)?;
             self.d3dapp.swap()?;
         }
         Ok(())
