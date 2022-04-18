@@ -1,21 +1,22 @@
 use super::{winapi::WindowsApplication, *};
-use windows::{
-    core::PCWSTR,
-    Win32::{
-        Foundation::*,
-        Graphics::{
-            Direct3D::{Fxc::*, *},
-            Direct3D11::*,
-            Dxgi::{Common::*, *},
-        },
+use std::{fs::File, io::Read};
+use windows::Win32::{
+    Foundation::*,
+    Graphics::{
+        Direct3D::*,
+        Direct3D11::*,
+        Dxgi::{Common::*, *},
     },
 };
 
 pub struct D3DApplication {
-    rtv_bbuf: ID3D11RenderTargetView,
+    context: ID3D11DeviceContext,
+    swapchain: IDXGISwapChain,
+    rtv_bbuf: Option<ID3D11RenderTargetView>,
 }
 
 impl D3DApplication {
+    /// Constructor.
     pub fn new(winapp: &WindowsApplication, width: u32, height: u32) -> Result<Self, MyErr> {
         // Create factory
         let factory = unsafe {
@@ -87,45 +88,56 @@ impl D3DApplication {
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("RTV of backbuffer")))?
         };
         // Create shaders
-        let path = PCWSTR(
-            (winapp.get_current_path().clone() + "shaders.hlsl\0")
-                .encode_utf16()
-                .collect::<Vec<u16>>()
-                .as_ptr(),
-        );
         let vshader = unsafe {
-            let mut vshader_mut = None;
-            D3DCompileFromFile(
-                path,
-                std::ptr::null(),
-                None,
-                "VSMain",
-                "vs_5_0",
-                0,
-                0,
-                &mut vshader_mut,
-                std::ptr::null_mut(),
-            )
-            .map_err(|_| MyErr::D3DApp(ErrKnd::IO, String::from("Compilation vshader failed")))?;
-            vshader_mut.ok_or(MyErr::D3DApp(ErrKnd::Creation, String::from("vshader")))?
+            let mut buf = Vec::new();
+            File::open(winapp.get_current_path().clone() + "vshader.cso")
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Open vshader.cso failed")))?
+                .read_to_end(&mut buf)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Read vshader.cso failed")))?;
+            let pshaderbytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
+            device
+                .CreateVertexShader(pshaderbytecode, buf.len(), None)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("vshader")))?
         };
         let pshader = unsafe {
-            let mut pshader_mut = None;
-            D3DCompileFromFile(
-                path,
-                std::ptr::null(),
-                None,
-                "PSMain",
-                "ps_5_0",
-                0,
-                0,
-                &mut pshader_mut,
-                std::ptr::null_mut(),
-            )
-            .map_err(|_| MyErr::D3DApp(ErrKnd::IO, String::from("Compilation pshader failed")))?;
-            pshader_mut.ok_or(MyErr::D3DApp(ErrKnd::Creation, String::from("pshader")))?
+            let mut buf = Vec::new();
+            File::open(winapp.get_current_path().clone() + "pshader.cso")
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Open pshader.cso failed")))?
+                .read_to_end(&mut buf)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Read pshader.cso failed")))?;
+            let pshaderbytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
+            device
+                .CreatePixelShader(pshaderbytecode, buf.len(), None)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Creation, String::from("pshader")))?
         };
+        // Set render configure
+        unsafe { context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) };
         unsafe { context.VSSetShader(vshader, std::ptr::null(), 0) };
-        Ok(Self { rtv_bbuf })
+        unsafe { context.PSSetShader(pshader, std::ptr::null(), 0) };
+        // Finish
+        Ok(Self {
+            context,
+            swapchain,
+            rtv_bbuf: Some(rtv_bbuf),
+        })
+    }
+    /// Set render target view.
+    pub fn set_rtv(&self) {
+        unsafe { self.context.OMSetRenderTargets(1, &self.rtv_bbuf, None) };
+    }
+    /// Clear render target view.
+    pub fn clear_rtv(&self) {
+        unsafe {
+            self.context
+                .ClearRenderTargetView(&self.rtv_bbuf, [0.0, 0.0, 0.0, 1.0].as_ptr())
+        };
+    }
+    /// Swap and wait vsync.
+    pub fn swap(&self) -> Result<(), MyErr> {
+        unsafe {
+            self.swapchain
+                .Present(1, 0)
+                .map_err(|_| MyErr::D3DApp(ErrKnd::Runtime, String::from("Backbuffer swap failed")))
+        }
     }
 }
