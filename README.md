@@ -17,7 +17,7 @@ ResultのエラーをStringからユーザー定義に変えようとして、�
 開発途上だからリファレンス通りの実装じゃなかったり文献が少なかったりは許すからよ、サンプルプログラムのフォーマットぐらいしてくれ。
 クソ雑魚の俺がContributorになってやろうか？
 
-SwapchainからBackbufferを取得しようとしたら、`the trait \`windows::core::Interface\` is not implemented for \`()\``って言われた。
+SwapchainからBackbufferを取得しようとしたら、「the trait `windows::core::Interface` is not implemented for `()`」って言われた。
 正解は下のコードだが、このエラー文からじゃ型推論エラーとは分からんやろ。
 
 ```rust
