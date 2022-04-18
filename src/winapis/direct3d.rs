@@ -1,4 +1,4 @@
-use super::{math::Matrix4x4, winapi::WindowsApplication, *};
+use super::{math::Matrix4x4, winapi::WindowsApplication, ErrKnd, MyErr};
 use std::{fs::File, io::Read, mem::size_of};
 use windows::{
     core::PCSTR,

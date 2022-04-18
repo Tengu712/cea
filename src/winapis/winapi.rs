@@ -1,4 +1,4 @@
-use super::*;
+use super::{ErrKnd, MyErr};
 use windows::{
     core::PCWSTR,
     Win32::{
