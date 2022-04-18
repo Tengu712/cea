@@ -53,12 +53,12 @@ extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: L
 /// Struct to reference basic objects
 pub struct WindowsApplication {
     hwnd: HWND,
-    path: String,
+    dir: String,
 }
 impl WindowsApplication {
     /// Create WindowsApplication struct that is only way to use api with window handle.
     pub fn new(
-        path: &str,
+        dir: String,
         title: &str,
         width: i32,
         height: i32,
@@ -126,7 +126,7 @@ impl WindowsApplication {
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
         Ok(Self {
-            path: path.to_string(),
+            dir: dir.to_string(),
             hwnd,
         })
     }
@@ -153,8 +153,8 @@ impl WindowsApplication {
     pub fn get_window_handle(&self) -> &HWND {
         &self.hwnd
     }
-    /// Getter for current path.
-    pub fn get_current_path(&self) -> &String {
-        &self.path
+    /// Getter for current directory.
+    pub fn get_cur_dir(&self) -> &String {
+        &self.dir
     }
 }

@@ -11,19 +11,16 @@ struct Application {
 
 impl Application {
     /// Constructor.
-    fn new(path: &str) -> Result<Self, MyErr> {
+    fn new(dir: String) -> Result<Self, MyErr> {
         let winapp = WindowsApplication::new(
-            path,
+            dir,
             "秘封俱楽部",
             1280,
             720,
             ask_yesno("Start with a fullscreen window?", "question"),
         )?;
         let d3dapp = D3DApplication::new(&winapp, 1280, 720)?;
-        Ok(Self {
-            winapp,
-            d3dapp,
-        })
+        Ok(Self { winapp, d3dapp })
     }
     /// **[Side Effect]**
     /// Run the game.
@@ -53,7 +50,7 @@ fn main_with_result() -> Result<(), MyErr> {
         .get(1)
         .unwrap_or(&current_dir)
         .clone();
-    Application::new(dir.as_str())?.run()?;
+    Application::new(dir)?.run()?;
     Ok(())
 }
 

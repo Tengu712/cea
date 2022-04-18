@@ -90,7 +90,7 @@ impl D3DApplication {
         // Create shaders
         let vshader = unsafe {
             let mut buf = Vec::new();
-            File::open(winapp.get_current_path().clone() + "vshader.cso")
+            File::open(winapp.get_cur_dir().clone() + "vshader.cso")
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Open vshader.cso failed")))?
                 .read_to_end(&mut buf)
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Read vshader.cso failed")))?;
@@ -101,7 +101,7 @@ impl D3DApplication {
         };
         let pshader = unsafe {
             let mut buf = Vec::new();
-            File::open(winapp.get_current_path().clone() + "pshader.cso")
+            File::open(winapp.get_cur_dir().clone() + "pshader.cso")
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Open pshader.cso failed")))?
                 .read_to_end(&mut buf)
                 .map_err(|_| MyErr::D3DApp(ErrKnd::Io, String::from("Read pshader.cso failed")))?;
