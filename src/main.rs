@@ -1,19 +1,20 @@
 pub mod winapis;
 
 use winapis::{
-    direct3d::{cbuffer::*, model::*, text::*, *},
-    math::*,
+    direct3d::{
+        cbuffer::CData,
+        model::{ModelBuffer, Vertex},
+        text::*,
+        D3DApplication,
+    },
+    math::Matrix4x4,
     winapi::*,
     *,
 };
 
-impl MyErr {
+impl WErr {
     fn app(errknd: EKnd, message: &str) -> Self {
-        Self {
-            message: String::from(message),
-            kind: errknd_string(errknd),
-            place: String::from("App"),
-        }
+        WErr::from(errknd, String::from(message), String::from("App"))
     }
 }
 
@@ -24,10 +25,9 @@ struct Application {
     d3dtxt: D3DTextModule,
     idea: ModelBuffer,
 }
-
 impl Application {
     /// Constructor.
-    fn new(dir: String) -> Result<Self, MyErr> {
+    fn new(dir: String) -> Result<Self, WErr> {
         let winapp = WindowsApplication::new(
             dir,
             "秘封俱楽部",
@@ -72,7 +72,7 @@ impl Application {
     }
     /// **[Side Effect]**
     /// Run the game.
-    fn run(self) -> Result<(), MyErr> {
+    fn run(self) -> Result<(), WErr> {
         let mut cdata = CData {
             mat_scl: Matrix4x4::new_scaling(640.0, 640.0, 1.0),
             mat_rtx: Matrix4x4::new_identity(),
@@ -109,11 +109,11 @@ impl Application {
 }
 
 /// Another entry point that's to return error to main function.
-fn main_with_result() -> Result<(), MyErr> {
+fn main_with_result() -> Result<(), WErr> {
     let current_dir = std::env::current_dir()
-        .map_err(|_| MyErr::app(EKnd::Get, "current directory"))?
+        .map_err(|_| WErr::app(EKnd::Get, "current directory"))?
         .to_str()
-        .ok_or(MyErr::app(EKnd::Common, "Convertion curdir to str failed"))?
+        .ok_or(WErr::app(EKnd::Common, "Convertion curdir to str failed"))?
         .to_string()
         + "\\";
     let dir = std::env::args()

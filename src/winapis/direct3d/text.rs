@@ -34,7 +34,7 @@ pub struct D3DTextModule {
     bitmap: ID2D1Bitmap1,
 }
 impl D3DTextModule {
-    pub fn draw_text(&self, desc: &DrawingTextDesc) -> Result<(), MyErr> {
+    pub fn draw_text(&self, desc: &DrawingTextDesc) -> Result<(), WErr> {
         let format = unsafe {
             self.dwfactory
                 .CreateTextFormat(
@@ -46,16 +46,18 @@ impl D3DTextModule {
                     desc.size * 72.0 / 96.0,
                     PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
                 )
-                .map_err(|_| MyErr::d3d(EKnd::Runtime, "Creation text format failed"))?
-            };
-            let alignment = match desc.align {
-                TextAlign::Left => DWRITE_TEXT_ALIGNMENT_LEADING,
-                TextAlign::Center => DWRITE_TEXT_ALIGNMENT_CENTER,
-                TextAlign::Right => DWRITE_TEXT_ALIGNMENT_TRAILING,
-            };
-            unsafe { format.SetTextAlignment(alignment)
-                .map_err(|_| MyErr::d3d(EKnd::Runtime, "Set text alignment"))?
-         };
+                .map_err(|_| WErr::d3d(EKnd::Runtime, "Creation text format failed"))?
+        };
+        let alignment = match desc.align {
+            TextAlign::Left => DWRITE_TEXT_ALIGNMENT_LEADING,
+            TextAlign::Center => DWRITE_TEXT_ALIGNMENT_CENTER,
+            TextAlign::Right => DWRITE_TEXT_ALIGNMENT_TRAILING,
+        };
+        unsafe {
+            format
+                .SetTextAlignment(alignment)
+                .map_err(|_| WErr::d3d(EKnd::Runtime, "Set text alignment"))?
+        };
         let brush = unsafe {
             let color = D2D1_COLOR_F {
                 r: desc.rgba[0],
@@ -69,7 +71,7 @@ impl D3DTextModule {
             };
             self.d2context
                 .CreateSolidColorBrush(&color, &brushproperties)
-                .map_err(|_| MyErr::d3d(EKnd::Runtime, "Creation text brush failed"))?
+                .map_err(|_| WErr::d3d(EKnd::Runtime, "Creation text brush failed"))?
         };
         let layoutrect = D2D_RECT_F {
             left: desc.rect[0],
@@ -92,15 +94,15 @@ impl D3DTextModule {
             );
             self.d2context
                 .EndDraw(std::ptr::null_mut(), std::ptr::null_mut())
-                .map_err(|e| MyErr::d3d(EKnd::Runtime, e.to_string().as_str()))?;
+                .map_err(|e| WErr::d3d(EKnd::Runtime, e.to_string().as_str()))?;
         };
         Ok(())
     }
 }
 
 impl D3DApplication {
-    /// Create DirectWrite coms based on Direct3D coms. 
-    pub fn create_text_module(&self, winapp: &WindowsApplication) -> Result<D3DTextModule, MyErr> {
+    /// Create DirectWrite coms based on Direct3D coms.
+    pub fn create_text_module(&self, winapp: &WindowsApplication) -> Result<D3DTextModule, WErr> {
         // Create factory first of all
         let factory: ID2D1Factory3 = unsafe {
             let mut ppifactory = None;
@@ -110,20 +112,20 @@ impl D3DApplication {
                 &D2D1_FACTORY_OPTIONS::default(),
                 std::mem::transmute(&mut ppifactory),
             )
-            .map_err(|_| MyErr::d3d(EKnd::Creation, "ID2D1Factory for DWrite"))?;
-            ppifactory.ok_or(MyErr::d3d(EKnd::Common, "ID2D1Factory for DWrite is none"))?
+            .map_err(|_| WErr::d3d(EKnd::Creation, "ID2D1Factory for DWrite"))?;
+            ppifactory.ok_or(WErr::d3d(EKnd::Common, "ID2D1Factory for DWrite is none"))?
         };
         // Create d2context from factory
         let d2context = unsafe {
             let dxdevice = self
                 .device
                 .cast::<IDXGIDevice>()
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "IDXGIDevice for DWrite"))?;
+                .map_err(|_| WErr::d3d(EKnd::Creation, "IDXGIDevice for DWrite"))?;
             factory
                 .CreateDevice(&dxdevice)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "ID2D1Device for DWrite"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "ID2D1Device for DWrite"))?
                 .CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "ID2D1DeviceContext for DWrite"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "ID2D1DeviceContext for DWrite"))?
         };
         // Create bitmap from d2context
         let bitmap = unsafe {
@@ -131,7 +133,7 @@ impl D3DApplication {
             let backbuffer = self
                 .swapchain
                 .GetBuffer::<IDXGISurface>(0)
-                .map_err(|_| MyErr::d3d(EKnd::Get, "backbuffer for DWrite"))?;
+                .map_err(|_| WErr::d3d(EKnd::Get, "backbuffer for DWrite"))?;
             let bitmapproperties = D2D1_BITMAP_PROPERTIES1 {
                 pixelFormat: D2D1_PIXEL_FORMAT {
                     format: DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -144,12 +146,12 @@ impl D3DApplication {
             };
             d2context
                 .CreateBitmapFromDxgiSurface(&backbuffer, &bitmapproperties)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "Bitmap for DWrite"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "Bitmap for DWrite"))?
         };
         // Create dwfactory
         let dwfactory = unsafe {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory::IID)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "DWrite factory"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "DWrite factory"))?
         };
         let dwfactory = unsafe { std::mem::transmute(dwfactory) };
         // Finish

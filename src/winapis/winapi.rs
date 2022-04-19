@@ -9,13 +9,13 @@ use windows::{
     },
 };
 
-impl MyErr {
+impl WErr {
     fn win(errknd: EKnd, message: &str) -> Self {
-        Self {
-            message: String::from(message),
-            kind: errknd_string(errknd),
-            place: String::from("WIC"),
-        }
+        WErr::from(
+            errknd,
+            String::from(message),
+            String::from("Windows Common App"),
+        )
     }
 }
 
@@ -73,7 +73,7 @@ impl WindowsApplication {
         width: i32,
         height: i32,
         windowed: bool,
-    ) -> Result<Self, MyErr> {
+    ) -> Result<Self, WErr> {
         let (window_style, window_show) = if windowed {
             (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
         } else {
@@ -82,7 +82,7 @@ impl WindowsApplication {
         // Get instance handle
         let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
-            return Err(MyErr::win(EKnd::Get, "instance handle"));
+            return Err(WErr::win(EKnd::Get, "instance handle"));
         }
         // Register window class
         let wcex = WNDCLASSEXW {
@@ -100,7 +100,7 @@ impl WindowsApplication {
             ..Default::default()
         };
         if unsafe { RegisterClassExW(&wcex) == 0 } {
-            return Err(MyErr::win(EKnd::Common, "Registration window class failed"));
+            return Err(WErr::win(EKnd::Common, "Registration window class failed"));
         }
         // Adjust window size
         let mut window_rect = RECT {
@@ -128,7 +128,7 @@ impl WindowsApplication {
             )
         };
         if hwnd.is_invalid() {
-            return Err(MyErr::win(EKnd::Creation, "window"));
+            return Err(WErr::win(EKnd::Creation, "window"));
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish

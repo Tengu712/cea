@@ -23,7 +23,7 @@ impl D3DApplication {
         data_vtx: &[Vertex],
         num_idx: u32,
         data_idx: &[u32],
-    ) -> Result<ModelBuffer, MyErr> {
+    ) -> Result<ModelBuffer, WErr> {
         let vbuf = unsafe {
             let vbuf_desc = D3D11_BUFFER_DESC {
                 ByteWidth: size_of::<Vertex>() as u32 * num_vtx,
@@ -40,7 +40,7 @@ impl D3DApplication {
             };
             self.device
                 .CreateBuffer(&vbuf_desc, &vbuf_data)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "Model vbuffer"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "Model vbuffer"))?
         };
         let ibuf = unsafe {
             let ibuf_desc = D3D11_BUFFER_DESC {
@@ -58,7 +58,7 @@ impl D3DApplication {
             };
             self.device
                 .CreateBuffer(&ibuf_desc, &ibuf_data)
-                .map_err(|_| MyErr::d3d(EKnd::Creation, "Model ibuffer"))?
+                .map_err(|_| WErr::d3d(EKnd::Creation, "Model ibuffer"))?
         };
         Ok(ModelBuffer {
             num_idx,
@@ -67,7 +67,7 @@ impl D3DApplication {
         })
     }
     /// Draw model on current buffer.
-    pub fn draw_model(&self, mbuf: &ModelBuffer) -> Result<(), MyErr> {
+    pub fn draw_model(&self, mbuf: &ModelBuffer) -> Result<(), WErr> {
         unsafe {
             self.context
                 .IASetVertexBuffers(0, 1, &mbuf.vbuf, &(size_of::<Vertex>() as u32), &0);

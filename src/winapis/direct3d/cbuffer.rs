@@ -15,12 +15,12 @@ pub struct CData {
 
 impl D3DApplication {
     /// Set constant data to constant buffer.
-    pub fn set_cdata(&self, cdata: &CData) -> Result<(), MyErr> {
+    pub fn set_cdata(&self, cdata: &CData) -> Result<(), WErr> {
         unsafe {
             self.context.UpdateSubresource(
                 self.cbuffer
                     .as_ref()
-                    .ok_or(MyErr::d3d(EKnd::Runtime, "Cbuffer is None"))?,
+                    .ok_or(WErr::d3d(EKnd::Runtime, "Cbuffer is None"))?,
                 0,
                 std::ptr::null(),
                 cdata as *const _ as *const ::core::ffi::c_void,
