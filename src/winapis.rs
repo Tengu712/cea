@@ -1,36 +1,43 @@
-pub mod direct2d;
+//pub mod direct2d;
 pub mod direct3d;
+pub mod image;
 pub mod math;
 pub mod winapi;
 
-pub enum ErrKnd {
+pub struct MyErr {
+    pub message: String,
+    pub kind: String,
+    pub place: String,
+}
+impl MyErr {
+    pub fn new(&self) -> Self {
+        Self {
+            kind: String::default(),
+            message: String::default(),
+            place: String::default(),
+        }
+    }
+    pub fn get_message(&self) -> String {
+        self.message.clone() + " in " + self.place.as_str()
+    }
+    pub fn get_title(&self) -> String {
+        self.kind.clone()
+    }
+}
+
+pub enum EKnd {
     Common,
     Creation,
     Get,
     Io,
     Runtime,
 }
-
-pub enum MyErr {
-    WinApp(ErrKnd, String),
-    D3DApp(ErrKnd, String),
-    App(ErrKnd, String),
-}
-
-fn errknd_str(k: ErrKnd) -> String {
-    match k {
-        ErrKnd::Common => String::from("Error"),
-        ErrKnd::Creation => String::from("Creation Error"),
-        ErrKnd::Get => String::from("Get Error"),
-        ErrKnd::Io => String::from("IO Error"),
-        ErrKnd::Runtime => String::from("Runtime Error"),
-    }
-}
-
-pub fn myerr_msg_ttl(e: MyErr) -> (String, String) {
-    match e {
-        MyErr::WinApp(k, m) => (m + " in WinApp", errknd_str(k)),
-        MyErr::D3DApp(k, m) => (m + " in D3DApp", errknd_str(k)),
-        MyErr::App(k, m) => (m, errknd_str(k)),
+pub fn errknd_string(errknd: EKnd) -> String {
+    match errknd {
+        EKnd::Common => String::from("Error"),
+        EKnd::Creation => String::from("Creation Error"),
+        EKnd::Get => String::from("Get Error"),
+        EKnd::Io => String::from("IO Error"),
+        EKnd::Runtime => String::from("Runtime Error"),
     }
 }

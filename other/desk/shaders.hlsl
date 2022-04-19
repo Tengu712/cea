@@ -1,3 +1,12 @@
+// Parameters
+//   x: 0.0 -> no image texture
+//   y:
+//   z:
+//   w:
+
+Texture2D diffuseTexture;
+SamplerState diffuseTextureSampler;
+
 cbuffer mats : register(b0) {
     float4x4 mat_scl;
     float4x4 mat_rtx;
@@ -44,5 +53,8 @@ PSInput vs_main(VSInput input)
 
 float4 ps_main(PSInput input) : SV_TARGET
 {
-    return input.col;
+    if (input.prm.x != 0.0)
+        return input.col * diffuseTexture.Sample(diffuseTextureSampler, input.tex);
+    else
+        return input.col;
 }

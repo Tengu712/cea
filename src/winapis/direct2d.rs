@@ -10,9 +10,8 @@ use windows::{
             Direct3D11::*,
             DirectWrite::*,
             Dxgi::{Common::*, *},
-            Imaging::*,
         },
-        System::{Com::*, SystemServices::*},
+        System::Com::*,
     },
 };
 
@@ -22,14 +21,6 @@ pub struct D2DApplication {
     swapchain: IDXGISwapChain1,
     dwfactory: IDWriteFactory,
 }
-
-/// Struct to reference image data.
-pub struct Image {
-    bitmap: ID2D1Bitmap,
-    pub width: u32,
-    pub height: u32,
-}
-
 impl D2DApplication {
     /// Create D2DApplication struct that is only way to use Direct2D.
     pub fn new(winapp: &super::winapi::WindowsApplication) -> Result<Self, String> {
@@ -307,64 +298,6 @@ impl D2DApplication {
             self.context
                 .CreateSolidColorBrush(&color, &brushproperties)
                 .map_err(|e| e.to_string() + "\nFailed to create brush.")?
-        })
-    }
-
-    /// Create image
-    pub fn create_image_from_file(&self, filename: &str) -> Result<Image, String> {
-        let factory: IWICImagingFactory = unsafe {
-            CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_SERVER).map_err(|e| {
-                e.to_string() + "\nFailed to create IWICImagingFactory. : " + filename
-            })?
-        };
-        let decoder = unsafe {
-            factory
-                .CreateDecoderFromFilename(
-                    filename,
-                    std::ptr::null(),
-                    GENERIC_READ,
-                    WICDecodeMetadataCacheOnLoad,
-                )
-                .map_err(|e| e.to_string() + "\nFailed to create decoder. : " + filename)?
-        };
-        let frame = unsafe {
-            decoder
-                .GetFrame(0)
-                .map_err(|e| e.to_string() + "\nFailed to get frame. : " + filename)?
-        };
-        let converter = unsafe {
-            factory
-                .CreateFormatConverter()
-                .map_err(|e| e.to_string() + "\nFailed to create format converter. : " + filename)?
-        };
-        unsafe {
-            converter
-                .Initialize(
-                    frame,
-                    &GUID_WICPixelFormat32bppPBGRA,
-                    WICBitmapDitherTypeNone,
-                    None,
-                    1.0,
-                    WICBitmapPaletteTypeMedianCut,
-                )
-                .map_err(|e| e.to_string() + "\nFailed to initialize converter. : " + filename)?
-        };
-        let mut width = 0;
-        let mut height = 0;
-        unsafe {
-            converter
-                .GetSize(&mut width, &mut height)
-                .map_err(|e| e.to_string() + "\nFailed to get image size. : " + filename)?
-        };
-        let bitmap = unsafe {
-            self.context
-                .CreateBitmapFromWicBitmap(converter, std::ptr::null())
-                .map_err(|e| e.to_string() + "\nFailed to create bitmap. : " + filename)?
-        };
-        Ok(Image {
-            bitmap,
-            width,
-            height,
         })
     }
 }

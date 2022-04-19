@@ -1,4 +1,4 @@
-use super::{ErrKnd, MyErr};
+use super::*;
 use windows::{
     core::PCWSTR,
     Win32::{
@@ -8,6 +8,16 @@ use windows::{
         UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::*},
     },
 };
+
+impl MyErr {
+    fn win(errknd: EKnd, message: &str) -> Self {
+        Self {
+            message: String::from(message),
+            kind: errknd_string(errknd),
+            place: String::from("WIC"),
+        }
+    }
+}
 
 /// Show a message box.
 pub fn show_messagebox<'a, T>(message: T, title: T)
@@ -72,7 +82,7 @@ impl WindowsApplication {
         // Get instance handle
         let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
-            return Err(MyErr::WinApp(ErrKnd::Get, String::from("instance handle")));
+            return Err(MyErr::win(EKnd::Get, "instance handle"));
         }
         // Register window class
         let wcex = WNDCLASSEXW {
@@ -90,10 +100,7 @@ impl WindowsApplication {
             ..Default::default()
         };
         if unsafe { RegisterClassExW(&wcex) == 0 } {
-            return Err(MyErr::WinApp(
-                ErrKnd::Common,
-                String::from("Registration window class failed"),
-            ));
+            return Err(MyErr::win(EKnd::Common, "Registration window class failed"));
         }
         // Adjust window size
         let mut window_rect = RECT {
@@ -121,7 +128,7 @@ impl WindowsApplication {
             )
         };
         if hwnd.is_invalid() {
-            return Err(MyErr::WinApp(ErrKnd::Creation, String::from("window")));
+            return Err(MyErr::win(EKnd::Creation, "window"));
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish

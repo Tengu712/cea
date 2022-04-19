@@ -1,7 +1,21 @@
 pub mod winapis;
 
-//use std::collections::HashMap;
-use winapis::{direct3d::*, math::*, winapi::*, *};
+use winapis::{
+    direct3d::{cbuffer::*, model::*, *},
+    math::*,
+    winapi::*,
+    *,
+};
+
+impl MyErr {
+    fn app(errknd: EKnd, message: &str) -> Self {
+        Self {
+            message: String::from(message),
+            kind: errknd_string(errknd),
+            place: String::from("App"),
+        }
+    }
+}
 
 /// A struct for application and resource bank to run the game.
 struct Application {
@@ -56,21 +70,26 @@ impl Application {
     /// **[Side Effect]**
     /// Run the game.
     fn run(self) -> Result<(), MyErr> {
-        let cdata = CData {
-            mat_scl: Matrix4x4::new_scaling(1279.0, 718.0, 1.0),
+        let mut cdata = CData {
+            mat_scl: Matrix4x4::new_scaling(640.0, 640.0, 1.0),
             mat_rtx: Matrix4x4::new_identity(),
             mat_rty: Matrix4x4::new_identity(),
             mat_rtz: Matrix4x4::new_identity(),
             mat_trs: Matrix4x4::new_translation(0.0, 0.0, 0.0),
             mat_view: Matrix4x4::new_identity(),
             mat_proj: Matrix4x4::new_ortho(-640.0, 640.0, 360.0, -360.0, 0.0, 1.0),
-            vec_col: [1.0, 0.0, 0.0, 1.0],
+            vec_col: [1.0; 4],
             vec_prm: [0.0; 4],
         };
+        let image = self
+            .d3dapp
+            .create_image_from_file(r"C:\Users\kazuki\OneDrive\touhou\sozai\th_abp\bg_title.png")?;
         while !self.winapp.do_event() {
             self.d3dapp.set_rtv();
             self.d3dapp.clear_rtv();
-            self.d3dapp.draw_model(&self.idea, &cdata)?;
+            cdata = self.d3dapp.set_d3dimage(Some(&image), cdata);
+            self.d3dapp.set_cdata(&cdata)?;
+            self.d3dapp.draw_model(&self.idea)?;
             self.d3dapp.swap()?;
         }
         Ok(())
@@ -80,12 +99,9 @@ impl Application {
 /// Another entry point that's to return error to main function.
 fn main_with_result() -> Result<(), MyErr> {
     let current_dir = std::env::current_dir()
-        .map_err(|_| MyErr::App(ErrKnd::Get, String::from("current directory")))?
+        .map_err(|_| MyErr::app(EKnd::Get, "current directory"))?
         .to_str()
-        .ok_or(MyErr::App(
-            ErrKnd::Common,
-            String::from("Convertion current directory to str"),
-        ))?
+        .ok_or(MyErr::app(EKnd::Common, "Convertion curdir to str failed"))?
         .to_string()
         + "\\";
     let dir = std::env::args()
@@ -102,8 +118,7 @@ fn main() {
     match main_with_result() {
         Ok(()) => (),
         Err(e) => {
-            let (message, title) = myerr_msg_ttl(e);
-            show_messagebox(message, title);
+            show_messagebox(e.get_message(), e.get_title());
         }
     }
 }
