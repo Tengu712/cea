@@ -15,6 +15,7 @@
 ResultのエラーをStringからユーザー定義に変えようとして、渋々`Box<dyn WError>`を使ったが、`From`トレイトがどうとか言われて面倒になったので、列挙型で定義した。
 
 `*const c_void`へのキャストが`v.as_ptr() as *const _ as *const ::core::ffi::c_void;`なのは見た目がやばい。
+`std::mem::transmute`を使うと綺麗になる。
 
 `std::env`とかがどこからでも呼べるの気持ち悪い。
 

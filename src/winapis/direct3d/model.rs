@@ -34,7 +34,7 @@ impl D3DApplication {
                 StructureByteStride: 0,
             };
             let vbuf_data = D3D11_SUBRESOURCE_DATA {
-                pSysMem: data_vtx as *const _ as *const ::core::ffi::c_void,
+                pSysMem: std::mem::transmute(&data_vtx),
                 SysMemPitch: 0,
                 SysMemSlicePitch: 0,
             };
@@ -52,7 +52,7 @@ impl D3DApplication {
                 StructureByteStride: 0,
             };
             let ibuf_data = D3D11_SUBRESOURCE_DATA {
-                pSysMem: data_idx as *const _ as *const ::core::ffi::c_void,
+                pSysMem: std::mem::transmute(&data_idx),
                 SysMemPitch: 0,
                 SysMemSlicePitch: 0,
             };
