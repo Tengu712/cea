@@ -1,3 +1,4 @@
+use super::{winapi::WindowsApplication, *};
 use std::ops::Mul;
 use windows::{
     core::{IUnknown, Interface},
@@ -15,17 +16,26 @@ use windows::{
     },
 };
 
-/// Struct to reference Direct2D objects.
+impl MyErr {
+    fn d2d(errknd: EKnd, message: &str) -> Self {
+        Self {
+            message: String::from(message),
+            kind: errknd_string(errknd),
+            place: String::from("Direct2D App"),
+        }
+    }
+}
+
 pub struct D2DApplication {
     context: ID2D1DeviceContext,
     swapchain: IDXGISwapChain1,
     dwfactory: IDWriteFactory,
 }
 impl D2DApplication {
-    /// Create D2DApplication struct that is only way to use Direct2D.
-    pub fn new(winapp: &super::winapi::WindowsApplication) -> Result<Self, String> {
+    pub fn new(winapp: &WindowsApplication) -> Result<Self, MyErr> {
         unsafe {
-            CoInitializeEx(std::ptr::null(), COINIT_MULTITHREADED).map_err(|e| e.to_string())?
+            CoInitializeEx(std::ptr::null(), COINIT_MULTITHREADED)
+                .map_err(|_| MyErr::d2d(EKnd::Common, "CoInitializeEx failed"))?
         };
         // Create factory
         let factory: ID2D1Factory1 = unsafe {
@@ -36,8 +46,8 @@ impl D2DApplication {
                 &D2D1_FACTORY_OPTIONS::default(),
                 std::mem::transmute(&mut ppifactory),
             )
-            .map_err(|e| e.to_string() + "\nFailed to create D2D1CreateFactory.")?;
-            ppifactory.ok_or("The Option of D2D1CreateFactry is None.")?
+            .map_err(|_| MyErr::d2d(EKnd::Creation, "factory"))?;
+            ppifactory.ok_or(MyErr::d2d(EKnd::Common, "factory is none"))?
         };
         // Create D3D11Device
         let d3d11device = unsafe {
@@ -54,31 +64,31 @@ impl D2DApplication {
                 std::ptr::null_mut(),
                 &mut None,
             )
-            .map_err(|e| e.to_string() + "\nFailed to create D3D11Device.")?;
-            ppdevice.ok_or("Failed to create D3D11Device.")?
+            .map_err(|_| MyErr::d2d(EKnd::Creation, "D3D11Device"))?;
+            ppdevice.ok_or(MyErr::d2d(EKnd::Common, "Creation D3D11Device failed"))?
         };
         // Create device context
         let context = unsafe {
             let dxdevice = d3d11device
                 .cast::<IDXGIDevice>()
-                .map_err(|e| e.to_string() + "\nFailed to cast D3D11Device to IDXGIDevice.")?;
+                .map_err(|_| MyErr::d2d(EKnd::Common, "Cast D3D11Device to IDXGIDevice failed"))?;
             factory
                 .CreateDevice(dxdevice)
-                .map_err(|e| e.to_string() + "\nFailed to create device ID2D1Device.")?
+                .map_err(|_| MyErr::d2d(EKnd::Creation, "D2D1Device"))?
                 .CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE)
-                .map_err(|e| e.to_string() + "\nFailed to create device context.")?
+                .map_err(|_| MyErr::d2d(EKnd::Creation, "D2D1DeviceContext"))?
         };
         unsafe { context.SetUnitMode(D2D1_UNIT_MODE_DIPS) };
         // Create swapchain
         let swapchain = unsafe {
             let dxdevice = d3d11device
                 .cast::<IDXGIDevice>()
-                .map_err(|e| e.to_string() + "\nFailed to cast D3D11Device to IDXGIDevice.")?;
+                .map_err(|_| MyErr::d2d(EKnd::Common, "Cast D3D11Device to IDXGIDevice failed"))?;
             let dxfactory: IDXGIFactory2 = dxdevice
                 .GetAdapter()
-                .map_err(|e| e.to_string() + "\nFailed to get IDXGIAdapter.")?
+                .map_err(|_| MyErr::d2d(EKnd::Get, "IDXGIAdapter"))?
                 .GetParent()
-                .map_err(|e| e.to_string() + "\nFailed to IDXGIAdapter::GetParent().")?;
+                .map_err(|_| MyErr::d2d(EKnd::Get, "Parent of IDXGIAdapter"))?;
             let pdesc = DXGI_SWAP_CHAIN_DESC1 {
                 Format: DXGI_FORMAT_B8G8R8A8_UNORM,
                 SampleDesc: DXGI_SAMPLE_DESC {
@@ -98,7 +108,7 @@ impl D2DApplication {
                     std::ptr::null(),
                     None,
                 )
-                .map_err(|e| e.to_string() + "\nFailed to create swapchain.")?
+                .map_err(|_| MyErr::d2d(EKnd::Creation, "Swapchain"))?
         };
         // Get dpi
         let mut dpi = 0.0;
@@ -108,7 +118,7 @@ impl D2DApplication {
         let bitmap = unsafe {
             let backbuffer: IDXGISurface = swapchain
                 .GetBuffer(0)
-                .map_err(|e| e.to_string() + "\nFailed to get backbuffer.")?;
+                .map_err(|_| MyErr::d2d(EKnd::Get, "backbuffer"))?;
             let bitmapproperties = D2D1_BITMAP_PROPERTIES1 {
                 pixelFormat: D2D1_PIXEL_FORMAT {
                     format: DXGI_FORMAT_B8G8R8A8_UNORM,
@@ -121,13 +131,13 @@ impl D2DApplication {
             };
             context
                 .CreateBitmapFromDxgiSurface(backbuffer, &bitmapproperties)
-                .map_err(|e| e.to_string() + "\nFailed to create bitmap from dxgisurface.")?
+                .map_err(|_| MyErr::d2d(EKnd::Creation, "DxgiSurface"))?
         };
         unsafe { context.SetTarget(bitmap) };
         // Create DirectWrite Factory
         let p_dwfactory = &unsafe {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory::IID)
-                .map_err(|e| e.to_string() + "\nFailed to create dwrite factory.")?
+                .map_err(|_| MyErr::d2d(EKnd::Creation, "DWrite factory"))?
         } as *const IUnknown as *const IDWriteFactory;
         let dwfactory = unsafe { &*p_dwfactory };
         // Finish

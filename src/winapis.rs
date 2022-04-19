@@ -1,4 +1,3 @@
-//pub mod direct2d;
 pub mod direct3d;
 pub mod image;
 pub mod math;
