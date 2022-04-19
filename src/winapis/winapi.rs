@@ -9,14 +9,12 @@ use windows::{
     },
 };
 
-impl WErr {
-    fn win(errknd: EKnd, message: &str) -> Self {
-        WErr::from(
-            errknd,
-            String::from(message),
-            String::from("Windows Common App"),
-        )
-    }
+fn raise_err(errknd: EKnd, message: &str) -> WErr {
+    WErr::from(
+        errknd,
+        String::from(message),
+        String::from("Windows Common App"),
+    )
 }
 
 /// Show a message box.
@@ -82,7 +80,7 @@ impl WindowsApplication {
         // Get instance handle
         let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
-            return Err(WErr::win(EKnd::Get, "instance handle"));
+            return Err(raise_err(EKnd::Get, "instance handle"));
         }
         // Register window class
         let wcex = WNDCLASSEXW {
@@ -100,7 +98,7 @@ impl WindowsApplication {
             ..Default::default()
         };
         if unsafe { RegisterClassExW(&wcex) == 0 } {
-            return Err(WErr::win(EKnd::Common, "Registration window class failed"));
+            return Err(raise_err(EKnd::Common, "Registration window class failed"));
         }
         // Adjust window size
         let mut window_rect = RECT {
@@ -128,7 +126,7 @@ impl WindowsApplication {
             )
         };
         if hwnd.is_invalid() {
-            return Err(WErr::win(EKnd::Creation, "window"));
+            return Err(raise_err(EKnd::Creation, "window"));
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish

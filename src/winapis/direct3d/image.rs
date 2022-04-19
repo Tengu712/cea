@@ -29,13 +29,13 @@ impl D3DApplication {
             };
             self.device
                 .CreateTexture2D(&tex_desc, std::ptr::null())
-                .map_err(|_| WErr::d3d_arg(EKnd::Creation, path, "Image texture"))?
+                .map_err(|_| raise_err_arg(EKnd::Creation, path, "Image texture"))?
         };
         unsafe {
             let mappd_sres = self
                 .context
                 .Map(&texture, 0, D3D11_MAP_WRITE_DISCARD, 0)
-                .map_err(|_| WErr::d3d_arg(EKnd::Common, path, "Map texture"))?;
+                .map_err(|_| raise_err_arg(EKnd::Common, path, "Map texture"))?;
             img_cnvtr
                 .converter
                 .CopyPixels(
@@ -44,7 +44,7 @@ impl D3DApplication {
                     img_cnvtr.width * img_cnvtr.height * 4,
                     mappd_sres.pData as *mut u8,
                 )
-                .map_err(|_| WErr::d3d_arg(EKnd::Common, path, "Copy pixels"))?;
+                .map_err(|_| raise_err_arg(EKnd::Common, path, "Copy pixels"))?;
             self.context.Unmap(&texture, 0);
         };
         let srv_img = unsafe {
@@ -60,7 +60,7 @@ impl D3DApplication {
             };
             self.device
                 .CreateShaderResourceView(&texture, &srv_desc)
-                .map_err(|_| WErr::d3d_arg(EKnd::Creation, path, "ShaderResourceView"))?
+                .map_err(|_| raise_err_arg(EKnd::Creation, path, "ShaderResourceView"))?
         };
         Ok(D3DImage {
             srv_img: Some(srv_img),

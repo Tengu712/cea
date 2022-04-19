@@ -7,10 +7,8 @@ use super::winapis::{
     *,
 };
 
-impl WErr {
-    fn app(errknd: EKnd, message: &str) -> Self {
-        WErr::from(errknd, String::from(message), String::from("App"))
-    }
+fn raise_err(errknd: EKnd, message: &str) -> WErr {
+    WErr::from(errknd, String::from(message), String::from("App"))
 }
 
 /// Start application.
@@ -42,9 +40,9 @@ pub fn start_app() -> Result<(), WErr> {
 /// Get current directory for WindowsApplication.
 fn get_curdir_for_winapp() -> Result<String, WErr> {
     let cur_dir = std::env::current_dir()
-        .map_err(|_| WErr::app(EKnd::Get, "current directory"))?
+        .map_err(|_| raise_err(EKnd::Get, "current directory"))?
         .to_str()
-        .ok_or(WErr::app(EKnd::Common, "Convertion curdir to str failed"))?
+        .ok_or(raise_err(EKnd::Common, "Convertion curdir to str failed"))?
         .to_string()
         + "\\";
     let dir = std::env::args()

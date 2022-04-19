@@ -14,27 +14,27 @@ impl ShaderComs {
         // Open vshader.cso here for input layout creation
         let mut vshader_bytebuf = Vec::new();
         File::open(dir.clone() + "vshader.cso")
-            .map_err(|_| WErr::d3d(EKnd::Io, "Open vshader.cso failed"))?
+            .map_err(|_| raise_err(EKnd::Io, "Open vshader.cso failed"))?
             .read_to_end(&mut vshader_bytebuf)
-            .map_err(|_| WErr::d3d(EKnd::Io, "Read vshader.cso failed"))?;
+            .map_err(|_| raise_err(EKnd::Io, "Read vshader.cso failed"))?;
         let vshader_bytecode = vshader_bytebuf.as_ptr() as *const _ as *const ::core::ffi::c_void;
         // Vertex shader
         let vshader = unsafe {
             device
                 .CreateVertexShader(vshader_bytecode, vshader_bytebuf.len(), None)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "vshader"))?
+                .map_err(|_| raise_err(EKnd::Creation, "vshader"))?
         };
         // Pixel shader
         let pshader = unsafe {
             let mut buf = Vec::new();
             File::open(dir.clone() + "pshader.cso")
-                .map_err(|_| WErr::d3d(EKnd::Io, "Open pshader.cso failed"))?
+                .map_err(|_| raise_err(EKnd::Io, "Open pshader.cso failed"))?
                 .read_to_end(&mut buf)
-                .map_err(|_| WErr::d3d(EKnd::Io, "Read pshader.cso failed"))?;
+                .map_err(|_| raise_err(EKnd::Io, "Read pshader.cso failed"))?;
             let bytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
             device
                 .CreatePixelShader(bytecode, buf.len(), None)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "pshader"))?
+                .map_err(|_| raise_err(EKnd::Creation, "pshader"))?
         };
         // Input layout
         let ilayout = unsafe {
@@ -74,7 +74,7 @@ impl ShaderComs {
                     vshader_bytecode,
                     vshader_bytebuf.len(),
                 )
-                .map_err(|_| WErr::d3d(EKnd::Creation, "InputLayout"))?
+                .map_err(|_| raise_err(EKnd::Creation, "InputLayout"))?
         };
         // Constant buffer
         let cbuffer = unsafe {
@@ -88,7 +88,7 @@ impl ShaderComs {
             };
             device
                 .CreateBuffer(&cbuf_desc, std::ptr::null())
-                .map_err(|_| WErr::d3d(EKnd::Creation, "Cbuffer"))?
+                .map_err(|_| raise_err(EKnd::Creation, "Cbuffer"))?
         };
         Ok(Self {
             vshader,

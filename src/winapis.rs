@@ -9,13 +9,6 @@ pub struct WErr {
     pub place: String,
 }
 impl WErr {
-    pub fn new(&self) -> Self {
-        Self {
-            kind: String::default(),
-            message: String::default(),
-            place: String::default(),
-        }
-    }
     pub fn from(errknd: EKnd, message: String, place: String) -> Self {
         Self {
             kind: errknd_string(errknd),

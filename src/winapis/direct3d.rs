@@ -17,17 +17,15 @@ use windows::{
     },
 };
 
-impl WErr {
-    fn d3d(errknd: EKnd, message: &str) -> Self {
-        WErr::from(errknd, String::from(message), String::from("Direct3D App"))
-    }
-    fn d3d_arg(errknd: EKnd, arg: &str, message: &str) -> Self {
-        WErr::from(
-            errknd,
-            String::from(arg) + " : " + message,
-            String::from("Direct3D App"),
-        )
-    }
+pub fn raise_err(errknd: EKnd, message: &str) -> WErr {
+    WErr::from(errknd, String::from(message), String::from("Direct3D App"))
+}
+pub fn raise_err_arg(errknd: EKnd, arg: &str, message: &str) -> WErr {
+    WErr::from(
+        errknd,
+        String::from(arg) + " : " + message,
+        String::from("Direct3D App"),
+    )
 }
 
 pub struct D3DApplication {
@@ -46,7 +44,7 @@ impl D3DApplication {
         // Create factory
         let factory = unsafe {
             CreateDXGIFactory::<IDXGIFactory>()
-                .map_err(|_| WErr::d3d(EKnd::Creation, "DXGIFactory"))?
+                .map_err(|_| raise_err(EKnd::Creation, "DXGIFactory"))?
         };
         // Create device
         let (device, context) = unsafe {
@@ -64,10 +62,10 @@ impl D3DApplication {
                 std::ptr::null_mut(),
                 &mut ppimmediatecontext,
             )
-            .map_err(|_| WErr::d3d(EKnd::Common, "D3D11CreateDevice failed"))?;
+            .map_err(|_| raise_err(EKnd::Common, "D3D11CreateDevice failed"))?;
             (
-                ppdevice.ok_or(WErr::d3d(EKnd::Creation, "D3D11Device"))?,
-                ppimmediatecontext.ok_or(WErr::d3d(EKnd::Creation, "D3D11DeviceContext"))?,
+                ppdevice.ok_or(raise_err(EKnd::Creation, "D3D11Device"))?,
+                ppimmediatecontext.ok_or(raise_err(EKnd::Creation, "D3D11DeviceContext"))?,
             )
         };
         // Create swapchain
@@ -98,16 +96,16 @@ impl D3DApplication {
             };
             factory
                 .CreateSwapChain(&device, &pdesc)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "SwapChain"))?
+                .map_err(|_| raise_err(EKnd::Creation, "SwapChain"))?
         };
         // Create back buffer rtv
         let rtv_bbuf = unsafe {
             let bbuf = swapchain
                 .GetBuffer::<ID3D11Texture2D>(0)
-                .map_err(|_| WErr::d3d(EKnd::Get, "RTV of backbuffer"))?;
+                .map_err(|_| raise_err(EKnd::Get, "RTV of backbuffer"))?;
             device
                 .CreateRenderTargetView(bbuf, std::ptr::null())
-                .map_err(|_| WErr::d3d(EKnd::Creation, "RTV of backbuffer"))?
+                .map_err(|_| raise_err(EKnd::Creation, "RTV of backbuffer"))?
         };
         // Create shaders
         let shader_coms = shader::ShaderComs::new(&device, winapp.get_cur_dir())?;
@@ -142,7 +140,7 @@ impl D3DApplication {
         let blend_state = unsafe {
             device
                 .CreateBlendState(&blend_desc)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "BlendState"))?
+                .map_err(|_| raise_err(EKnd::Creation, "BlendState"))?
         };
         unsafe { context.OMSetBlendState(blend_state, [1.0, 1.0, 1.0, 1.0].as_ptr(), 0xffffffff) };
         unsafe { context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) };
@@ -174,7 +172,7 @@ impl D3DApplication {
         unsafe {
             self.swapchain
                 .Present(1, 0)
-                .map_err(|_| WErr::d3d(EKnd::Runtime, "Backbuffer swap failed"))
+                .map_err(|_| raise_err(EKnd::Runtime, "Backbuffer swap failed"))
         }
     }
 }

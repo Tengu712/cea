@@ -20,7 +20,7 @@ impl D3DApplication {
             self.context.UpdateSubresource(
                 self.cbuffer
                     .as_ref()
-                    .ok_or(WErr::d3d(EKnd::Runtime, "Cbuffer is None"))?,
+                    .ok_or(raise_err(EKnd::Runtime, "Cbuffer is None"))?,
                 0,
                 std::ptr::null(),
                 cdata as *const _ as *const ::core::ffi::c_void,

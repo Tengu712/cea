@@ -40,7 +40,7 @@ impl D3DApplication {
             };
             self.device
                 .CreateBuffer(&vbuf_desc, &vbuf_data)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "Model vbuffer"))?
+                .map_err(|_| raise_err(EKnd::Creation, "Model vbuffer"))?
         };
         let ibuf = unsafe {
             let ibuf_desc = D3D11_BUFFER_DESC {
@@ -58,7 +58,7 @@ impl D3DApplication {
             };
             self.device
                 .CreateBuffer(&ibuf_desc, &ibuf_data)
-                .map_err(|_| WErr::d3d(EKnd::Creation, "Model ibuffer"))?
+                .map_err(|_| raise_err(EKnd::Creation, "Model ibuffer"))?
         };
         Ok(ModelBuffer {
             num_idx,
