@@ -1,7 +1,7 @@
 pub mod winapis;
 
 use winapis::{
-    direct3d::{cbuffer::*, model::*, *},
+    direct3d::{cbuffer::*, model::*, text::*, *},
     math::*,
     winapi::*,
     *,
@@ -21,6 +21,7 @@ impl MyErr {
 struct Application {
     winapp: WindowsApplication,
     d3dapp: D3DApplication,
+    d3dtxt: D3DTextModule,
     idea: ModelBuffer,
 }
 
@@ -35,6 +36,7 @@ impl Application {
             ask_yesno("Start with a fullscreen window?", "question"),
         )?;
         let d3dapp = D3DApplication::new(&winapp, 1280, 720)?;
+        let d3dtxt = d3dapp.create_text_module(&winapp)?;
         let idea = {
             let data_vtx = [
                 Vertex {
@@ -64,6 +66,7 @@ impl Application {
         Ok(Self {
             winapp,
             d3dapp,
+            d3dtxt,
             idea,
         })
     }
@@ -84,12 +87,21 @@ impl Application {
         let image = self
             .d3dapp
             .create_image_from_file(r"C:\Users\kazuki\OneDrive\touhou\sozai\th_abp\bg_title.png")?;
+        let text_desc = DrawingTextDesc {
+            text: String::from("秘封俱楽部"),
+            font: String::from("メイリオ"),
+            size: 64.0,
+            rect: [0.0, 1280.0, 0.0, 720.0],
+            rgba: [1.0; 4],
+            align: TextAlign::Left,
+        };
         while !self.winapp.do_event() {
             self.d3dapp.set_rtv();
             self.d3dapp.clear_rtv();
             cdata = self.d3dapp.set_d3dimage(Some(&image), cdata);
             self.d3dapp.set_cdata(&cdata)?;
             self.d3dapp.draw_model(&self.idea)?;
+            self.d3dtxt.draw_text(&text_desc)?;
             self.d3dapp.swap()?;
         }
         Ok(())

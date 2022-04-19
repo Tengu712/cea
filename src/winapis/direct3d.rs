@@ -1,4 +1,5 @@
 pub mod cbuffer;
+pub mod text;
 pub mod image;
 pub mod model;
 pub mod shader;
