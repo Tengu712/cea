@@ -8,6 +8,7 @@ use windows::{
     },
 };
 
+#[derive(Clone, Copy)]
 pub enum TextAlign {
     Left,
     Center,
@@ -21,23 +22,6 @@ pub struct TextDesc {
     pub rgba: [f32; 4],
     pub align: TextAlign,
 }
-pub trait TextDescImpl<T> {
-    fn set_text(self, text: T) -> Self;
-}
-impl TextDescImpl<String> for TextDesc {
-    fn set_text(self, text: String) -> Self {
-        let mut self_mut = self;
-        self_mut.text = text;
-        self_mut
-    }
-}
-impl TextDescImpl<&str> for TextDesc {
-    fn set_text(self, text: &str) -> Self {
-        let mut self_mut = self;
-        self_mut.text = String::from(text);
-        self_mut
-    }
-}
 impl TextDesc {
     pub fn new() -> Self {
         Self {
@@ -46,6 +30,11 @@ impl TextDesc {
             rgba: [1.0; 4],
             align: TextAlign::Left,
         }
+    }
+    pub fn set_text<T: std::string::ToString>(self, text: T) -> Self {
+        let mut self_mut = self;
+        self_mut.text = text.to_string();
+        self_mut
     }
     pub fn set_rect(self, rect: [f32; 4]) -> Self {
         let mut self_mut = self;

@@ -4,7 +4,7 @@ pub mod gameapis;
 pub mod winapis;
 
 use gameapis::{
-    request::{CDataDiff, Request},
+    request::{cdata::CDataDiff, Request},
     Game,
 };
 use winapis::{
@@ -13,6 +13,7 @@ use winapis::{
         model::{ModelBuffer, Vertex},
         D3DApplication,
     },
+    directwrite::text::TextDesc,
     math::Matrix4x4,
     winapi::*,
     *,
@@ -43,7 +44,8 @@ pub fn start_app() -> Result<(), WErr> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
-    //let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf");
+    let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
+    let format_dialogue = dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?;
     // Run the app
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
@@ -63,8 +65,14 @@ pub fn start_app() -> Result<(), WErr> {
                     d3dapp.set_cdata(&cdata)?;
                 }
                 Request::DrawImage => d3dapp.draw_model(&idea)?,
-                Request::DrawText => (),
-                //dwapp.draw_text(),
+                Request::DrawText(n) => {
+                    let desc = TextDesc::new()
+                        .set_text(String::from_utf8_lossy(&n.text))
+                        .set_rect(n.rect)
+                        .set_rgba(n.rgba)
+                        .set_align(n.align);
+                    dwapp.draw_text(&desc, &format_dialogue)?;
+                }
             }
         }
         game = next;
@@ -123,7 +131,7 @@ fn create_default_cdata() -> CData {
         mat_rtz: Matrix4x4::new_identity(),
         mat_trs: Matrix4x4::new_identity(),
         mat_view: Matrix4x4::new_identity(),
-        mat_proj: Matrix4x4::new_ortho(0.0, WIDTH as f32, 0.0, HEIGHT as f32, 0.0, 100.0),
+        mat_proj: Matrix4x4::new_ortho(0.0, WIDTH as f32, HEIGHT as f32, 0.0, 0.0, 1.0),
         vec_col: [1.0; 4],
         vec_prm: [0.0; 4],
     }

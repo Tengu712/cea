@@ -1,23 +1,20 @@
 /// [essential]
 /// This defines CDataDiff struct.
-mod cdata;
+pub mod cdata;
 /// [essential]
 /// This defines ImgID enum that's a kind of resource identifier.
-mod imgid;
+pub mod imgid;
 /// [essential]
 /// This defines Text struct.
-mod text;
-
-use cdata::CDataDiff;
-use imgid::ImgID;
+pub mod text;
 
 #[derive(Clone, Copy)]
 pub enum Request {
     NoRequest,
-    SetImage(ImgID),
-    SetCData(CDataDiff),
+    SetImage(imgid::ImgID),
+    SetCData(cdata::CDataDiff),
     DrawImage,
-    DrawText,
+    DrawText(text::TextDesc),
 }
 pub trait PackingRequest {
     fn pack(self) -> Request;
