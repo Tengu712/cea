@@ -3,7 +3,10 @@ pub mod gameapis;
 /// This provides apis to call WindowsAPI.
 pub mod winapis;
 
-use gameapis::Game;
+use gameapis::{
+    request::{CDataDiff, Request},
+    Game,
+};
 use winapis::{
     direct3d::{
         cbuffer::CData,
@@ -40,16 +43,31 @@ pub fn start_app() -> Result<(), WErr> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
-    let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf");
+    //let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf");
     // Run the app
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
     let mut game = Game::new();
-    d3dapp.set_cdata(&cdata);
+    d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        game = game.update();
+        let (next, reqs) = game.update();
+        let reqs_array = reqs.get_array();
+        for i in reqs_array {
+            match i {
+                Request::NoRequest => (),
+                Request::SetImage(_) => cdata = d3dapp.set_d3dimage(None, cdata),
+                Request::SetCData(n) => {
+                    cdata = apply_cdata_diff(cdata, n);
+                    d3dapp.set_cdata(&cdata)?;
+                }
+                Request::DrawImage => d3dapp.draw_model(&idea)?,
+                Request::DrawText => (),
+                //dwapp.draw_text(),
+            }
+        }
+        game = next;
         d3dapp.swap()?;
     }
     Ok(())
@@ -109,4 +127,24 @@ fn create_default_cdata() -> CData {
         vec_col: [1.0; 4],
         vec_prm: [0.0; 4],
     }
+}
+/// Apply constant buffer difference request to cdata.
+fn apply_cdata_diff(cdata: CData, cdata_diff: CDataDiff) -> CData {
+    let mut cdata_mut = cdata;
+    if let Some(n) = cdata_diff.scl_xy {
+        cdata_mut.mat_scl = Matrix4x4::new_scaling(n[0], n[1], 1.0);
+    }
+    if let Some(n) = cdata_diff.rot_xyz {
+        cdata_mut.mat_rtx = Matrix4x4::new_rotation_x(n[0]);
+        cdata_mut.mat_rtx = Matrix4x4::new_rotation_y(n[1]);
+        cdata_mut.mat_rtx = Matrix4x4::new_rotation_z(n[2]);
+    }
+    if let Some(n) = cdata_diff.trs_xy {
+        cdata_mut.mat_trs = Matrix4x4::new_scaling(n[0], n[1], 0.0);
+    }
+    if let Some(_) = cdata_diff.view_xy {}
+    if let Some(n) = cdata_diff.col_rgba {
+        cdata_mut.vec_col = n;
+    }
+    cdata_mut
 }

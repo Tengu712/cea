@@ -1,5 +1,6 @@
 pub mod request;
 pub mod resource;
+pub mod scene;
 
 pub struct Game {}
 impl Game {
@@ -7,6 +8,6 @@ impl Game {
         Self {}
     }
     pub fn update(self) -> (Self, request::Requests) {
-        (Self {}, 
+        (Self {}, request::Requests::new())
     }
 }
