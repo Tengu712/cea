@@ -1,6 +1,6 @@
-/// A module for registration font.
+/// This enables to use custom font.
 pub mod font;
-/// A module for drawing text.
+/// This enables to draw text on screen.
 pub mod text;
 
 use super::*;

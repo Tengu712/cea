@@ -1,4 +1,5 @@
 pub mod gameapis;
+/// This provides apis to call WindowsAPI.
 pub mod winapis;
 
 use gameapis::Game;
