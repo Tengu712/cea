@@ -1,4 +1,5 @@
 pub mod direct3d;
+pub mod directwrite;
 pub mod image;
 pub mod math;
 pub mod winapi;

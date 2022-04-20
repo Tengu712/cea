@@ -1,8 +1,8 @@
 pub mod cbuffer;
+pub mod dwd3d;
 pub mod image;
 pub mod model;
 pub mod shader;
-pub mod text;
 
 use super::*;
 use windows::{

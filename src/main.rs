@@ -2,11 +2,7 @@ pub mod gameapis;
 pub mod winapis;
 
 use gameapis::Game;
-use winapis::{
-    direct3d::{text::*, D3DApplication},
-    winapi::*,
-    *,
-};
+use winapis::{direct3d::D3DApplication, directwrite::text::*, winapi::*, *};
 
 /// Entory point.
 fn main() {
@@ -30,17 +26,16 @@ pub fn start_app() -> Result<(), WErr> {
     )?;
     // Create drawing app
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
-    let d3dtxt = d3dapp.create_text_module(&winapp)?;
+    let dwapp = d3dapp.create_text_module(&winapp)?;
     //
-    d3dtxt.register_custom_font(cur_dir + "SourceHanSerif-Heavy.otf")?;
-    let text = DrawingTextDesc::new()
-        .set_text("コンピュータの世界が");
-    let format = d3dtxt.create_text_format("さつき源代明朝", 64.0)?;
+    dwapp.register_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
+    let text = TextDesc::new().set_text("コンピュータの世界が");
+    let format = dwapp.create_text_format("衡山毛筆フォント行書", 64.0)?;
     // Run the app
     while !winapp.do_event() {
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        d3dtxt.draw_text(&text, &format)?;
+        dwapp.draw_text(&text, &format)?;
         d3dapp.swap()?;
     }
     Ok(())

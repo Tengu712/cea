@@ -1,0 +1,48 @@
+/// A module for registration font.
+pub mod font;
+/// A module for drawing text.
+pub mod text;
+
+use super::*;
+use windows::{
+    core::PCWSTR,
+    Foundation::Numerics::*,
+    Win32::Graphics::{
+        Direct2D::{Common::*, *},
+        DirectWrite::*,
+    },
+};
+
+pub fn raise_err(errknd: EKnd, message: &str) -> WErr {
+    WErr::from(
+        errknd,
+        String::from(message),
+        String::from("DirectWrite App"),
+    )
+}
+pub fn raise_err_arg(errknd: EKnd, arg: &String, message: &str) -> WErr {
+    WErr::from(
+        errknd,
+        arg.clone() + " : " + message,
+        String::from("DirectWrite App"),
+    )
+}
+
+pub struct DWriteApp {
+    d2context: ID2D1DeviceContext,
+    dwfactory: IDWriteFactory5,
+    bitmap: ID2D1Bitmap1,
+}
+impl DWriteApp {
+    pub fn from(
+        d2context: ID2D1DeviceContext,
+        dwfactory: IDWriteFactory5,
+        bitmap: ID2D1Bitmap1,
+    ) -> Self {
+        Self {
+            d2context,
+            dwfactory,
+            bitmap,
+        }
+    }
+}
