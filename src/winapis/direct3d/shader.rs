@@ -17,7 +17,7 @@ impl ShaderComs {
             .map_err(|_| raise_err(EKnd::Io, "Open vshader.cso failed"))?
             .read_to_end(&mut vshader_bytebuf)
             .map_err(|_| raise_err(EKnd::Io, "Read vshader.cso failed"))?;
-        let vshader_bytecode = unsafe { std::mem::transmute(vshader_bytebuf.as_ptr()) };
+        let vshader_bytecode = vshader_bytebuf.as_ptr() as *const _ as *const ::core::ffi::c_void;
         // Vertex shader
         let vshader = unsafe {
             device
@@ -31,7 +31,7 @@ impl ShaderComs {
                 .map_err(|_| raise_err(EKnd::Io, "Open pshader.cso failed"))?
                 .read_to_end(&mut buf)
                 .map_err(|_| raise_err(EKnd::Io, "Read pshader.cso failed"))?;
-            let bytecode = std::mem::transmute(buf.as_ptr());
+            let bytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
             device
                 .CreatePixelShader(bytecode, buf.len(), None)
                 .map_err(|_| raise_err(EKnd::Creation, "pshader"))?
