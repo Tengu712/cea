@@ -29,9 +29,9 @@ pub fn start_app() -> Result<(), WErr> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     //
-    dwapp.register_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
+    let collection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
     let text = TextDesc::new().set_text("コンピュータの世界が");
-    let format = dwapp.create_text_format("衡山毛筆フォント行書", 64.0)?;
+    let format = dwapp.create_text_format("さつき源代明朝", collection, 64.0)?;
     // Run the app
     while !winapp.do_event() {
         d3dapp.set_rtv();

@@ -1,4 +1,12 @@
 use super::*;
+use windows::{
+    core::PCWSTR,
+    Foundation::Numerics::*,
+    Win32::Graphics::{
+        Direct2D::{Common::*, *},
+        DirectWrite::*,
+    },
+};
 
 pub enum TextAlign {
     Left,
@@ -58,11 +66,7 @@ impl TextDesc {
 
 impl DWriteApp {
     /// Draw text. To call it, user give it DrawTextDesc struct.
-    pub fn draw_text(
-        &self,
-        desc: &TextDesc,
-        format: &IDWriteTextFormat,
-    ) -> Result<(), WErr> {
+    pub fn draw_text(&self, desc: &TextDesc, format: &IDWriteTextFormat) -> Result<(), WErr> {
         let alignment = match desc.align {
             TextAlign::Left => DWRITE_TEXT_ALIGNMENT_LEADING,
             TextAlign::Center => DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -113,20 +117,27 @@ impl DWriteApp {
         };
         Ok(())
     }
-    /// Create text format.
-    pub fn create_text_format(&self, font: &str, size: f32) -> Result<IDWriteTextFormat, WErr> {
+    /// Create text format. If no custom font, fontcollection must be None.
+    pub fn create_text_format<'a, T>(
+        &self,
+        font: &str,
+        fontcollection: T,
+        size: f32,
+    ) -> Result<IDWriteTextFormat, WErr>
+    where
+        T: ::windows::core::IntoParam<'a, IDWriteFontCollection>,
+    {
         unsafe {
-            self.dwfactory
-                .CreateTextFormat(
-                    PCWSTR(font.encode_utf16().collect::<Vec<u16>>().as_ptr()),
-                    None,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    DWRITE_FONT_STYLE_NORMAL,
-                    DWRITE_FONT_STRETCH_NORMAL,
-                    size * 72.0 / 96.0,
-                    PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
-                )
-                .map_err(|_| raise_err(EKnd::Runtime, "Creation text format failed"))
+            self.dwfactory.CreateTextFormat(
+                PCWSTR(font.encode_utf16().collect::<Vec<u16>>().as_ptr()),
+                fontcollection,
+                DWRITE_FONT_WEIGHT_NORMAL,
+                DWRITE_FONT_STYLE_NORMAL,
+                DWRITE_FONT_STRETCH_NORMAL,
+                size * 72.0 / 96.0,
+                PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
+            )
         }
+        .map_err(|_| raise_err(EKnd::Runtime, "Creation text format failed"))
     }
 }

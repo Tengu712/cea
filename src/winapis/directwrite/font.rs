@@ -1,8 +1,8 @@
 use super::*;
 
 impl DWriteApp {
-    /// Register custom font.
-    pub fn register_custom_font(&self, path: String) -> Result<(), WErr> {
+    /// Create font collection for custom font.
+    pub fn create_custom_font(&self, path: String) -> Result<IDWriteFontCollection1, WErr> {
         let font_file = unsafe {
             self.dwfactory
                 .CreateFontFileReference(path.clone(), std::ptr::null())
@@ -28,14 +28,6 @@ impl DWriteApp {
                 .CreateFontCollectionFromFontSet(font_set)
                 .map_err(|_| raise_err_arg(EKnd::Creation, &path, "FontCollection"))?
         };
-        /*
-        unsafe {
-            self.dwfactory
-                .RegisterFontCollectionLoader(font_collection)
-                .map_err(|_| {
-                    raise_err_arg(EKnd::Common, &path, "Registration font collection failed")
-                })?
-        };*/
-        Ok(())
+        Ok(font_collection)
     }
 }

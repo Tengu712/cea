@@ -4,14 +4,7 @@ pub mod font;
 pub mod text;
 
 use super::*;
-use windows::{
-    core::PCWSTR,
-    Foundation::Numerics::*,
-    Win32::Graphics::{
-        Direct2D::{Common::*, *},
-        DirectWrite::*,
-    },
-};
+use windows::Win32::Graphics::{Direct2D::*, DirectWrite::*};
 
 pub fn raise_err(errknd: EKnd, message: &str) -> WErr {
     WErr::from(
