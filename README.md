@@ -42,3 +42,5 @@ swapchain.GetBuffer(0)
 // 正
 swapchain.GetBuffer::<ID3D11Texture2D>(0)
 ```
+
+`CreateFontSetBuilder2`メソッドで`IDWriteFontSetBuilder1`が作られるのは名前の付け方が酷い。

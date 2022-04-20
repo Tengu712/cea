@@ -21,25 +21,17 @@ pub enum TextAlign {
 /// Use it when drawing text.
 pub struct DrawingTextDesc {
     pub text: String,
-    pub font: String,
-    pub size: f32,
     pub rect: [f32; 4],
     pub rgba: [f32; 4],
     pub align: TextAlign,
 }
 pub trait DrawingTextDescImpl<T> {
     fn set_text(self, text: T) -> Self;
-    fn set_font(self, text: T) -> Self;
 }
 impl DrawingTextDescImpl<String> for DrawingTextDesc {
     fn set_text(self, text: String) -> Self {
         let mut self_mut = self;
         self_mut.text = text;
-        self_mut
-    }
-    fn set_font(self, font: String) -> Self {
-        let mut self_mut = self;
-        self_mut.font = font;
         self_mut
     }
 }
@@ -49,27 +41,15 @@ impl DrawingTextDescImpl<&str> for DrawingTextDesc {
         self_mut.text = String::from(text);
         self_mut
     }
-    fn set_font(self, font: &str) -> Self {
-        let mut self_mut = self;
-        self_mut.font = String::from(font);
-        self_mut
-    }
 }
 impl DrawingTextDesc {
     pub fn new() -> Self {
         Self {
             text: String::default(),
-            font: String::from("メイリオ"),
-            size: 64.0,
             rect: [0.0, 1280.0, 0.0, 720.0],
             rgba: [1.0; 4],
             align: TextAlign::Left,
         }
-    }
-    pub fn set_size(self, size: f32) -> Self {
-        let mut self_mut = self;
-        self_mut.size = size;
-        self_mut
     }
     pub fn set_rect(self, rect: [f32; 4]) -> Self {
         let mut self_mut = self;
@@ -92,24 +72,16 @@ impl DrawingTextDesc {
 /// It's created by D3DApplication.create_text_module method.
 pub struct D3DTextModule {
     d2context: ID2D1DeviceContext,
-    dwfactory: IDWriteFactory,
+    dwfactory: IDWriteFactory5,
     bitmap: ID2D1Bitmap1,
 }
 impl D3DTextModule {
-    pub fn draw_text(&self, desc: &DrawingTextDesc) -> Result<(), WErr> {
-        let format = unsafe {
-            self.dwfactory
-                .CreateTextFormat(
-                    PCWSTR(desc.font.encode_utf16().collect::<Vec<u16>>().as_ptr()),
-                    None,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    DWRITE_FONT_STYLE_NORMAL,
-                    DWRITE_FONT_STRETCH_NORMAL,
-                    desc.size * 72.0 / 96.0,
-                    PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
-                )
-                .map_err(|_| raise_err(EKnd::Runtime, "Creation text format failed"))?
-        };
+    /// Draw text. To call it, user give it DrawTextDesc struct.
+    pub fn draw_text(
+        &self,
+        desc: &DrawingTextDesc,
+        format: &IDWriteTextFormat,
+    ) -> Result<(), WErr> {
         let alignment = match desc.align {
             TextAlign::Left => DWRITE_TEXT_ALIGNMENT_LEADING,
             TextAlign::Center => DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -148,7 +120,7 @@ impl D3DTextModule {
             self.d2context.DrawText(
                 PCWSTR(v_text.as_ptr()),
                 v_text.len() as u32,
-                &format,
+                format,
                 &layoutrect,
                 &brush,
                 D2D1_DRAW_TEXT_OPTIONS_NONE,
@@ -157,6 +129,51 @@ impl D3DTextModule {
             self.d2context
                 .EndDraw(std::ptr::null_mut(), std::ptr::null_mut())
                 .map_err(|e| raise_err(EKnd::Runtime, e.to_string().as_str()))?;
+        };
+        Ok(())
+    }
+    /// Create text format.
+    pub fn create_text_format(&self, font: &str, size: f32) -> Result<IDWriteTextFormat, WErr> {
+        unsafe {
+            self.dwfactory
+                .CreateTextFormat(
+                    PCWSTR(font.encode_utf16().collect::<Vec<u16>>().as_ptr()),
+                    None,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    DWRITE_FONT_STYLE_NORMAL,
+                    DWRITE_FONT_STRETCH_NORMAL,
+                    size * 72.0 / 96.0,
+                    PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
+                )
+                .map_err(|_| raise_err(EKnd::Runtime, "Creation text format failed"))
+        }
+    }
+    /// Register custom font.
+    pub fn register_custom_font(&self, path: String) -> Result<(), WErr> {
+        let font_file = unsafe {
+            self.dwfactory
+                .CreateFontFileReference(path.clone(), std::ptr::null())
+                .map_err(|_| raise_err_arg(EKnd::Creation, &path, "FontFile"))?
+        };
+        let font_set_builder = unsafe {
+            self.dwfactory
+                .CreateFontSetBuilder2()
+                .map_err(|_| raise_err_arg(EKnd::Creation, &path, "FontSetBuilder"))?
+        };
+        unsafe {
+            font_set_builder
+                .AddFontFile(font_file)
+                .map_err(|_| raise_err_arg(EKnd::Common, &path, "add font file"))?
+        };
+        let font_set = unsafe {
+            font_set_builder
+                .CreateFontSet()
+                .map_err(|_| raise_err_arg(EKnd::Creation, &path, "FontSet"))?
+        };
+        let font_collection = unsafe {
+            self.dwfactory
+                .CreateFontCollectionFromFontSet(font_set)
+                .map_err(|_| raise_err_arg(EKnd::Creation, &path, "FontCollection"))?
         };
         Ok(())
     }
@@ -212,10 +229,10 @@ impl D3DApplication {
         };
         // Create dwfactory
         let dwfactory = unsafe {
-            DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory::IID)
+            DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory5::IID)
                 .map_err(|_| raise_err(EKnd::Creation, "DWrite factory"))?
         };
-        let dwfactory = unsafe { std::mem::transmute(dwfactory) };
+        let dwfactory: IDWriteFactory5 = unsafe { std::mem::transmute(dwfactory) };
         // Finish
         Ok(D3DTextModule {
             d2context,

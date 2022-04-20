@@ -7,10 +7,10 @@ use windows::Win32::{
     },
 };
 
-fn raise_err(errknd: EKnd, arg: &str, message: &str) -> WErr {
+fn raise_err(errknd: EKnd, arg: &String, message: &str) -> WErr {
     WErr::from(
         errknd,
-        String::from(arg) + " : " + message,
+        arg.clone() + " : " + message,
         String::from("Windows Imaging Component"),
     )
 }
@@ -22,30 +22,30 @@ pub struct ImageConverter {
     pub height: u32,
 }
 impl ImageConverter {
-    pub fn from_file(path: &str) -> Result<Self, WErr> {
+    pub fn from_file(path: String) -> Result<Self, WErr> {
         let factory: IWICImagingFactory = unsafe {
             CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_SERVER)
-                .map_err(|_| raise_err(EKnd::Creation, path, "WICfactory"))?
+                .map_err(|_| raise_err(EKnd::Creation, &path, "WICfactory"))?
         };
         let decoder = unsafe {
             factory
                 .CreateDecoderFromFilename(
-                    path,
+                    path.clone(),
                     std::ptr::null(),
                     GENERIC_READ,
                     WICDecodeMetadataCacheOnLoad,
                 )
-                .map_err(|_| raise_err(EKnd::Creation, path, "Decoder"))?
+                .map_err(|_| raise_err(EKnd::Creation, &path, "Decoder"))?
         };
         let frame = unsafe {
             decoder
                 .GetFrame(0)
-                .map_err(|_| raise_err(EKnd::Get, path, "Frame"))?
+                .map_err(|_| raise_err(EKnd::Get, &path, "Frame"))?
         };
         let converter = unsafe {
             factory
                 .CreateFormatConverter()
-                .map_err(|_| raise_err(EKnd::Creation, path, "Format converter"))?
+                .map_err(|_| raise_err(EKnd::Creation, &path, "Format converter"))?
         };
         unsafe {
             converter
@@ -57,14 +57,14 @@ impl ImageConverter {
                     1.0,
                     WICBitmapPaletteTypeMedianCut,
                 )
-                .map_err(|_| raise_err(EKnd::Common, path, "Initialize converter"))?
+                .map_err(|_| raise_err(EKnd::Common, &path, "Initialize converter"))?
         };
         let mut width = 0;
         let mut height = 0;
         unsafe {
             converter
                 .GetSize(&mut width, &mut height)
-                .map_err(|_| raise_err(EKnd::Get, path, "Size"))?
+                .map_err(|_| raise_err(EKnd::Get, &path, "Size"))?
         };
         Ok(Self {
             converter,

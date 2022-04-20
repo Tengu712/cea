@@ -20,10 +20,10 @@ use windows::{
 pub fn raise_err(errknd: EKnd, message: &str) -> WErr {
     WErr::from(errknd, String::from(message), String::from("Direct3D App"))
 }
-pub fn raise_err_arg(errknd: EKnd, arg: &str, message: &str) -> WErr {
+pub fn raise_err_arg(errknd: EKnd, arg: &String, message: &str) -> WErr {
     WErr::from(
         errknd,
-        String::from(arg) + " : " + message,
+        arg.clone() + " : " + message,
         String::from("Direct3D App"),
     )
 }
