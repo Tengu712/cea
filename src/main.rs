@@ -2,7 +2,7 @@ pub mod gameapis;
 pub mod winapis;
 
 use gameapis::Game;
-use winapis::{direct3d::D3DApplication, winapi::*, *};
+use winapis::{direct3d::{D3DApplication, text::*}, winapi::*, *};
 
 /// Entory point.
 fn main() {
@@ -26,10 +26,12 @@ pub fn start_app() -> Result<(), WErr> {
     // Create drawing app
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let d3dtxt = d3dapp.create_text_module(&winapp)?;
+    let text = DrawingTextDesc::new().set_text("秘封俱楽部");
     // Run the app
     while !winapp.do_event() {
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
+        d3dtxt.draw_text(&text)?;
         d3dapp.swap()?;
     }
     Ok(())

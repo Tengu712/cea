@@ -27,7 +27,69 @@ pub struct DrawingTextDesc {
     pub rgba: [f32; 4],
     pub align: TextAlign,
 }
+pub trait DrawingTextDescImpl<T> {
+    fn set_text(self, text: T) -> Self;
+    fn set_font(self, text: T) -> Self;
+}
+impl DrawingTextDescImpl<String> for DrawingTextDesc {
+    fn set_text(self, text: String) -> Self {
+        let mut self_mut = self;
+        self_mut.text = text;
+        self_mut
+    }
+    fn set_font(self, font: String) -> Self {
+        let mut self_mut = self;
+        self_mut.font = font;
+        self_mut
+    }
+}
+impl DrawingTextDescImpl<&str> for DrawingTextDesc {
+    fn set_text(self, text: &str) -> Self {
+        let mut self_mut = self;
+        self_mut.text = String::from(text);
+        self_mut
+    }
+    fn set_font(self, font: &str) -> Self {
+        let mut self_mut = self;
+        self_mut.font = String::from(font);
+        self_mut
+    }
+}
+impl DrawingTextDesc {
+    pub fn new() -> Self {
+        Self {
+            text: String::default(),
+            font: String::from("メイリオ"),
+            size: 64.0,
+            rect: [0.0, 1280.0, 0.0, 720.0],
+            rgba: [1.0; 4],
+            align: TextAlign::Left,
+        }
+    }
+    pub fn set_size(self, size: f32) -> Self {
+        let mut self_mut = self;
+        self_mut.size = size;
+        self_mut
+    }
+    pub fn set_rect(self, rect: [f32; 4]) -> Self {
+        let mut self_mut = self;
+        self_mut.rect = rect;
+        self_mut
+    }
+    pub fn set_rgba(self, rgba: [f32; 4]) -> Self {
+        let mut self_mut = self;
+        self_mut.rgba = rgba;
+        self_mut
+    }
+    pub fn set_align(self, align: TextAlign) -> Self {
+        let mut self_mut = self;
+        self_mut.align = align;
+        self_mut
+    }
+}
 
+/// Use it when drawing text.
+/// It's created by D3DApplication.create_text_module method.
 pub struct D3DTextModule {
     d2context: ID2D1DeviceContext,
     dwfactory: IDWriteFactory,
