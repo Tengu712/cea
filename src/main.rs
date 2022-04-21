@@ -4,6 +4,7 @@ pub mod gameapis;
 pub mod winapis;
 
 use gameapis::{
+    input::KeyStates,
     request::{cdata::CDataDiff, text::TextFormat, Request},
     Game,
 };
@@ -21,7 +22,7 @@ use winapis::{
 };
 
 const WIDTH: u32 = 1280;
-const HEIGHT: u32 = 720;
+const HEIGHT: u32 = 960;
 
 /// Entory point.
 fn main() {
@@ -36,7 +37,7 @@ pub fn start_app() -> Result<(), WErr> {
     // Create window app
     let winapp = WindowsApplication::new(
         cur_dir.clone(),
-        "秘封俱楽部",
+        "",
         WIDTH as i32,
         HEIGHT as i32,
         ask_yesno("Start with a fullscreen window?", "question"),
@@ -53,6 +54,10 @@ pub fn start_app() -> Result<(), WErr> {
         dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?,
     );
     map_text_format.insert(
+        TextFormat::Score,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 32.0)?,
+    );
+    map_text_format.insert(
         TextFormat::Option,
         dwapp.create_text_format("さつき源代明朝", &fontcollection, 32.0)?,
     );
@@ -60,11 +65,18 @@ pub fn start_app() -> Result<(), WErr> {
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
     let mut game = Game::new();
+    let mut keystates = KeyStates::default();
     d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
+        keystates.z = get_next_keystate(0x5A, keystates.z);
+        keystates.s = get_next_keystate(0xA0, keystates.s);
+        keystates.left = get_next_keystate(0x25, keystates.left);
+        keystates.up = get_next_keystate(0x26, keystates.up);
+        keystates.right = get_next_keystate(0x27, keystates.right);
+        keystates.down = get_next_keystate(0x28, keystates.down);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let (next, reqs) = game.update();
+        let (next, reqs) = game.update(&keystates);
         for i in reqs {
             match i {
                 Request::NoRequest => (),
@@ -162,7 +174,7 @@ fn apply_cdata_diff(cdata: CData, cdata_diff: CDataDiff) -> CData {
         cdata_mut.mat_rtx = Matrix4x4::new_rotation_z(n[2]);
     }
     if let Some(n) = cdata_diff.trs_xy {
-        cdata_mut.mat_trs = Matrix4x4::new_scaling(n[0], n[1], 0.0);
+        cdata_mut.mat_trs = Matrix4x4::new_translation(n[0], n[1], 0.0);
     }
     if let Some(_) = cdata_diff.view_xy {}
     if let Some(n) = cdata_diff.col_rgba {

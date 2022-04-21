@@ -5,6 +5,7 @@ pub use super::super::super::winapis::directwrite::text::TextAlign;
 #[derive(Eq, PartialEq, Hash)]
 pub enum TextFormat {
     Normal,
+    Score,
     Option,
 }
 
