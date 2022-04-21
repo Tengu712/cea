@@ -8,7 +8,6 @@ pub mod imgid;
 /// This defines Text struct.
 pub mod text;
 
-#[derive(Clone, Copy)]
 pub enum Request {
     NoRequest,
     SetImage(imgid::ImgID),
@@ -25,22 +24,15 @@ impl PackingRequest for Request {
     }
 }
 
-const REQ_SIZE: usize = 20;
-pub struct Requests([Request; REQ_SIZE], usize);
+pub struct Requests(Vec<Request>);
 impl Requests {
     pub fn new() -> Self {
-        Self([Request::NoRequest; REQ_SIZE], 0)
+        Self(Vec::new())
     }
-    pub fn push<T: PackingRequest>(self, arg: T) -> Self {
-        if self.1 >= REQ_SIZE {
-            return self;
-        }
-        let mut self_mut = self;
-        self_mut.0[self_mut.1] = arg.pack();
-        self_mut.1 += 1;
-        self_mut
+    pub fn push<T: PackingRequest>(&mut self, arg: T) {
+        self.push(arg.pack());
     }
-    pub fn get_array(self) -> [Request; REQ_SIZE] {
+    pub fn get_array(self) -> Vec<Request> {
         self.0
     }
 }

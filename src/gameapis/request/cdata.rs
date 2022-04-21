@@ -1,6 +1,5 @@
 use super::*;
 
-#[derive(Clone, Copy)]
 pub struct CDataDiff {
     pub scl_xy: Option<[f32; 2]>,
     pub rot_xyz: Option<[f32; 3]>,

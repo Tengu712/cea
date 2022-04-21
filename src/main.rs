@@ -55,8 +55,7 @@ pub fn start_app() -> Result<(), WErr> {
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
         let (next, reqs) = game.update();
-        let reqs_array = reqs.get_array();
-        for i in reqs_array {
+        for i in reqs {
             match i {
                 Request::NoRequest => (),
                 Request::SetImage(_) => cdata = d3dapp.set_d3dimage(None, cdata),
@@ -67,7 +66,7 @@ pub fn start_app() -> Result<(), WErr> {
                 Request::DrawImage => d3dapp.draw_model(&idea)?,
                 Request::DrawText(n) => {
                     let desc = TextDesc::new()
-                        .set_text(String::from_utf8_lossy(&n.text))
+                        .set_text(n.text)
                         .set_rect(n.rect)
                         .set_rgba(n.rgba)
                         .set_align(n.align);

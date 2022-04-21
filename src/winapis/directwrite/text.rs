@@ -25,7 +25,7 @@ pub struct TextDesc {
 impl TextDesc {
     pub fn new() -> Self {
         Self {
-            text: String::default(),
+            text: String::new(),
             rect: [0.0, 1280.0, 0.0, 720.0],
             rgba: [1.0; 4],
             align: TextAlign::Left,

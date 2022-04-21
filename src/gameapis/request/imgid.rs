@@ -1,6 +1,5 @@
 use super::*;
 
-#[derive(Clone, Copy)]
 pub enum ImgID {
     Title,
 }
