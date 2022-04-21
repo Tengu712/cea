@@ -4,9 +4,10 @@ pub mod gameapis;
 pub mod winapis;
 
 use gameapis::{
-    request::{cdata::CDataDiff, Request},
+    request::{cdata::CDataDiff, text::TextFormat, Request},
     Game,
 };
+use std::collections::HashMap;
 use winapis::{
     direct3d::{
         cbuffer::CData,
@@ -45,7 +46,16 @@ pub fn start_app() -> Result<(), WErr> {
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
     let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
-    let format_dialogue = dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?;
+    let default_text_format = dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?;
+    let mut map_text_format = HashMap::new();
+    map_text_format.insert(
+        TextFormat::Normal,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?,
+    );
+    map_text_format.insert(
+        TextFormat::Option,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 32.0)?,
+    );
     // Run the app
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
@@ -70,7 +80,12 @@ pub fn start_app() -> Result<(), WErr> {
                         .set_rect(n.rect)
                         .set_rgba(n.rgba)
                         .set_align(n.align);
-                    dwapp.draw_text(&desc, &format_dialogue)?;
+                    dwapp.draw_text(
+                        &desc,
+                        map_text_format
+                            .get(&n.format)
+                            .unwrap_or(&default_text_format),
+                    )?;
                 }
             }
         }
