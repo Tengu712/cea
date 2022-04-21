@@ -23,16 +23,3 @@ impl PackingRequest for Request {
         self
     }
 }
-
-pub struct Requests(Vec<Request>);
-impl Requests {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
-    pub fn push<T: PackingRequest>(&mut self, arg: T) {
-        self.push(arg.pack());
-    }
-    pub fn get_array(self) -> Vec<Request> {
-        self.0
-    }
-}
