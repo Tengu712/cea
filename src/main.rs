@@ -54,8 +54,12 @@ pub fn start_app() -> Result<(), WErr> {
         dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?,
     );
     map_text_format.insert(
-        TextFormat::Score,
+        TextFormat::Fps,
         dwapp.create_text_format("さつき源代明朝", &fontcollection, 32.0)?,
+    );
+    map_text_format.insert(
+        TextFormat::Score,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 60.0)?,
     );
     map_text_format.insert(
         TextFormat::Option,
