@@ -16,7 +16,7 @@ impl Title {
                 .set_align(TextAlign::Center)
                 .pack(),
         );
-        if keystates.z > 0 {
+        if keystates.z == 1 {
             return (Scene::Stage(Stage::new()), reqs);
         }
         (Scene::Title(Self(self.0 + 1)), reqs)

@@ -1,31 +1,49 @@
-use super::input::KeyStates;
+use super::request::{cdata::CDataDiff, *};
+use std::collections::LinkedList;
 
 const P_SPD: f32 = 8.0;
+const INIT_POS: [f32; 2] = [0.0, -280.0];
+const SQUARE_SIZE: f32 = 80.0;
 
 pub struct Player {
     pub pos: [f32; 2],
+    pub inp: [i32; 2],
+    pub slow: bool,
 }
 impl Player {
     pub fn new() -> Self {
-        Self { pos: [0.0, -280.0] }
+        Self {
+            pos: INIT_POS,
+            inp: [0; 2],
+            slow: false,
+        }
     }
-    pub fn update(self, rect: [f32; 4], keystates: &KeyStates) -> Self {
-        let inp_x = (keystates.right > 0) as i32 - (keystates.left > 0) as i32;
-        let inp_y = (keystates.up > 0) as i32 - (keystates.down > 0) as i32;
-        let c_spd = if keystates.s > 0 { 0.5 } else { 1.0 }
-            / if inp_x.abs() + inp_y.abs() == 2 {
+    pub fn update(self, rect: [f32; 4], inp: [i32; 2], slow: bool) -> Self {
+        let c_spd = if slow { 0.5 } else { 1.0 }
+            / if inp[0].abs() + inp[1].abs() == 2 {
                 std::f32::consts::SQRT_2
             } else {
                 1.0
             };
         let pos = [
-            self.pos[0] + inp_x as f32 * P_SPD * c_spd,
-            self.pos[1] + inp_y as f32 * P_SPD * c_spd,
+            self.pos[0] + inp[0] as f32 * P_SPD * c_spd,
+            self.pos[1] + inp[1] as f32 * P_SPD * c_spd,
         ];
         let pos = [
             pos[0].max(rect[0]).min(rect[1]),
             pos[1].max(rect[3]).min(rect[2]),
         ];
-        Self { pos }
+        Self { pos, inp, slow }
+    }
+    pub fn create_requests(&self) -> LinkedList<Request> {
+        let mut reqs = LinkedList::new();
+        reqs.push_back(
+            CDataDiff::new()
+                .set_trs(self.pos)
+                .set_scl([SQUARE_SIZE, SQUARE_SIZE])
+                .pack(),
+        );
+        reqs.push_back(Request::DrawImage);
+        reqs
     }
 }

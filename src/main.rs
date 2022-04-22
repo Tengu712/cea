@@ -51,7 +51,7 @@ pub fn start_app() -> Result<(), WErr> {
     let mut map_text_format = HashMap::new();
     map_text_format.insert(
         TextFormat::Normal,
-        dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 42.0)?,
     );
     map_text_format.insert(
         TextFormat::Fps,
@@ -63,7 +63,7 @@ pub fn start_app() -> Result<(), WErr> {
     );
     map_text_format.insert(
         TextFormat::Option,
-        dwapp.create_text_format("さつき源代明朝", &fontcollection, 32.0)?,
+        dwapp.create_text_format("さつき源代明朝", &fontcollection, 60.0)?,
     );
     // Run the app
     let idea = create_idea(&d3dapp)?;

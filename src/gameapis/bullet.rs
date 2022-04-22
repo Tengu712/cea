@@ -1,3 +1,6 @@
+use super::request::{cdata::CDataDiff, *};
+use std::collections::LinkedList;
+
 pub struct Bullet {
     pub vel: f32,
     pub deg: f32,
@@ -39,5 +42,16 @@ impl Bullet {
                 pos,
             })
         }
+    }
+    pub fn create_requests(&self) -> LinkedList<Request> {
+        let mut reqs = LinkedList::new();
+        reqs.push_back(
+            CDataDiff::new()
+                .set_trs(self.pos)
+                .set_scl([10.0, 10.0])
+                .pack(),
+        );
+        reqs.push_back(Request::DrawImage);
+        reqs
     }
 }
