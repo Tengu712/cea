@@ -74,6 +74,7 @@ pub fn start_app() -> Result<(), WErr> {
     while !winapp.do_event() {
         keystates.z = get_next_keystate(0x5A, keystates.z);
         keystates.s = get_next_keystate(0xA0, keystates.s);
+        keystates.e = get_next_keystate(0x1B, keystates.e);
         keystates.left = get_next_keystate(0x25, keystates.left);
         keystates.up = get_next_keystate(0x26, keystates.up);
         keystates.right = get_next_keystate(0x27, keystates.right);

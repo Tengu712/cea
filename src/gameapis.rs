@@ -1,15 +1,21 @@
+///
+pub mod bullet;
+/// 
+pub mod enemy;
+/// [essensial]
+/// This provides a way to get fps.
+mod fps;
 /// [essensial]
 /// This provides a way to get key input states.
 pub mod input;
+/// 
+mod player;
 /// [essensial]
 /// This defines request.
 pub mod request;
 /// [essensial]
 /// This defines each scene updater.
 pub mod scene;
-/// [essensial]
-/// This provides a way to get fps.
-mod fps;
 
 pub struct Game(scene::Scene, fps::FpsData);
 impl Game {

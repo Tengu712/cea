@@ -1,4 +1,6 @@
 pub mod title;
+/// [essensial]
+/// use gameapis::player.
 pub mod stage;
 
 use super::{
