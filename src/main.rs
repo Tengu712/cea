@@ -73,6 +73,7 @@ pub fn start_app() -> Result<(), WErr> {
     d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
         keystates.z = get_next_keystate(0x5A, keystates.z);
+        keystates.x = get_next_keystate(0x58, keystates.x);
         keystates.s = get_next_keystate(0xA0, keystates.s);
         keystates.e = get_next_keystate(0x1B, keystates.e);
         keystates.left = get_next_keystate(0x25, keystates.left);

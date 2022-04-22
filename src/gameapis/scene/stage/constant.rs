@@ -19,4 +19,6 @@ pub const BULLET_RECT: [f32; 4] = [
     GAME_BOTTOM - 80.0,
 ];
 // UI
+pub const SCORE_RECT: [f32; 4] = [300.0, WIDTH, 0.0, HEIGHT];
+pub const DAMAGE_RECT: [f32; 4] = [0.0, WIDTH, 70.0, HEIGHT];
 pub const LOG_RECT: [f32; 4] = [340.0, 940.0, 700.0, HEIGHT];

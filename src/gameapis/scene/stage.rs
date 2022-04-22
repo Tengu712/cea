@@ -3,13 +3,13 @@ mod constant;
 mod enemy;
 mod player;
 mod stage1;
-mod state;
 
 use super::{
     super::{
         input::KeyStates,
         request::{cdata::*, text::*, *},
     },
+    title::Title,
     Scene,
 };
 use bullet::Bullet;
@@ -17,13 +17,22 @@ use constant::*;
 use enemy::Enemy;
 use player::Player;
 use stage1::*;
-use state::State;
 use std::collections::LinkedList;
+
+enum State {
+    Start,
+    Shoot,
+    End,
+}
 
 pub struct Stage {
     stage: u32,
-    count: u32,
+    cnt_all: u32,
+    cnt_chp: u32,
+    cnt_log: usize,
+    graze: u32,
     score: u64,
+    damage: u64,
     state: State,
     player: Player,
     enemy: Enemy,
@@ -33,9 +42,13 @@ impl Stage {
     pub fn new() -> Self {
         Self {
             stage: 1,
-            count: 0,
+            cnt_all: 0,
+            cnt_log: 0,
+            cnt_chp: 0,
+            graze: 0,
             score: 0,
-            state: State::Start(0),
+            damage: 0,
+            state: State::Start,
             player: Player::new(),
             enemy: Enemy::new(),
             bullets: LinkedList::new(),
@@ -48,44 +61,70 @@ impl Stage {
         res
     }
     pub fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
+        let cnt_all = self.cnt_all + 1;
         // ======================================================================================== //
         //   Do task that reacts with input
         // ======================================================================================== //
-        let reqs_input = LinkedList::new();
-        let (state, is_next) = self.state.update(self.stage, keystates.z == 1);
-        if is_next {
-            return (
-                Scene::Stage(Stage::from(self.stage + 1, self.score)),
-                reqs_input,
-            );
-        }
-        let (inp, slow) = {
+        // Log count
+        let (state, cnt_log) = match self.state {
+            State::Shoot => (self.state, self.cnt_log),
+            _ if keystates.z != 1 => (self.state, self.cnt_log),
+            State::Start if self.cnt_log + 1 >= get_startlogsize(self.stage) => {
+                (State::Shoot, self.cnt_log)
+            }
+            State::End if self.cnt_log + 1 >= get_logsize(self.stage) => {
+                if self.stage == 3 {
+                    return (Scene::Title(Title::new()), LinkedList::new());
+                } else {
+                    return (
+                        Scene::Stage(Stage::from(self.stage + 1, self.score)),
+                        LinkedList::new(),
+                    );
+                }
+            }
+            _ => (self.state, self.cnt_log + 1),
+        };
+        // Player input
+        let (inp, slow, snap, atack) = {
             let inp_x = (keystates.right > 0) as i32 - (keystates.left > 0) as i32;
             let inp_y = (keystates.up > 0) as i32 - (keystates.down > 0) as i32;
-            ([inp_x, inp_y], keystates.s > 0)
+            ([inp_x, inp_y], keystates.s > 0, keystates.z == 1, keystates.x == 1)
         };
         // ======================================================================================== //
         //   Update entity
         // ======================================================================================== //
         let mut reqs_entity = LinkedList::new();
-        let count = self.count + 1;
-        let score = self.score;
-        let (mut enemy, mut reqs_enemy) = self.enemy.update(count as f32);
+        // Update counter
+        let mut cnt_chp = match state {
+            State::Shoot => self.cnt_chp + 1,
+            _ => 0,
+        };
+        let mut damage = match state {
+            State::Shoot => (self.damage + 1).min(10000),
+            _ => 0,
+        };
+        let mut score = self.score;
+        let mut graze = self.graze;
+        // Update entities
+        let (enemy, mut reqs_enemy) = self.enemy.update(cnt_all as f32);
         reqs_entity.append(&mut reqs_enemy);
-        let (mut player, mut reqs_player) = self.player.update(PLAYER_RECT, inp, slow);
+        let (player, mut reqs_player) = self.player.update(PLAYER_RECT, inp, slow);
         reqs_entity.append(&mut reqs_player);
         let mut bullets = LinkedList::new();
         match state {
             State::Shoot if self.stage == 1 => {
-                bullets.append(&mut create_stage1_bullet(count, &player, &enemy))
+                bullets.append(&mut create_stage1_bullet(cnt_chp, &player, &enemy))
             }
             _ => (),
         }
         for i in self.bullets {
             let bullet_n = i.update(BULLET_RECT);
             if let Some((n, mut reqs)) = bullet_n {
-                let (player_n, is_hit, _) = player.check_hit(n.pos, n.r);
-                player = player_n;
+                let (is_hit, is_graze) = player.check_hit(n.pos, n.r);
+                if is_graze {
+                    score += 10; // !SCORE!
+                    graze += 1; // !GRAZE!
+                }
                 if !is_hit {
                     bullets.push_back(n);
                     reqs_entity.append(&mut reqs);
@@ -98,32 +137,48 @@ impl Stage {
         let mut reqs_ui = LinkedList::new();
         reqs_ui.push_back(
             TextDesc::new()
-                .set_text(format!("{:>012}", self.score))
-                .set_rect([300.0, 1280.0, 0.0, 960.0])
+                .set_text(format!("{:>012}", score))
+                .set_rect(SCORE_RECT)
                 .set_format(TextFormat::Score)
                 .pack(),
         );
-        let log = match state {
-            State::Start(n) if self.stage == 1 => Some(get_stage1_start_log(n)),
-            _ => None,
-        };
-        if let Some(n) = log {
-            reqs_ui.push_back(
+        match state {
+            State::Shoot => reqs_ui.push_back(
                 TextDesc::new()
-                    .set_text(n)
-                    .set_rect(LOG_RECT)
-                    .set_format(TextFormat::Normal)
+                    .set_text(damage)
+                    .set_rect(DAMAGE_RECT)
+                    .set_align(TextAlign::Center)
+                    .set_format(TextFormat::Score)
                     .pack(),
-            );
+            ),
+            _ => (),
         }
+        match state {
+            State::Shoot => (),
+            _ if self.stage == 1 => {
+                let n = STAGE1_LOG[cnt_log];
+                reqs_ui.push_back(
+                    TextDesc::new()
+                        .set_text(n)
+                        .set_rect(LOG_RECT)
+                        .set_format(TextFormat::Normal)
+                        .pack(),
+                );
+            }
+            _ => (),
+        };
         // Finish
         let mut reqs = reqs_entity;
         reqs.append(&mut reqs_ui);
         (
             Scene::Stage(Stage {
                 stage: self.stage,
-                count,
+                cnt_all,
+                cnt_chp,
+                cnt_log,
+                graze,
                 score,
+                damage,
                 state,
                 player,
                 enemy,
@@ -131,5 +186,19 @@ impl Stage {
             }),
             reqs,
         )
+    }
+}
+fn get_startlogsize(stage: u32) -> usize {
+    if stage == 1 {
+        STAGE1_START_LOG_SIZE
+    } else {
+        0
+    }
+}
+fn get_logsize(stage: u32) -> usize {
+    if stage == 1 {
+        STAGE1_LOG_SIZE
+    } else {
+        0
     }
 }

@@ -1,19 +1,18 @@
 use super::*;
 
-pub const STAGE1_START_LOG_SIZE: u32 = 2;
+pub const STAGE1_LOG_SIZE: usize = 4;
+pub const STAGE1_START_LOG_SIZE: usize = 2;
+pub const STAGE1_LOG: [&str; STAGE1_LOG_SIZE] = [
+    "はろーわーるど",
+    "ほげ",
+    "ほげ",
+    "ほげ",
+];
 
-pub fn get_stage1_start_log(cnt: u32) -> String {
-    if cnt == 0 {
-        String::from("はろーわーるど")
-    } else {
-        String::from("ほげ")
-    }
-}
-
-pub fn create_stage1_bullet(count: u32, _: &Player, enemy: &Enemy) -> LinkedList<Bullet> {
+pub fn create_stage1_bullet(cnt_chp: u32, _: &Player, enemy: &Enemy) -> LinkedList<Bullet> {
     let mut bullets = LinkedList::new();
     if enemy.phase == 0 {
-        if count % 16 == 0 {
+        if cnt_chp % 16 == 0 {
             for i in 0..32 {
                 bullets.push_back(
                     Bullet::new()

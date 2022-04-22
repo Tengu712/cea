@@ -15,10 +15,10 @@ impl Enemy {
             pos: [0.0, 280.0],
         }
     }
-    pub fn update(self, count_scene_f32: f32) -> (Self, LinkedList<Request>) {
+    pub fn update(self, cnt_all_f32: f32) -> (Self, LinkedList<Request>) {
         let pos = [
             self.pos[0],
-            self.pos[1] + (count_scene_f32 * 6.0).to_radians().cos() * 0.5,
+            self.pos[1] + (cnt_all_f32 * 6.0).to_radians().cos() * 0.5,
         ];
         let mut reqs = LinkedList::new();
         reqs.push_back(

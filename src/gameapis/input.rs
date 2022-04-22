@@ -1,6 +1,7 @@
 #[derive(Default)]
 pub struct KeyStates {
     pub z: i16,
+    pub x: i16,
     pub s: i16,
     pub e: i16,
     pub left: i16,

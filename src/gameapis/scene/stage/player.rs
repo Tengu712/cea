@@ -52,16 +52,14 @@ impl Player {
             reqs,
         )
     }
-    pub fn check_hit(self, pos: [f32; 2], r: [f32; 2]) -> (Self, bool, bool) {
-        let mut self_mut = self;
-        let dis = (self_mut.pos[0] - pos[0]).powf(2.0) + (self_mut.pos[1] - pos[1]).powf(2.0);
+    pub fn check_hit(&self, pos: [f32; 2], r: [f32; 2]) -> (bool, bool) {
+        let dis = (self.pos[0] - pos[0]).powf(2.0) + (self.pos[1] - pos[1]).powf(2.0);
         if dis < r[0] {
-            (self_mut, true, false)
+            (true, false)
         } else if dis < r[1] {
-            self_mut.graze += 1;
-            (self_mut, false, true)
+            (false, true)
         } else {
-            (self_mut, false, false)
+            (false, false)
         }
     }
 }
