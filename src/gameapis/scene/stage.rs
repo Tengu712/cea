@@ -57,7 +57,7 @@ pub struct Stage {
     state: State,
     player: Player,
     enemy: Enemy,
-    bullet: LinkedList<Bullet>,
+    bullets: LinkedList<Bullet>,
 }
 impl Stage {
     pub fn new() -> Self {
@@ -69,7 +69,7 @@ impl Stage {
             state: State::Start(0),
             player: Player::new(),
             enemy: Enemy::new(),
-            bullet: LinkedList::new(),
+            bullets: LinkedList::new(),
         }
     }
     pub fn from(prev: Self) -> Self {
@@ -123,25 +123,36 @@ impl Stage {
             ([inp_x, inp_y], keystates.s > 0)
         };
         //   == Calculate information ==
-        // Update data
-        let (count, score, player, enemy, bullet) = if pause > 0 {
-            (self.count, self.score, self.player, self.enemy, self.bullet)
+        let (count, score, player, enemy, bullets) = if pause > 0 {
+            (
+                self.count,
+                self.score,
+                self.player,
+                self.enemy,
+                self.bullets,
+            )
         } else {
             let count = self.count + 1 - pause as u32;
             let player = self.player.update(PLAYER_RECT, inp, slow);
             let enemy = self.enemy.update(count as f32);
-            let bullet = self
-                .bullet
+            let mut bullets = self
+                .bullets
                 .into_iter()
                 .filter_map(|n| n.update(BULLET_RECT))
                 .collect::<LinkedList<Bullet>>();
-            (count, self.score, player, enemy, bullet)
+            match state {
+                State::Shoot if self.stage == 1 => {
+                    bullets.append(&mut create_stage1_bullet(count, &player, &enemy))
+                }
+                _ => (),
+            }
+            (count, self.score, player, enemy, bullets)
         };
         //   == Build request list ==
         // Entities
         reqs.append(&mut enemy.create_requests());
         reqs.append(&mut player.create_requests());
-        for i in bullet.iter() {
+        for i in bullets.iter() {
             reqs.append(&mut i.create_requests());
         }
         // Score
@@ -203,7 +214,7 @@ impl Stage {
                 state,
                 player,
                 enemy,
-                bullet,
+                bullets,
             }),
             reqs,
         )
