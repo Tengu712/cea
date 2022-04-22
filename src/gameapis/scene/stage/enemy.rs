@@ -1,5 +1,4 @@
-use super::request::{cdata::CDataDiff, *};
-use std::collections::LinkedList;
+use super::*;
 
 const SQUARE_SIZE: f32 = 100.0;
 

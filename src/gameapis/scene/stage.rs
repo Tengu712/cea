@@ -1,10 +1,21 @@
+mod bullet;
+mod enemy;
+mod player;
 mod stage1;
 
 use super::{
-    super::{bullet::Bullet, enemy::Enemy, player::Player},
-    *,
+    super::{
+        input::KeyStates,
+        request::{cdata::*, text::*, *},
+    },
+    title::Title,
+    Scene,
 };
+use bullet::Bullet;
+use enemy::Enemy;
+use player::Player;
 use stage1::*;
+use std::collections::LinkedList;
 
 // Base
 const WIDTH: f32 = 1280.0;
@@ -98,7 +109,7 @@ impl Stage {
             if self.pause % 2 == 0 {
                 0
             } else {
-                return (Scene::Title(title::Title::new()), reqs);
+                return (Scene::Title(Title::new()), reqs);
             }
         } else {
             self.pause

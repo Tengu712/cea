@@ -1,5 +1,4 @@
-use super::request::{cdata::CDataDiff, *};
-use std::collections::LinkedList;
+use super::*;
 
 const P_SPD: f32 = 8.0;
 const INIT_POS: [f32; 2] = [0.0, -280.0];
