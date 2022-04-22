@@ -30,7 +30,7 @@ impl Bullet {
         self_mut.deg = deg;
         self_mut
     }
-    pub fn update(self, rect: [f32; 4]) -> Option<Self> {
+    pub fn update(self, rect: [f32; 4]) -> Option<(Self, LinkedList<Request>)> {
         let pos = [
             self.pos[0] + self.vel * self.deg.to_radians().cos(),
             self.pos[1] + self.vel * self.deg.to_radians().sin(),
@@ -40,25 +40,24 @@ impl Bullet {
             || self.pos[1] > rect[2]
             || self.pos[1] < rect[3]
         {
-            None
-        } else {
-            Some(Self {
-                r: self.r,
-                vel: self.vel,
-                deg: self.deg,
-                pos,
-            })
+            return None;
         }
-    }
-    pub fn create_requests(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
-                .set_scl([20.0, 20.0])
+                .set_scl([10.0, 10.0])
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);
-        reqs
+        Some((
+            Self {
+                r: self.r,
+                vel: self.vel,
+                deg: self.deg,
+                pos,
+            },
+            reqs,
+        ))
     }
 }

@@ -8,6 +8,7 @@ pub struct Player {
     pub pos: [f32; 2],
     pub inp: [i32; 2],
     pub slow: bool,
+    pub graze: u32,
 }
 impl Player {
     pub fn new() -> Self {
@@ -15,9 +16,10 @@ impl Player {
             pos: INIT_POS,
             inp: [0; 2],
             slow: false,
+            graze: 0,
         }
     }
-    pub fn update(self, rect: [f32; 4], inp: [i32; 2], slow: bool) -> Self {
+    pub fn update(self, rect: [f32; 4], inp: [i32; 2], slow: bool) -> (Self, LinkedList<Request>) {
         let c_spd = if slow { 0.5 } else { 1.0 }
             / if inp[0].abs() + inp[1].abs() == 2 {
                 std::f32::consts::SQRT_2
@@ -32,9 +34,6 @@ impl Player {
             pos[0].max(rect[0]).min(rect[1]),
             pos[1].max(rect[3]).min(rect[2]),
         ];
-        Self { pos, inp, slow }
-    }
-    pub fn create_requests(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         reqs.push_back(
             CDataDiff::new()
@@ -43,6 +42,26 @@ impl Player {
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);
-        reqs
+        (
+            Self {
+                pos,
+                inp,
+                slow,
+                graze: self.graze,
+            },
+            reqs,
+        )
+    }
+    pub fn check_hit(self, pos: [f32; 2], r: [f32; 2]) -> (Self, bool, bool) {
+        let mut self_mut = self;
+        let dis = (self_mut.pos[0] - pos[0]).powf(2.0) + (self_mut.pos[1] - pos[1]).powf(2.0);
+        if dis < r[0] {
+            (self_mut, true, false)
+        } else if dis < r[1] {
+            self_mut.graze += 1;
+            (self_mut, false, true)
+        } else {
+            (self_mut, false, false)
+        }
     }
 }

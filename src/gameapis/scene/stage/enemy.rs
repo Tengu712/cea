@@ -1,6 +1,6 @@
 use super::*;
 
-const SQUARE_SIZE: f32 = 100.0;
+const ENEMY_SQUARE_SIZE: f32 = 100.0;
 
 pub struct Enemy {
     pub phase: u32,
@@ -15,26 +15,26 @@ impl Enemy {
             pos: [0.0, 280.0],
         }
     }
-    pub fn update(self, count_scene_f32: f32) -> Self {
+    pub fn update(self, count_scene_f32: f32) -> (Self, LinkedList<Request>) {
         let pos = [
             self.pos[0],
             self.pos[1] + (count_scene_f32 * 6.0).to_radians().cos() * 0.5,
         ];
-        Self {
-            phase: self.phase,
-            hp: self.hp,
-            pos,
-        }
-    }
-    pub fn create_requests(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
-                .set_scl([SQUARE_SIZE, SQUARE_SIZE])
+                .set_scl([ENEMY_SQUARE_SIZE, ENEMY_SQUARE_SIZE])
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);
-        reqs
+        (
+            Self {
+                phase: self.phase,
+                hp: self.hp,
+                pos,
+            },
+            reqs,
+        )
     }
 }
