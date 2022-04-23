@@ -1,5 +1,6 @@
 mod constant;
 mod entity;
+mod logue;
 mod stage1;
 
 use super::{
@@ -30,9 +31,8 @@ enum State {
 pub struct Stage {
     stage: u32,
     cnt_all: u32,
-    cnt_log: usize,
-    score: u64,
     state: State,
+    logue: logue::Logue,
     entity: Entity,
 }
 impl Stage {
@@ -40,39 +40,14 @@ impl Stage {
         Self {
             stage: 1,
             cnt_all: 0,
-            cnt_log: 0,
-            score: 0,
             state: State::Start,
+            logue: logue::Logue::new(),
             entity: Entity::new(),
         }
-    }
-    pub fn from(stage: u32, score: u64) -> Self {
-        let mut res = Stage::new();
-        res.stage = stage;
-        res.score = score;
-        res
     }
     pub fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
         let cnt_all = self.cnt_all + 1;
         // Do task that reacts with input
-        let (state, cnt_log) = match self.state {
-            State::Shoot => (self.state, self.cnt_log),
-            _ if keystates.z != 1 => (self.state, self.cnt_log),
-            State::Start if self.cnt_log + 1 >= get_startlogsize(self.stage) => {
-                (State::Shoot, self.cnt_log)
-            }
-            State::End if self.cnt_log + 1 >= get_logsize(self.stage) => {
-                if self.stage == 3 {
-                    return (Scene::Title(Title::new()), LinkedList::new());
-                } else {
-                    return (
-                        Scene::Stage(Stage::from(self.stage + 1, self.score)),
-                        LinkedList::new(),
-                    );
-                }
-            }
-            _ => (self.state, self.cnt_log + 1),
-        };
         let inp = {
             let inp_x = (keystates.right > 0) as i32 - (keystates.left > 0) as i32;
             let inp_y = (keystates.up > 0) as i32 - (keystates.down > 0) as i32;
@@ -83,69 +58,38 @@ impl Stage {
                 atack: keystates.x == 1,
             }
         };
+        // Update logue
+        let logue = match self.state {
+            State::Start | State::End => self.logue.update(inp.snap),
+            _ => self.logue,
+        };
+        // Update state
+        let state = match self.state {
+            State::Start if logue.is_end_start_log(self.stage) => State::Shoot,
+            State::End if logue.is_end_log(self.stage) => State::Shoot,
+            _ => self.state,
+        };
         // Update entity
         let is_shooting = match state {
             State::Shoot => true,
             _ => false,
         };
-        let (entity, reqs_entity, res) = self.entity.update(is_shooting, self.stage, cnt_all, inp);
-        let state = if res.gameover {
-            State::GameOver
-        } else if res.gameclear {
-            State::End
-        } else {
-            state
-        };
-        // UI
-        let mut reqs_ui = LinkedList::new();
-        reqs_ui.push_back(
-            TextDesc::new()
-                .set_text(format!("{:>012}", self.score))
-                .set_rect(SCORE_RECT)
-                .set_format(TextFormat::Score)
-                .pack(),
-        );
-        match state {
-            State::Shoot => (),
-            _ if self.stage == 1 => {
-                let n = STAGE1_LOG[cnt_log];
-                reqs_ui.push_back(
-                    TextDesc::new()
-                        .set_text(n)
-                        .set_rect(LOG_RECT)
-                        .set_format(TextFormat::Normal)
-                        .pack(),
-                );
-            }
-            _ => (),
-        };
+        let (entity, reqs_entity) = self.entity.update(is_shooting, self.stage, cnt_all, inp);
         // Finish
         let mut reqs = reqs_entity;
-        reqs.append(&mut reqs_ui);
+        match state {
+            State::Start => reqs.append(&mut logue.create_reqs(self.stage)),
+            _ => (),
+        }
         (
             Scene::Stage(Stage {
                 stage: self.stage,
                 cnt_all,
-                cnt_log,
-                score: self.score,
                 state,
+                logue,
                 entity,
             }),
             reqs,
         )
-    }
-}
-fn get_startlogsize(stage: u32) -> usize {
-    if stage == 1 {
-        STAGE1_START_LOG_SIZE
-    } else {
-        0
-    }
-}
-fn get_logsize(stage: u32) -> usize {
-    if stage == 1 {
-        STAGE1_LOG_SIZE
-    } else {
-        0
     }
 }
