@@ -6,9 +6,8 @@ mod stage1;
 use super::{
     super::{
         input::KeyStates,
-        request::{cdata::*, text::*, *},
+        request::{cdata::*, imgid::*, text::*, *},
     },
-    title::Title,
     Scene,
 };
 use constant::*;
@@ -63,10 +62,11 @@ impl Stage {
             State::Start | State::End => self.logue.update(inp.snap),
             _ => self.logue,
         };
-        // Update state
         let state = match self.state {
             State::Start if logue.is_end_start_log(self.stage) => State::Shoot,
-            State::End if logue.is_end_log(self.stage) => State::Shoot,
+            State::End if logue.is_end_log(self.stage) => {
+                return (Scene::Stage(Stage::new()), LinkedList::new());
+            }
             _ => self.state,
         };
         // Update entity
@@ -74,9 +74,20 @@ impl Stage {
             State::Shoot => true,
             _ => false,
         };
-        let (entity, reqs_entity) = self.entity.update(is_shooting, self.stage, cnt_all, inp);
+        let (entity, reqs_entity) = self.entity.update(is_shooting, self.stage, inp);
+        let state = if is_shooting && entity.is_game_over() {
+            State::GameOver
+        } else if is_shooting && entity.is_game_clear(self.stage) {
+            State::End
+        } else {
+            state
+        };
         // Finish
         let mut reqs = reqs_entity;
+        reqs.push_back(ImgID::UiFrame.pack());
+        reqs.push_back(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
+        reqs.push_back(Request::DrawImage);
+        reqs.push_back(Request::UnsetImage);
         match state {
             State::Start => reqs.append(&mut logue.create_reqs(self.stage)),
             _ => (),

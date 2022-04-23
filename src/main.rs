@@ -5,7 +5,7 @@ pub mod winapis;
 
 use gameapis::{
     input::KeyStates,
-    request::{cdata::CDataDiff, text::TextFormat, Request},
+    request::{cdata::CDataDiff, imgid::ImgID, text::TextFormat, Request},
     Game,
 };
 use std::collections::HashMap;
@@ -46,7 +46,16 @@ pub fn start_app() -> Result<(), WErr> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
-    let fontcollection = dwapp.create_custom_font(cur_dir + "SatsukiGendaiMincho-M.ttf")?;
+    let mut map_image = HashMap::new();
+    map_image.insert(
+        ImgID::UiFrame,
+        d3dapp.create_image_from_file(cur_dir.clone() + "ui_frame.png")?,
+    );
+    map_image.insert(
+        ImgID::StFlan,
+        d3dapp.create_image_from_file(cur_dir.clone() + "st_flan0.png")?,
+    );
+    let fontcollection = dwapp.create_custom_font(cur_dir.clone() + "SatsukiGendaiMincho-M.ttf")?;
     let default_text_format = dwapp.create_text_format("さつき源代明朝", &fontcollection, 64.0)?;
     let mut map_text_format = HashMap::new();
     map_text_format.insert(
@@ -86,7 +95,8 @@ pub fn start_app() -> Result<(), WErr> {
         for i in reqs {
             match i {
                 Request::NoRequest => (),
-                Request::SetImage(_) => cdata = d3dapp.set_d3dimage(None, cdata),
+                Request::SetImage(n) => cdata = d3dapp.set_d3dimage(map_image.get(&n), cdata),
+                Request::UnsetImage => cdata = d3dapp.set_d3dimage(None, cdata),
                 Request::SetCData(n) => {
                     cdata = apply_cdata_diff(cdata, n);
                     d3dapp.set_cdata(&cdata)?;
@@ -170,12 +180,15 @@ fn create_default_cdata() -> CData {
 }
 /// Apply constant buffer difference request to cdata.
 fn apply_cdata_diff(cdata: CData, cdata_diff: CDataDiff) -> CData {
-    let mut cdata_mut = cdata;
-    cdata_mut.mat_scl = Matrix4x4::new_scaling(cdata_diff.scl_xy[0], cdata_diff.scl_xy[1], 1.0);
-    cdata_mut.mat_rtx = Matrix4x4::new_rotation_x(cdata_diff.rot_xyz[0]);
-    cdata_mut.mat_rty = Matrix4x4::new_rotation_y(cdata_diff.rot_xyz[1]);
-    cdata_mut.mat_rtz = Matrix4x4::new_rotation_z(cdata_diff.rot_xyz[2]);
-    cdata_mut.mat_trs = Matrix4x4::new_translation(cdata_diff.trs_xy[0], cdata_diff.trs_xy[1], 0.0);
-    cdata_mut.vec_col = cdata_diff.col_rgba;
-    cdata_mut
+    CData {
+        mat_scl: Matrix4x4::new_scaling(cdata_diff.scl_xy[0], cdata_diff.scl_xy[1], 1.0),
+        mat_rtx: Matrix4x4::new_rotation_x(cdata_diff.rot_xyz[0]),
+        mat_rty: Matrix4x4::new_rotation_y(cdata_diff.rot_xyz[1]),
+        mat_rtz: Matrix4x4::new_rotation_z(cdata_diff.rot_xyz[2]),
+        mat_trs: Matrix4x4::new_translation(cdata_diff.trs_xy[0], cdata_diff.trs_xy[1], 0.0),
+        mat_view: cdata.mat_view,
+        mat_proj: cdata.mat_proj,
+        vec_col: cdata_diff.col_rgba,
+        vec_prm: cdata.vec_prm,
+    }
 }

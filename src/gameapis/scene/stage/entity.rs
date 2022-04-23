@@ -37,29 +37,17 @@ impl Entity {
         self,
         is_shooting: bool,
         stage: u32,
-        cnt_all: u32,
         inp: PlayerInput,
     ) -> (Self, LinkedList<Request>) {
         let mut reqs = LinkedList::new();
         // Update enemy
-        let enemy = self.enemy.update(cnt_all as f32);
+        let enemy = self.enemy.update();
         reqs.append(&mut enemy.create_reqs_body());
         // Update player
         let player = self.player.update(PLAYER_RECT, inp);
         reqs.append(&mut player.create_reqs_body());
-        // Launch bullet
-        let mut bullets = LinkedList::new();
-        if is_shooting {
-            if stage == 1 {
-                bullets.append(&mut create_stage1_bullet(
-                    &player,
-                    &enemy,
-                    self.phase,
-                    self.cnt_phs,
-                ));
-            }
-        }
         // Update bullet and check hit
+        let mut bullets = LinkedList::new();
         let mut flg_hit = 0;
         let mut flg_graze = 0;
         for i in self.bullets {
@@ -73,7 +61,23 @@ impl Entity {
                 }
             }
         }
+        // Launch bullet
+        if is_shooting {
+            if stage == 1 {
+                bullets.append(&mut create_stage1_bullet(
+                    &player,
+                    &enemy,
+                    self.phase,
+                    self.cnt_phs,
+                ));
+            }
+        }
         // Calculate
+        let (phase, cnt_phs) = if enemy.hp[0] == 0 {
+            (self.phase + 1, 0)
+        } else {
+            (self.phase, self.cnt_phs)
+        };
         let graze = flg_graze;
         let score = flg_graze as u64 * 10;
         // UI
@@ -95,8 +99,8 @@ impl Entity {
         (
             Self {
                 score,
-                phase: self.phase,
-                cnt_phs: self.cnt_phs,
+                phase,
+                cnt_phs,
                 graze,
                 player,
                 enemy,
@@ -104,5 +108,11 @@ impl Entity {
             },
             reqs,
         )
+    }
+    pub fn is_game_clear(&self, stage: u32) -> bool {
+        false
+    }
+    pub fn is_game_over(&self) -> bool {
+        false
     }
 }

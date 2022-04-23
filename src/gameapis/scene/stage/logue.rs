@@ -15,7 +15,16 @@ impl Logue {
     pub fn create_reqs(&self, stage: u32) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if stage == 1 {
-            let n = STAGE1_LOG[self.0];
+            let (n, l) = &STAGE1_LOG[self.0];
+            reqs.push_back(l.clone().pack());
+            reqs.push_back(
+                CDataDiff::new()
+                    .set_trs([-380.0, -120.0])
+                    .set_scl([720.0, 720.0])
+                    .pack(),
+            );
+            reqs.push_back(Request::DrawImage);
+            reqs.push_back(Request::UnsetImage);
             reqs.push_back(
                 TextDesc::new()
                     .set_text(n)

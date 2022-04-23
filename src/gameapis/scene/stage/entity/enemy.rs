@@ -15,10 +15,10 @@ impl Enemy {
             pos: [0.0, 280.0],
         }
     }
-    pub fn update(self, cnt_all_f32: f32) -> Self {
+    pub fn update(self) -> Self {
         let pos = [
             self.pos[0],
-            self.pos[1] + (cnt_all_f32 * 6.0).to_radians().cos() * 0.5,
+            self.pos[1],
         ];
         Self {
             hp: self.hp,

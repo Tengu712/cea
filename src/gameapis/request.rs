@@ -11,6 +11,7 @@ pub mod text;
 pub enum Request {
     NoRequest,
     SetImage(imgid::ImgID),
+    UnsetImage,
     SetCData(cdata::CDataDiff),
     DrawImage,
     DrawText(text::TextDesc),

@@ -1,7 +1,10 @@
 use super::*;
 
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub enum ImgID {
     Title,
+    StFlan,
+    UiFrame,
 }
 impl PackingRequest for ImgID {
     fn pack(self) -> Request {

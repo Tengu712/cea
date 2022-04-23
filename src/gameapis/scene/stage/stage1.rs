@@ -2,11 +2,11 @@ use super::*;
 
 pub const STAGE1_LOG_SIZE: usize = 4;
 pub const STAGE1_START_LOG_SIZE: usize = 2;
-pub const STAGE1_LOG: [&str; STAGE1_LOG_SIZE] = [
-    "はろーわーるど",
-    "ほげ",
-    "ほげ",
-    "ほげ",
+pub const STAGE1_LOG: [(&str, ImgID); STAGE1_LOG_SIZE] = [
+    ("はろーわーるど", ImgID::StFlan),
+    ("ほげ", ImgID::StFlan),
+    ("ど", ImgID::StFlan),
+    ("ろ", ImgID::StFlan),
 ];
 
 pub fn create_stage1_bullet(_: &Player, enemy: &Enemy, phase: u32, cnt_phs: u32) -> LinkedList<Bullet> {
