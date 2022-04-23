@@ -16,17 +16,12 @@ impl Enemy {
         }
     }
     pub fn update(self) -> Self {
-        let pos = [
-            self.pos[0],
-            self.pos[1],
-        ];
-        Self {
-            hp: self.hp,
-            pos,
-        }
+        let pos = [self.pos[0], self.pos[1]];
+        Self { hp: self.hp, pos }
     }
     pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
+        reqs.push_back(Request::UnsetImage);
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
@@ -39,6 +34,7 @@ impl Enemy {
     pub fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         let theta = 360.0 * self.hp[0] as f32 / self.hp[1] as f32;
+        reqs.push_back(Request::UnsetImage);
         for i in 0..360 {
             if i as f32 > theta {
                 break;

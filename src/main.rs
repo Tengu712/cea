@@ -48,6 +48,10 @@ pub fn start_app() -> Result<(), WErr> {
     // Load
     let mut map_image = HashMap::new();
     map_image.insert(
+        ImgID::FlanB0,
+        d3dapp.create_image_from_file(cur_dir.clone() + "ch_flan_b0.png")?,
+    );
+    map_image.insert(
         ImgID::UiFrame,
         d3dapp.create_image_from_file(cur_dir.clone() + "ui_frame.png")?,
     );

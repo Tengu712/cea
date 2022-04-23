@@ -1,14 +1,14 @@
 use super::*;
 
 const PLAYER_RECT: [f32; 4] = [
-    GAME_LEFT + 50.0,
-    GAME_RIGHT - 50.0,
-    GAME_TOP - 200.0,
-    GAME_BOTTOM + 80.0,
+    GAME_LEFT + 10.0,
+    GAME_RIGHT - 10.0,
+    GAME_TOP - 150.0,
+    GAME_BOTTOM + 20.0,
 ];
 const P_SPD: f32 = 8.0;
 const INIT_POS: [f32; 2] = [0.0, -280.0];
-const SQUARE_SIZE: f32 = 80.0;
+const SQUARE_SIZE: f32 = 100.0;
 
 pub struct PlayerInput {
     pub lr_ud: [i32; 2],
@@ -52,6 +52,7 @@ impl Player {
     }
     pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
+        reqs.push_back(ImgID::FlanB0.pack());
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
