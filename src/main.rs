@@ -171,20 +171,11 @@ fn create_default_cdata() -> CData {
 /// Apply constant buffer difference request to cdata.
 fn apply_cdata_diff(cdata: CData, cdata_diff: CDataDiff) -> CData {
     let mut cdata_mut = cdata;
-    if let Some(n) = cdata_diff.scl_xy {
-        cdata_mut.mat_scl = Matrix4x4::new_scaling(n[0], n[1], 1.0);
-    }
-    if let Some(n) = cdata_diff.rot_xyz {
-        cdata_mut.mat_rtx = Matrix4x4::new_rotation_x(n[0]);
-        cdata_mut.mat_rtx = Matrix4x4::new_rotation_y(n[1]);
-        cdata_mut.mat_rtx = Matrix4x4::new_rotation_z(n[2]);
-    }
-    if let Some(n) = cdata_diff.trs_xy {
-        cdata_mut.mat_trs = Matrix4x4::new_translation(n[0], n[1], 0.0);
-    }
-    if let Some(_) = cdata_diff.view_xy {}
-    if let Some(n) = cdata_diff.col_rgba {
-        cdata_mut.vec_col = n;
-    }
+    cdata_mut.mat_scl = Matrix4x4::new_scaling(cdata_diff.scl_xy[0], cdata_diff.scl_xy[1], 1.0);
+    cdata_mut.mat_rtx = Matrix4x4::new_rotation_x(cdata_diff.rot_xyz[0]);
+    cdata_mut.mat_rty = Matrix4x4::new_rotation_y(cdata_diff.rot_xyz[1]);
+    cdata_mut.mat_rtz = Matrix4x4::new_rotation_z(cdata_diff.rot_xyz[2]);
+    cdata_mut.mat_trs = Matrix4x4::new_translation(cdata_diff.trs_xy[0], cdata_diff.trs_xy[1], 0.0);
+    cdata_mut.vec_col = cdata_diff.col_rgba;
     cdata_mut
 }

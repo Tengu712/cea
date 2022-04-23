@@ -32,7 +32,6 @@ pub struct Stage {
     cnt_log: usize,
     graze: u32,
     score: u64,
-    damage: u64,
     state: State,
     player: Player,
     enemy: Enemy,
@@ -47,7 +46,6 @@ impl Stage {
             cnt_chp: 0,
             graze: 0,
             score: 0,
-            damage: 0,
             state: State::Start,
             player: Player::new(),
             enemy: Enemy::new(),
@@ -99,10 +97,6 @@ impl Stage {
             State::Shoot => self.cnt_chp + 1,
             _ => 0,
         };
-        let mut damage = match state {
-            State::Shoot => (self.damage + 1).min(10000),
-            _ => 0,
-        };
         let mut score = self.score;
         let mut graze = self.graze;
         // Update entities
@@ -113,7 +107,7 @@ impl Stage {
         let mut bullets = LinkedList::new();
         match state {
             State::Shoot if self.stage == 1 => {
-                bullets.append(&mut create_stage1_bullet(cnt_chp, &player, &enemy))
+                bullets.append(&mut create_stage1_bullet(cnt_chp, &player, &enemy, 0))
             }
             _ => (),
         }
@@ -135,6 +129,7 @@ impl Stage {
         //   Build ui requests
         // ======================================================================================== //
         let mut reqs_ui = LinkedList::new();
+        reqs_ui.append(&mut enemy.create_reqs_hp_gage());
         reqs_ui.push_back(
             TextDesc::new()
                 .set_text(format!("{:>012}", score))
@@ -142,17 +137,6 @@ impl Stage {
                 .set_format(TextFormat::Score)
                 .pack(),
         );
-        match state {
-            State::Shoot => reqs_ui.push_back(
-                TextDesc::new()
-                    .set_text(damage)
-                    .set_rect(DAMAGE_RECT)
-                    .set_align(TextAlign::Center)
-                    .set_format(TextFormat::Score)
-                    .pack(),
-            ),
-            _ => (),
-        }
         match state {
             State::Shoot => (),
             _ if self.stage == 1 => {
@@ -178,7 +162,6 @@ impl Stage {
                 cnt_log,
                 graze,
                 score,
-                damage,
                 state,
                 player,
                 enemy,
