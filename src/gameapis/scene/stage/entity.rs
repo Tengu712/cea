@@ -7,6 +7,9 @@ pub mod enemy;
 /// The player moves according to an input information.
 pub mod player;
 
+pub const SCORE_RECT: [f32; 4] = [300.0, WIDTH, 0.0, HEIGHT];
+pub const GRAZE_RECT: [f32; 4] = [300.0, WIDTH, 70.0, HEIGHT];
+
 use super::*;
 use bullet::Bullet;
 use enemy::Enemy;
@@ -44,14 +47,14 @@ impl Entity {
         let enemy = self.enemy.update();
         reqs.append(&mut enemy.create_reqs_body());
         // Update player
-        let player = self.player.update(PLAYER_RECT, inp);
+        let player = self.player.update(inp);
         reqs.append(&mut player.create_reqs_body());
         // Update bullet and check hit
         let mut bullets = LinkedList::new();
         let mut flg_hit = 0;
         let mut flg_graze = 0;
         for i in self.bullets {
-            if let Some(n) = i.update(BULLET_RECT) {
+            if let Some(n) = i.update() {
                 if player.check_hit(n.pos, n.r[0]) {
                     flg_hit += 1;
                 } else {
@@ -110,7 +113,7 @@ impl Entity {
         )
     }
     pub fn is_game_clear(&self, stage: u32) -> bool {
-        false
+        self.phase >= if stage == 1 { 3 } else { 0 }
     }
     pub fn is_game_over(&self) -> bool {
         false

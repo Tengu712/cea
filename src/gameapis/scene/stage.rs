@@ -1,4 +1,3 @@
-mod constant;
 mod entity;
 mod logue;
 mod stage1;
@@ -10,7 +9,6 @@ use super::{
     },
     Scene,
 };
-use constant::*;
 use entity::{
     bullet::Bullet,
     enemy::Enemy,
@@ -19,6 +17,13 @@ use entity::{
 };
 use stage1::*;
 use std::collections::LinkedList;
+
+pub const WIDTH: f32 = 1280.0;
+pub const HEIGHT: f32 = 960.0;
+pub const GAME_LEFT: f32 = -392.0;
+pub const GAME_RIGHT: f32 = 392.0;
+pub const GAME_TOP: f32 = 480.0;
+pub const GAME_BOTTOM: f32 = -480.0;
 
 enum State {
     Start,

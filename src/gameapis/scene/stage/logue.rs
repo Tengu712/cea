@@ -1,5 +1,14 @@
 use super::*;
 
+// Stand character
+const ST_LEFT_ACT_POS: [f32; 2] = [-360.0, -60.0];
+const ST_LEFT_ACT_SCL: [f32; 2] = [840.0, 840.0];
+// Logue
+const LOGBOX_POS: [f32; 2] = [0.0, -300.0];
+const LOGBOX_SCL: [f32; 2] = [(GAME_RIGHT - GAME_LEFT) as f32 * 0.85, 120.0];
+const LOGBOX_COL: [f32; 4] = [0.0, 0.0, 0.0, 0.8];
+const LOG_RECT: [f32; 4] = [340.0, 940.0, 735.0, HEIGHT];
+
 pub struct Logue(usize);
 impl Logue {
     pub fn new() -> Self {
@@ -19,12 +28,20 @@ impl Logue {
             reqs.push_back(l.clone().pack());
             reqs.push_back(
                 CDataDiff::new()
-                    .set_trs([-420.0, -80.0])
-                    .set_scl([800.0, 800.0])
+                    .set_trs(ST_LEFT_ACT_POS)
+                    .set_scl(ST_LEFT_ACT_SCL)
                     .pack(),
             );
             reqs.push_back(Request::DrawImage);
             reqs.push_back(Request::UnsetImage);
+            reqs.push_back(
+                CDataDiff::new()
+                    .set_trs(LOGBOX_POS)
+                    .set_scl(LOGBOX_SCL)
+                    .set_col(LOGBOX_COL)
+                    .pack(),
+            );
+            reqs.push_back(Request::DrawImage);
             reqs.push_back(
                 TextDesc::new()
                     .set_text(n)
