@@ -79,7 +79,7 @@ impl Entity {
         let (phase, cnt_phs) = if enemy.hp[0] == 0 {
             (self.phase + 1, 0)
         } else {
-            (self.phase, self.cnt_phs)
+            (self.phase, self.cnt_phs + 1)
         };
         let graze = flg_graze;
         let score = flg_graze as u64 * 10;

@@ -1,8 +1,11 @@
 use super::*;
 
 // Stand character
+const ST_DISACT_COL: [f32; 4] = [0.8, 0.8, 0.8, 1.0];
 const ST_LEFT_ACT_POS: [f32; 2] = [-360.0, -60.0];
 const ST_LEFT_ACT_SCL: [f32; 2] = [840.0, 840.0];
+const ST_LEFT_DISACT_POS: [f32; 2] = [-380.0, -80.0];
+const ST_LEFT_DISACT_SCL: [f32; 2] = [800.0, 800.0];
 // Logue
 const LOGBOX_POS: [f32; 2] = [0.0, -300.0];
 const LOGBOX_SCL: [f32; 2] = [(GAME_RIGHT - GAME_LEFT) as f32 * 0.85, 120.0];
@@ -24,13 +27,20 @@ impl Logue {
     pub fn create_reqs(&self, stage: u32) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if stage == 1 {
-            let (n, l) = &STAGE1_LOG[self.0];
-            reqs.push_back(l.clone().pack());
+            let (n, imgid_left, is_right) = &STAGE1_LOG[self.0];
+            reqs.push_back(imgid_left.clone().pack());
             reqs.push_back(
-                CDataDiff::new()
-                    .set_trs(ST_LEFT_ACT_POS)
-                    .set_scl(ST_LEFT_ACT_SCL)
-                    .pack(),
+                if *is_right {
+                    CDataDiff::new()
+                        .set_trs(ST_LEFT_DISACT_POS)
+                        .set_scl(ST_LEFT_DISACT_SCL)
+                        .set_col(ST_DISACT_COL)
+                } else {
+                    CDataDiff::new()
+                        .set_trs(ST_LEFT_ACT_POS)
+                        .set_scl(ST_LEFT_ACT_SCL)
+                }
+                .pack(),
             );
             reqs.push_back(Request::DrawImage);
             reqs.push_back(Request::UnsetImage);
