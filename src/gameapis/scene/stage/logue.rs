@@ -19,8 +19,8 @@ impl Logue {
             reqs.push_back(l.clone().pack());
             reqs.push_back(
                 CDataDiff::new()
-                    .set_trs([-380.0, -120.0])
-                    .set_scl([720.0, 720.0])
+                    .set_trs([-420.0, -80.0])
+                    .set_scl([800.0, 800.0])
                     .pack(),
             );
             reqs.push_back(Request::DrawImage);
