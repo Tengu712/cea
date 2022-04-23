@@ -15,11 +15,17 @@ impl Enemy {
             pos: [0.0, 280.0],
         }
     }
-    pub fn update(self, cnt_all_f32: f32) -> (Self, LinkedList<Request>) {
+    pub fn update(self, cnt_all_f32: f32) -> Self {
         let pos = [
             self.pos[0],
             self.pos[1] + (cnt_all_f32 * 6.0).to_radians().cos() * 0.5,
         ];
+        Self {
+            hp: self.hp,
+            pos,
+        }
+    }
+    pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         reqs.push_back(
             CDataDiff::new()
@@ -28,13 +34,7 @@ impl Enemy {
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);
-        (
-            Self {
-                hp: [self.hp[0] - 1, self.hp[1]],
-                pos,
-            },
-            reqs,
-        )
+        reqs
     }
     pub fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();

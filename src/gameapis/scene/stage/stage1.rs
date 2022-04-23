@@ -9,10 +9,10 @@ pub const STAGE1_LOG: [&str; STAGE1_LOG_SIZE] = [
     "ほげ",
 ];
 
-pub fn create_stage1_bullet(cnt_chp: u32, _: &Player, enemy: &Enemy, phase: u32) -> LinkedList<Bullet> {
+pub fn create_stage1_bullet(_: &Player, enemy: &Enemy, phase: u32, cnt_phs: u32) -> LinkedList<Bullet> {
     let mut bullets = LinkedList::new();
     if phase == 0 {
-        if cnt_chp % 16 == 0 {
+        if cnt_phs % 16 == 0 {
             for i in 0..32 {
                 bullets.push_back(
                     Bullet::new()
