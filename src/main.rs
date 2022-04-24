@@ -1,9 +1,9 @@
 /// This is a logic of game.
 pub mod gameapis;
+///
+mod resource;
 /// This provides apis to call WindowsAPI.
 pub mod winapis;
-/// 
-mod resource;
 
 use gameapis::{
     input::KeyStates,
@@ -48,27 +48,10 @@ pub fn start_app() -> Result<(), WErr> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
-    let map_image = resource::load_images(&d3dapp, &cur_dir)?;
-    let fontcollection =
-        dwapp.create_custom_font(cur_dir.clone() + "SourceHanSerifJP-VF.ttf")?;
-    let default_text_format = dwapp.create_text_format("源ノ明朝", &fontcollection, 64.0)?;
-    let mut map_text_format = HashMap::new();
-    map_text_format.insert(
-        TextFormat::Normal,
-        dwapp.create_text_format("源ノ明朝", &fontcollection, 42.0)?,
-    );
-    map_text_format.insert(
-        TextFormat::Fps,
-        dwapp.create_text_format("源ノ明朝", &fontcollection, 32.0)?,
-    );
-    map_text_format.insert(
-        TextFormat::Score,
-        dwapp.create_text_format("源ノ明朝", &fontcollection, 60.0)?,
-    );
-    map_text_format.insert(
-        TextFormat::Option,
-        dwapp.create_text_format("源ノ明朝", &fontcollection, 60.0)?,
-    );
+    let config = resource::load_config(cur_dir.clone());
+    let default_text_format = dwapp.create_text_format(" ", None, 64.0)?;
+    let map_text_format = resource::load_font_collection(&dwapp, &config)?;
+    let map_image = resource::load_images(&d3dapp, cur_dir.clone())?;
     // Run the app
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
