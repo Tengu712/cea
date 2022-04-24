@@ -1,30 +1,40 @@
 use super::*;
 
-const ENEMY_SQUARE_SIZE: f32 = 128.0;
+const ENEMY_SQUARE_SIZE: f32 = 140.0;
 const HP_GAGE_R: f32 = 150.0;
 const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
 pub struct Enemy {
+    pub cnt: u32,
     pub hp: [u32; 2],
     pub pos: [f32; 2],
 }
 impl Enemy {
     pub fn new() -> Self {
         Self {
+            cnt: 0,
             hp: [2000; 2],
             pos: [0.0, 280.0],
         }
     }
     pub fn update(self) -> Self {
         let pos = [self.pos[0], self.pos[1]];
-        Self { hp: self.hp, pos }
+        Self {
+            cnt: self.cnt + 1,
+            hp: self.hp,
+            pos,
+        }
     }
     pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
+        let trs = [
+            self.pos[0],
+            self.pos[1] + (self.cnt as f32 * 4.0).to_radians().cos() * 10.0,
+        ];
         reqs.push_back(ImgID::RemiliaF0.pack());
         reqs.push_back(
             CDataDiff::new()
-                .set_trs(self.pos)
+                .set_trs(trs)
                 .set_scl([ENEMY_SQUARE_SIZE, ENEMY_SQUARE_SIZE])
                 .pack(),
         );
