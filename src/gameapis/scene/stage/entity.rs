@@ -7,8 +7,9 @@ pub mod enemy;
 /// The player moves according to an input information.
 pub mod player;
 
-pub const SCORE_RECT: [f32; 4] = [300.0, WIDTH, 0.0, HEIGHT];
-pub const GRAZE_RECT: [f32; 4] = [300.0, WIDTH, 60.0, HEIGHT];
+const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
+const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
+const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
 
 use super::*;
 use bullet::Bullet;
@@ -79,12 +80,22 @@ impl Entity {
         let (phase, cnt_phs) = if enemy.hp[0] == 0 {
             (self.phase + 1, 0)
         } else {
-            (self.phase, self.cnt_phs + 1)
+            (self.phase, self.cnt_phs + is_shooting as u32)
         };
         let graze = flg_graze;
         let score = flg_graze as u64 * 10;
         // UI
         reqs.append(&mut enemy.create_reqs_hp_gage());
+        if is_shooting {
+            reqs.push_back(
+                TextDesc::new()
+                    .set_text(get_time_count(stage, phase, cnt_phs))
+                    .set_rect(TIME_RECT)
+                    .set_align(TextAlign::Right)
+                    .set_format(TextFormat::Score)
+                    .pack(),
+            );
+        }
         reqs.push_back(
             TextDesc::new()
                 .set_text(format!("{:>012}", self.score))
@@ -119,4 +130,12 @@ impl Entity {
     pub fn is_game_over(&self) -> bool {
         false
     }
+}
+fn get_time_count(stage: u32, phase: u32, cnt_phs: u32) -> u32 {
+    let time_limit = if stage == 1 && phase < STAGE1_PHASE_SIZE as u32 {
+        STAGE1_TIMELIMIT[phase as usize]
+    } else {
+        1
+    };
+    (time_limit as i32 - cnt_phs as i32).max(0) as u32 / 60
 }

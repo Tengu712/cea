@@ -8,8 +8,15 @@ pub const STAGE1_LOG: [(&str, ImgID, bool); STAGE1_LOG_SIZE] = [
     ("ど", ImgID::StFlan, false),
     ("ろ", ImgID::StFlan, false),
 ];
+pub const STAGE1_PHASE_SIZE: usize = 3;
+pub const STAGE1_TIMELIMIT: [u32; STAGE1_PHASE_SIZE] = [3600, 3600, 3600];
 
-pub fn create_stage1_bullet(_: &Player, enemy: &Enemy, phase: u32, cnt_phs: u32) -> LinkedList<Bullet> {
+pub fn create_stage1_bullet(
+    _: &Player,
+    enemy: &Enemy,
+    phase: u32,
+    cnt_phs: u32,
+) -> LinkedList<Bullet> {
     let mut bullets = LinkedList::new();
     if phase == 0 {
         if cnt_phs % 16 == 0 {
