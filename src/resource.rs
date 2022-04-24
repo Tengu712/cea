@@ -78,29 +78,30 @@ pub fn load_images(
     cur_dir: String,
 ) -> Result<HashMap<ImgID, D3DImage>, WErr> {
     let mut map = HashMap::new();
+    let res_dir = cur_dir + r"img\";
     map.insert(
         ImgID::FlanB0,
-        d3dapp.create_image_from_file(cur_dir.clone() + "ch_flan_b0.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_b0.png")?,
     );
     map.insert(
         ImgID::FlanR0,
-        d3dapp.create_image_from_file(cur_dir.clone() + "ch_flan_r0.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_r0.png")?,
     );
     map.insert(
         ImgID::FlanL0,
-        d3dapp.create_image_from_file(cur_dir.clone() + "ch_flan_l0.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_l0.png")?,
     );
     map.insert(
         ImgID::RemiliaF0,
-        d3dapp.create_image_from_file(cur_dir.clone() + "ch_remilia_f0.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "ch_remilia_f0.png")?,
     );
     map.insert(
         ImgID::UiFrame,
-        d3dapp.create_image_from_file(cur_dir.clone() + "ui_frame.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "ui_frame.png")?,
     );
     map.insert(
         ImgID::StFlan,
-        d3dapp.create_image_from_file(cur_dir.clone() + "st_flan0.png")?,
+        d3dapp.create_image_from_file(res_dir.clone() + "st_flan0.png")?,
     );
     Ok(map)
 }

@@ -1,4 +1,4 @@
 pshader.cso
 vshader.cso
 *.ttf
-*.png
+/img/
