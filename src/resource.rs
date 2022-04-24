@@ -39,10 +39,12 @@ pub fn load_config(cur_dir: String) -> Config {
         if line_splited.len() != 2 {
             continue;
         }
+        let mut res = line_splited[1].to_string();
+        res.push('\0');
         if line_splited[0] == "NumbersFont" {
-            config.numbers_font = line_splited[1].to_string();
+            config.numbers_font = res;
         } else if line_splited[0] == "DialogueFont" {
-            config.dialogue_font = line_splited[1].to_string();
+            config.dialogue_font = res;
         }
     }
     config
