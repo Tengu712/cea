@@ -4,6 +4,9 @@ use super::*;
 pub enum ImgID {
     Title,
     FlanB0,
+    FlanL0,
+    FlanR0,
+    RemiliaF0,
     StFlan,
     UiFrame,
 }

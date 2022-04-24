@@ -1,6 +1,6 @@
 use super::*;
 
-const ENEMY_SQUARE_SIZE: f32 = 100.0;
+const ENEMY_SQUARE_SIZE: f32 = 128.0;
 const HP_GAGE_R: f32 = 150.0;
 const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
@@ -21,7 +21,7 @@ impl Enemy {
     }
     pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
-        reqs.push_back(Request::UnsetImage);
+        reqs.push_back(ImgID::RemiliaF0.pack());
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)

@@ -59,6 +59,7 @@ impl Bullet {
     }
     pub fn create_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
+        reqs.push_back(Request::UnsetImage);
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
