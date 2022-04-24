@@ -7,6 +7,7 @@ pub enum TextFormat {
     Normal,
     Fps,
     Score,
+    Graze,
 }
 
 pub struct TextDesc {

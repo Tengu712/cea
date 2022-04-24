@@ -8,7 +8,7 @@ pub mod enemy;
 pub mod player;
 
 pub const SCORE_RECT: [f32; 4] = [300.0, WIDTH, 0.0, HEIGHT];
-pub const GRAZE_RECT: [f32; 4] = [300.0, WIDTH, 70.0, HEIGHT];
+pub const GRAZE_RECT: [f32; 4] = [300.0, WIDTH, 60.0, HEIGHT];
 
 use super::*;
 use bullet::Bullet;
@@ -96,6 +96,7 @@ impl Entity {
             TextDesc::new()
                 .set_text(self.graze)
                 .set_rect(GRAZE_RECT)
+                .set_format(TextFormat::Graze)
                 .pack(),
         );
         // Finish

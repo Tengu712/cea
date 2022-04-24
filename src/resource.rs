@@ -64,6 +64,10 @@ pub fn load_font_collection(
         TextFormat::Score,
         dwapp.create_text_format(config.numbers_font.as_str(), None, 60.0)?,
     );
+    map.insert(
+        TextFormat::Graze,
+        dwapp.create_text_format(config.numbers_font.as_str(), None, 56.0)?,
+    );
     Ok(map)
 }
 

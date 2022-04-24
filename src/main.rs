@@ -7,10 +7,9 @@ pub mod winapis;
 
 use gameapis::{
     input::KeyStates,
-    request::{cdata::CDataDiff, text::TextFormat, Request},
+    request::{cdata::CDataDiff, Request},
     Game,
 };
-use std::collections::HashMap;
 use winapis::{
     direct3d::{
         cbuffer::CData,
