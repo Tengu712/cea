@@ -58,6 +58,7 @@ impl Entity {
         let mut flg_graze = 0;
         for i in self.bullets {
             if let Some(n) = i.update() {
+                println!("{:p}", &n);
                 if check_hit(player.pos, n.pos, n.knd.r) {
                     flg_hit += 1;
                 } else {
