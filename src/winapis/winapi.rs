@@ -59,14 +59,10 @@ extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: L
 }
 
 /// Struct to reference basic objects
-pub struct WindowsApplication {
-    hwnd: HWND,
-    dir: String,
-}
+pub struct WindowsApplication(HWND);
 impl WindowsApplication {
     /// Create WindowsApplication struct that is only way to use api with window handle.
     pub fn new(
-        dir: String,
         title: &str,
         width: i32,
         height: i32,
@@ -130,10 +126,7 @@ impl WindowsApplication {
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
-        Ok(Self {
-            dir: dir.to_string(),
-            hwnd,
-        })
+        Ok(Self(hwnd))
     }
     /// Process all window events.
     /// If return value is true, window has closed. Otherwise, it is deadtime.
@@ -155,11 +148,7 @@ impl WindowsApplication {
         false
     }
     /// Getter for window handle.
-    pub fn get_window_handle(&self) -> &HWND {
-        &self.hwnd
-    }
-    /// Getter for current directory.
-    pub fn get_cur_dir(&self) -> &String {
-        &self.dir
+    pub(super) fn get_window_handle(&self) -> &HWND {
+        &self.0
     }
 }

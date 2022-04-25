@@ -16,13 +16,13 @@ fn raise_err(errknd: EKnd, arg: &String, message: &str) -> WErr {
 }
 
 /// Struct to reference image data.
-pub struct ImageConverter {
-    pub converter: IWICFormatConverter,
-    pub width: u32,
-    pub height: u32,
+pub(super) struct ImageConverter {
+    pub(super) converter: IWICFormatConverter,
+    pub(super) width: u32,
+    pub(super) height: u32,
 }
 impl ImageConverter {
-    pub fn from_file(path: String) -> Result<Self, WErr> {
+    pub(super) fn from_file(path: String) -> Result<Self, WErr> {
         let factory: IWICImagingFactory = unsafe {
             CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_SERVER)
                 .map_err(|_| raise_err(EKnd::Creation, &path, "WICfactory"))?

@@ -1,19 +1,19 @@
 use std::time::Instant;
 
-pub struct FpsData {
+pub(super) struct FpsData {
     fps: f32,
     count: u32,
     last: Instant,
 }
 impl FpsData {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             fps: 0.0,
             count: 0,
             last: Instant::now(),
         }
     }
-    pub fn update(self) -> Self {
+    pub(super) fn update(self) -> Self {
         let end = Instant::now();
         let since = end.duration_since(self.last);
         if since.as_secs() >= 1 {
@@ -30,7 +30,7 @@ impl FpsData {
             }
         }
     }
-    pub fn get_fps(&self) -> f32 {
+    pub(super) fn get_fps(&self) -> f32 {
         self.fps
     }
 }

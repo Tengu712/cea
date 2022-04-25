@@ -1,5 +1,6 @@
 use super::*;
 use std::mem::size_of;
+use windows::Win32::Graphics::{Direct3D11::*, Dxgi::Common::DXGI_FORMAT_R32_UINT};
 
 /// Use it when making model buffer.
 pub struct Vertex {
@@ -7,7 +8,6 @@ pub struct Vertex {
     pub col: [f32; 4],
     pub tex: [f32; 2],
 }
-
 /// A struct for vertex and index buffers.
 pub struct ModelBuffer {
     num_idx: u32,

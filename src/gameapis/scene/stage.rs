@@ -2,27 +2,21 @@ mod entity;
 mod logue;
 mod stage1;
 
-use super::{
-    super::{
-        input::KeyStates,
-        request::{cdata::*, imgid::*, text::*, *},
-    },
-    Scene,
-};
-use entity::{
-    enemy::Enemy,
-    player::{Player, PlayerInput},
-    *,
-};
-use stage1::*;
-use std::collections::LinkedList;
+use super::*;
 
-pub const WIDTH: f32 = 1280.0;
-pub const HEIGHT: f32 = 960.0;
-pub const GAME_LEFT: f32 = -392.0;
-pub const GAME_RIGHT: f32 = 392.0;
-pub const GAME_TOP: f32 = 480.0;
-pub const GAME_BOTTOM: f32 = -480.0;
+const WIDTH: f32 = 1280.0;
+const HEIGHT: f32 = 960.0;
+const GAME_LEFT: f32 = -392.0;
+const GAME_RIGHT: f32 = 392.0;
+const GAME_TOP: f32 = 480.0;
+const GAME_BOTTOM: f32 = -480.0;
+
+struct PlayerInput {
+    lr_ud: [i32; 2],
+    cnt_s: i16,
+    cnt_z: i16,
+    cnt_x: i16,
+}
 
 enum State {
     Start,
@@ -31,24 +25,24 @@ enum State {
     GameOver,
 }
 
-pub struct Stage {
+pub(in super::super) struct Stage {
     stage: u32,
     cnt_all: u32,
     state: State,
     logue: logue::Logue,
-    entity: Entity,
+    entity: entity::Entity,
 }
 impl Stage {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             stage: 1,
             cnt_all: 0,
             state: State::Start,
             logue: logue::Logue::new(),
-            entity: Entity::new(),
+            entity: entity::Entity::new(),
         }
     }
-    pub fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
+    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
         let cnt_all = self.cnt_all + 1;
         // Do task that reacts with input
         let inp = {

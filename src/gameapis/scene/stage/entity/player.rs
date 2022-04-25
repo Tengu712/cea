@@ -13,19 +13,12 @@ const PLAYER_BULLET_VELOCITY: f32 = 40.0;
 const PLAYER_BULLET_POS_DIF: [f32; 2] = [20.0, 50.0];
 const PLAYER_BULLET_BASE_DAMAGE: i32 = 100;
 
-pub struct PlayerInput {
-    pub lr_ud: [i32; 2],
-    pub cnt_s: i16,
-    pub cnt_z: i16,
-    pub cnt_x: i16,
-}
-
-pub struct Player {
-    pub pos: [f32; 2],
-    pub inp: PlayerInput,
+pub(in super::super) struct Player {
+    pub(super) pos: [f32; 2],
+    pub(super) inp: PlayerInput,
 }
 impl Player {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             pos: INIT_POS,
             inp: PlayerInput {
@@ -36,7 +29,7 @@ impl Player {
             },
         }
     }
-    pub fn update(self, inp: PlayerInput) -> Self {
+    pub(super) fn update(self, inp: PlayerInput) -> Self {
         let c_spd = if inp.cnt_s > 0 { 0.5 } else { 1.0 }
             / if inp.lr_ud[0].abs() + inp.lr_ud[1].abs() == 2 {
                 std::f32::consts::SQRT_2
@@ -53,7 +46,7 @@ impl Player {
         ];
         Self { pos, inp }
     }
-    pub fn create_reqs_body(&self) -> LinkedList<Request> {
+    pub(super) fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if self.inp.lr_ud[0] == 1 {
             reqs.push_back(IMGID_FLAN_R0.pack());
@@ -71,7 +64,7 @@ impl Player {
         reqs.push_back(Request::DrawImage);
         reqs
     }
-    pub fn shoot(&self) -> LinkedList<Bullet> {
+    pub(super) fn shoot(&self) -> LinkedList<Bullet> {
         let mut res = LinkedList::new();
         if !self.is_shootable() {
             return res;
@@ -90,7 +83,7 @@ impl Player {
         ]));
         res
     }
-    pub fn is_shootable(&self) -> bool {
+    pub(super) fn is_shootable(&self) -> bool {
         self.inp.cnt_z % 6 == 1
     }
 }

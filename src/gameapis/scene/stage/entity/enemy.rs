@@ -4,20 +4,20 @@ const ENEMY_SQUARE_SIZE: f32 = 140.0;
 const HP_GAGE_R: f32 = 150.0;
 const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
-pub struct Enemy {
-    pub cnt: u32,
-    pub hp: [i32; 2],
-    pub pos: [f32; 2],
+pub(in super::super) struct Enemy {
+    pub(super) cnt: u32,
+    pub(super) hp: [i32; 2],
+    pub(super) pos: [f32; 2],
 }
 impl Enemy {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             cnt: 0,
             hp: [2000; 2],
             pos: [0.0, 280.0],
         }
     }
-    pub fn update(self) -> Self {
+    pub(super) fn update(self) -> Self {
         let pos = [self.pos[0], self.pos[1]];
         Self {
             cnt: self.cnt + 1,
@@ -25,7 +25,7 @@ impl Enemy {
             pos,
         }
     }
-    pub fn create_reqs_body(&self) -> LinkedList<Request> {
+    pub(super) fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         let trs = [
             self.pos[0],
@@ -41,7 +41,7 @@ impl Enemy {
         reqs.push_back(Request::DrawImage);
         reqs
     }
-    pub fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
+    pub(super) fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         let theta = 360.0 * self.hp[0].max(0) as f32 / self.hp[1] as f32;
         reqs.push_back(Request::UnsetImage);

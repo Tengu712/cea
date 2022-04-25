@@ -1,5 +1,7 @@
 use super::*;
 
+use super::stage1::*;
+
 // Stand character
 const ST_DISACT_COL: [f32; 4] = [0.8, 0.8, 0.8, 1.0];
 const ST_LEFT_ACT_POS: [f32; 2] = [-360.0, -60.0];
@@ -12,19 +14,19 @@ const LOGBOX_SCL: [f32; 2] = [(GAME_RIGHT - GAME_LEFT) as f32 * 0.85, 120.0];
 const LOGBOX_COL: [f32; 4] = [0.0, 0.0, 0.0, 0.8];
 const LOG_RECT: [f32; 4] = [340.0, 940.0, 735.0, HEIGHT];
 
-pub struct Logue(usize);
+pub(super) struct Logue(usize);
 impl Logue {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self(0)
     }
-    pub fn update(self, is_down_z: bool) -> Self {
+    pub(super) fn update(self, is_down_z: bool) -> Self {
         if is_down_z {
             Self(self.0 + 1)
         } else {
             Self(self.0)
         }
     }
-    pub fn create_reqs(&self, stage: u32) -> LinkedList<Request> {
+    pub(super) fn create_reqs(&self, stage: u32) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if stage == 1 {
             let (n, imgid_left, is_right) = &STAGE1_LOG[self.0];
@@ -62,10 +64,10 @@ impl Logue {
         }
         reqs
     }
-    pub fn is_end_start_log(&self, stage: u32) -> bool {
+    pub(super) fn is_end_start_log(&self, stage: u32) -> bool {
         self.0 >= if stage == 1 { STAGE1_START_LOG_SIZE } else { 0 }
     }
-    pub fn is_end_log(&self, stage: u32) -> bool {
+    pub(super) fn is_end_log(&self, stage: u32) -> bool {
         self.0 >= if stage == 1 { STAGE1_LOG_SIZE } else { 0 }
     }
 }

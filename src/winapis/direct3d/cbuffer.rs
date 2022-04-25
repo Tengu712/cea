@@ -1,4 +1,7 @@
-use super::{super::math::Matrix4x4, *};
+use super::{
+    super::{math::Matrix4x4, *},
+    raise_err, D3DApplication,
+};
 
 /// Constant buffer data.
 pub struct CData {

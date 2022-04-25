@@ -1,15 +1,14 @@
 /// [essential]
 /// This defines CDataDiff struct.
-mod cdata;
+pub mod cdata;
 /// [essential]
 /// This defines ImgID enum that's a kind of resource identifier.
-mod imgid;
+pub mod imgid;
 /// [essential]
 /// This defines Text struct.
-mod text;
+pub mod text;
 
 pub enum Request {
-    NoRequest,
     SetImage(imgid::ImgID),
     UnsetImage,
     SetCData(cdata::CDataDiff),

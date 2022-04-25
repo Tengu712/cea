@@ -1,11 +1,17 @@
-use super::{super::directwrite::DWriteApp, super::winapi::WindowsApplication, *};
+use super::{
+    super::{directwrite::DWriteApp, winapi::WindowsApplication, *},
+    raise_err, D3DApplication,
+};
 use windows::{
     core::Interface,
     Win32::{
         Graphics::{
-            Direct2D::{Common::*, *},
-            DirectWrite::*,
-            Dxgi::{Common::*, *},
+            Direct2D::{
+                Common::{D2D1_ALPHA_MODE_PREMULTIPLIED, D2D1_PIXEL_FORMAT},
+                *,
+            },
+            DirectWrite::{DWriteCreateFactory, IDWriteFactory5, DWRITE_FACTORY_TYPE_SHARED},
+            Dxgi::{Common::DXGI_FORMAT_R8G8B8A8_UNORM, IDXGIDevice, IDXGISurface},
         },
         UI::HiDpi::GetDpiForWindow,
     },

@@ -16,18 +16,18 @@ fn main() {
     }
 }
 /// Start application.
-pub fn start_app() -> Result<(), winapis::WErr> {
+fn start_app() -> Result<(), winapis::WErr> {
     let cur_dir = get_curdir_for_winapp().unwrap_or(String::from(r"\"));
     // Create window app
     let winapp = winapis::winapi::WindowsApplication::new(
-        cur_dir.clone(),
         "",
         WIDTH as i32,
         HEIGHT as i32,
         winapis::winapi::ask_yesno("Start with a fullscreen window?", "question"),
     )?;
     // Create drawing app
-    let d3dapp = winapis::direct3d::D3DApplication::new(&winapp, WIDTH, HEIGHT)?;
+    let d3dapp =
+        winapis::direct3d::D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
     let config = resource::load_config(cur_dir.clone());
@@ -54,7 +54,6 @@ pub fn start_app() -> Result<(), winapis::WErr> {
         let (next, reqs) = game.update(&keystates);
         for i in reqs {
             match i {
-                gameapis::request::Request::NoRequest => (),
                 gameapis::request::Request::SetImage(n) => {
                     cdata = d3dapp.set_d3dimage(map_image.get(n.0), cdata)
                 }
@@ -65,7 +64,7 @@ pub fn start_app() -> Result<(), winapis::WErr> {
                 }
                 gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea)?,
                 gameapis::request::Request::DrawText(n) => {
-                    let desc = winapis::directwrite::text::TextDesc::new()
+                    let desc = winapis::directwrite::TextDesc::new()
                         .set_text(n.text)
                         .set_rect(n.rect)
                         .set_rgba(n.rgba)

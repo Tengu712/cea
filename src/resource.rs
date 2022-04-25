@@ -12,8 +12,8 @@ use std::{
 use windows::Win32::Graphics::DirectWrite::IDWriteTextFormat;
 
 pub struct Config {
-    pub numbers_font: String,
-    pub dialogue_font: String,
+    numbers_font: String,
+    dialogue_font: String,
 }
 impl Config {
     fn new() -> Self {
@@ -49,6 +49,7 @@ pub fn load_config(cur_dir: String) -> Config {
     }
     config
 }
+
 pub fn load_font_collection(
     dwapp: &DWriteApp,
     config: &Config,

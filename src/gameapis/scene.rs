@@ -1,12 +1,25 @@
-mod title;
-/// [essensial]
-/// use gameapis::player.
-mod stage;
+pub(super) mod stage;
+pub(super) mod title;
 
-use title::Title;
-use stage::Stage;
+use super::{
+    input::KeyStates,
+    request::{cdata::*, imgid::*, text::*, *},
+};
+use std::collections::LinkedList;
 
-pub enum Scene {
-    Title(Title),
-    Stage(Stage),
+pub(super) enum Scene {
+    Title(title::Title),
+    Stage(stage::Stage),
+}
+impl Scene {
+    pub(super) fn update(self, keystates: &KeyStates) -> (Self, LinkedList<Request>) {
+        match self {
+            Scene::Title(n) => n.update(keystates),
+            Scene::Stage(n) => n.update(keystates),
+        }
+    }
+}
+
+pub(super) fn create_first_scene() -> Scene {
+    Scene::Title(title::Title::new())
 }

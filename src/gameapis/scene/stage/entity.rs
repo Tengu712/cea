@@ -1,22 +1,24 @@
 /// [essensial]
-mod bullet;
+pub(super) mod bullet;
 /// [essensial]
 /// The enemy moves according to an instruction.
-mod enemy;
+pub(super) mod enemy;
 /// [essensial]
 /// The player moves according to an input information.
-mod player;
+pub(super) mod player;
+
+use super::*;
+
+use super::stage1::*;
+use bullet::*;
+use enemy::Enemy;
+use player::Player;
 
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
 const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
 
-use super::*;
-use bullet::*;
-use enemy::Enemy;
-use player::{Player, PlayerInput};
-
-pub struct Entity {
+pub(super) struct Entity {
     score: u64,
     phase: u32,
     cnt_phs: u32,
@@ -27,7 +29,7 @@ pub struct Entity {
     pbullets: LinkedList<Bullet>,
 }
 impl Entity {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             score: 0,
             phase: 0,
@@ -39,7 +41,7 @@ impl Entity {
             pbullets: LinkedList::new(),
         }
     }
-    pub fn update(
+    pub(super) fn update(
         self,
         is_shooting: bool,
         stage: u32,
@@ -143,10 +145,10 @@ impl Entity {
             reqs,
         )
     }
-    pub fn is_game_clear(&self, stage: u32) -> bool {
+    pub(super) fn is_game_clear(&self, stage: u32) -> bool {
         self.phase >= if stage == 1 { 3 } else { 0 }
     }
-    pub fn is_game_over(&self) -> bool {
+    pub(super) fn is_game_over(&self) -> bool {
         false
     }
 }

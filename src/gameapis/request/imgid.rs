@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Clone)]
 pub struct ImgID(pub &'static str);
-impl ImgID {
-    pub fn pack(self) -> Request {
+impl PackingRequest for ImgID {
+    fn pack(self) -> Request {
         Request::SetImage(self)
     }
 }

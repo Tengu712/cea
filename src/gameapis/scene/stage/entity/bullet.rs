@@ -8,27 +8,27 @@ const BULLET_RECT: [f32; 4] = [
 ];
 
 #[derive(Clone)]
-pub struct BulletKind {
+pub(super) struct BulletKind {
     imgid: ImgID,
     size: f32,
-    pub r: f32,
+    pub(super) r: f32,
 }
-pub const BUL_FLAN: BulletKind = BulletKind {
+pub(super) const BUL_FLAN: BulletKind = BulletKind {
     imgid: IMGID_BUL_FLAN,
     size: 90.0,
     r: 100.0,
 };
 
 #[derive(Clone)]
-pub struct Bullet {
-    pub knd: BulletKind,
-    pub vel: f32,
-    pub deg: f32,
-    pub pos: [f32; 2],
-    pub dmg: i32,
+pub(in super::super) struct Bullet {
+    pub(super) knd: BulletKind,
+    pub(super) vel: f32,
+    pub(super) deg: f32,
+    pub(super) pos: [f32; 2],
+    pub(super) dmg: i32,
 }
 impl Bullet {
-    pub fn new(knd: BulletKind) -> Self {
+    pub(super) fn new(knd: BulletKind) -> Self {
         Self {
             knd,
             vel: 0.0,
@@ -37,27 +37,27 @@ impl Bullet {
             dmg: 0,
         }
     }
-    pub fn set_pos(self, pos: [f32; 2]) -> Self {
+    pub(super) fn set_pos(self, pos: [f32; 2]) -> Self {
         let mut self_mut = self;
         self_mut.pos = pos;
         self_mut
     }
-    pub fn set_vel(self, vel: f32) -> Self {
+    pub(super) fn set_vel(self, vel: f32) -> Self {
         let mut self_mut = self;
         self_mut.vel = vel;
         self_mut
     }
-    pub fn set_deg(self, deg: f32) -> Self {
+    pub(super) fn set_deg(self, deg: f32) -> Self {
         let mut self_mut = self;
         self_mut.deg = deg;
         self_mut
     }
-    pub fn set_dmg(self, dmg: i32) -> Self {
+    pub(super) fn set_dmg(self, dmg: i32) -> Self {
         let mut self_mut = self;
         self_mut.dmg = dmg;
         self_mut
     }
-    pub fn update(self) -> Option<Self> {
+    pub(super) fn update(self) -> Option<Self> {
         let pos = [
             self.pos[0] + self.vel * self.deg.to_radians().cos(),
             self.pos[1] + self.vel * self.deg.to_radians().sin(),
@@ -78,7 +78,7 @@ impl Bullet {
             })
         }
     }
-    pub fn create_reqs(&self) -> LinkedList<Request> {
+    pub(super) fn create_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         reqs.push_back(self.knd.imgid.clone().pack());
         reqs.push_back(

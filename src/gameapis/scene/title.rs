@@ -1,19 +1,13 @@
-use super::{
-    super::{
-        input::KeyStates,
-        request::{text::*, *},
-    },
-    stage::Stage,
-    Scene,
-};
-use std::collections::LinkedList;
+use super::*;
 
-pub struct Title(u32);
+use super::stage::Stage;
+
+pub(in super::super) struct Title(u32);
 impl Title {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self(0)
     }
-    pub fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
+    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
         let mut reqs = LinkedList::new();
         reqs.push_back(
             TextDesc::new()

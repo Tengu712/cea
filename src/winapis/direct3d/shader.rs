@@ -1,16 +1,21 @@
-use super::{cbuffer::CData, *};
+use super::cbuffer::CData;
+use super::*;
 use std::{fs::File, io::Read, mem::size_of};
+use windows::{
+    core::PCSTR,
+    Win32::Graphics::{Direct3D11::*, Dxgi::Common::*},
+};
 
 /// A struct for giving coms around shaders to D3DApp.
-pub struct ShaderComs {
-    pub vshader: ID3D11VertexShader,
-    pub pshader: ID3D11PixelShader,
-    pub ilayout: ID3D11InputLayout,
-    pub cbuffer: ID3D11Buffer,
+pub(super) struct ShaderComs {
+    pub(super) vshader: ID3D11VertexShader,
+    pub(super) pshader: ID3D11PixelShader,
+    pub(super) ilayout: ID3D11InputLayout,
+    pub(super) cbuffer: ID3D11Buffer,
 }
 impl ShaderComs {
     /// A function for create coms around shader effectively.
-    pub fn new(device: &ID3D11Device, dir: &String) -> Result<Self, WErr> {
+    pub(super) fn new(device: &ID3D11Device, dir: &String) -> Result<Self, WErr> {
         // Open vshader.cso here for input layout creation
         let mut vshader_bytebuf = Vec::new();
         File::open(dir.clone() + "vshader.cso")

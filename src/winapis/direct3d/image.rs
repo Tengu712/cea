@@ -1,11 +1,11 @@
-use super::{super::image::ImageConverter, cbuffer::CData, *};
+use super::*;
+use super::{super::image::ImageConverter, cbuffer::CData};
+use windows::Win32::Graphics::{
+    Direct3D::D3D11_SRV_DIMENSION_TEXTURE2D, Direct3D11::*, Dxgi::Common::*,
+};
 
 /// Image available to Direct3D.
-pub struct D3DImage {
-    srv_img: Option<ID3D11ShaderResourceView>,
-    pub width: u32,
-    pub height: u32,
-}
+pub struct D3DImage(Option<ID3D11ShaderResourceView>);
 
 impl D3DApplication {
     /// Create Image for Direct3D.
@@ -62,17 +62,13 @@ impl D3DApplication {
                 .CreateShaderResourceView(&texture, &srv_desc)
                 .map_err(|_| raise_err_arg(EKnd::Creation, &path, "ShaderResourceView"))?
         };
-        Ok(D3DImage {
-            srv_img: Some(srv_img),
-            width: img_cnvtr.width,
-            height: img_cnvtr.height,
-        })
+        Ok(D3DImage(Some(srv_img)))
     }
     /// Set D3DImage.
     pub fn set_d3dimage(&self, d3dimage: Option<&D3DImage>, cdata: CData) -> CData {
         let mut cdata_mut = cdata;
         if let Some(n) = d3dimage {
-            unsafe { self.context.PSSetShaderResources(0, 1, &n.srv_img) };
+            unsafe { self.context.PSSetShaderResources(0, 1, &n.0) };
             cdata_mut.vec_prm[0] = 1.0;
         } else {
             cdata_mut.vec_prm[0] = 0.0;
