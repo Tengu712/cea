@@ -1,11 +1,11 @@
 /// [essensial]
-pub mod bullet;
+mod bullet;
 /// [essensial]
 /// The enemy moves according to an instruction.
-pub mod enemy;
+mod enemy;
 /// [essensial]
 /// The player moves according to an input information.
-pub mod player;
+mod player;
 
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];

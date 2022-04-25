@@ -1,7 +1,7 @@
 /// This enables to use custom font.
-pub mod font;
+mod font;
 /// This enables to draw text on screen.
-pub mod text;
+mod text;
 
 use super::*;
 use windows::Win32::Graphics::{Direct2D::*, DirectWrite::*};

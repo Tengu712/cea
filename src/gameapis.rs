@@ -3,13 +3,13 @@
 mod fps;
 /// [essensial]
 /// This provides a way to get key input states.
-pub mod input;
+mod input;
 /// [essensial]
 /// This defines request.
-pub mod request;
+mod request;
 /// [essensial]
 /// This defines each scene updater.
-pub mod scene;
+mod scene;
 
 pub struct Game(scene::Scene, fps::FpsData);
 impl Game {
@@ -33,7 +33,7 @@ impl Game {
                 .set_text(format!("{:.1}fps", fpsdata.get_fps()))
                 .set_rect([0.0, 1270.0, 920.0, 960.0])
                 .set_format(request::text::TextFormat::Fps)
-                .set_align(super::winapis::directwrite::text::TextAlign::Right),
+                .set_align(request::text::TextAlign::Right),
         ));
         (Self(scene, fpsdata), reqs)
     }

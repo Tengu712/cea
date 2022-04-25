@@ -1,7 +1,7 @@
-pub mod title;
+mod title;
 /// [essensial]
 /// use gameapis::player.
-pub mod stage;
+mod stage;
 
 use title::Title;
 use stage::Stage;

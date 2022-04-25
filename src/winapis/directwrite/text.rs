@@ -8,19 +8,12 @@ use windows::{
     },
 };
 
-#[derive(Clone, Copy)]
-pub enum TextAlign {
-    Left,
-    Center,
-    Right,
-}
-
 /// Use it when drawing text.
 pub struct TextDesc {
     pub text: String,
     pub rect: [f32; 4],
     pub rgba: [f32; 4],
-    pub align: TextAlign,
+    pub align: u32,
 }
 impl TextDesc {
     pub fn new() -> Self {
@@ -28,7 +21,7 @@ impl TextDesc {
             text: String::new(),
             rect: [0.0, 1280.0, 0.0, 720.0],
             rgba: [1.0; 4],
-            align: TextAlign::Left,
+            align: 0,
         }
     }
     pub fn set_text<T: std::string::ToString>(self, text: T) -> Self {
@@ -46,7 +39,7 @@ impl TextDesc {
         self_mut.rgba = rgba;
         self_mut
     }
-    pub fn set_align(self, align: TextAlign) -> Self {
+    pub fn set_align(self, align: u32) -> Self {
         let mut self_mut = self;
         self_mut.align = align;
         self_mut
@@ -56,10 +49,12 @@ impl TextDesc {
 impl DWriteApp {
     /// Draw text. To call it, user give it DrawTextDesc struct.
     pub fn draw_text(&self, desc: &TextDesc, format: &IDWriteTextFormat) -> Result<(), WErr> {
-        let alignment = match desc.align {
-            TextAlign::Left => DWRITE_TEXT_ALIGNMENT_LEADING,
-            TextAlign::Center => DWRITE_TEXT_ALIGNMENT_CENTER,
-            TextAlign::Right => DWRITE_TEXT_ALIGNMENT_TRAILING,
+        let alignment = if desc.align == 1 {
+            DWRITE_TEXT_ALIGNMENT_CENTER
+        } else if desc.align == 2 {
+            DWRITE_TEXT_ALIGNMENT_TRAILING
+        } else {
+            DWRITE_TEXT_ALIGNMENT_LEADING
         };
         unsafe {
             format

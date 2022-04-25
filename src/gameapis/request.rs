@@ -1,12 +1,12 @@
 /// [essential]
 /// This defines CDataDiff struct.
-pub mod cdata;
+mod cdata;
 /// [essential]
 /// This defines ImgID enum that's a kind of resource identifier.
-pub mod imgid;
+mod imgid;
 /// [essential]
 /// This defines Text struct.
-pub mod text;
+mod text;
 
 pub enum Request {
     NoRequest,

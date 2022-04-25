@@ -1,13 +1,17 @@
 use super::*;
 
-pub use super::super::super::winapis::directwrite::text::TextAlign;
-
 #[derive(Eq, PartialEq, Hash)]
 pub enum TextFormat {
     Normal,
     Fps,
     Score,
     Graze,
+}
+
+pub enum TextAlign {
+    Left = 0,
+    Center = 1,
+    Right = 2,
 }
 
 pub struct TextDesc {
