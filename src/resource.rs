@@ -1,4 +1,4 @@
-use super::gameapis::request::{imgid::ImgID, text::TextFormat};
+use super::gameapis::request::{imgid::*, text::TextFormat};
 use super::winapis::{
     direct3d::{image::D3DImage, D3DApplication},
     directwrite::DWriteApp,
@@ -76,36 +76,11 @@ pub fn load_font_collection(
 pub fn load_images(
     d3dapp: &D3DApplication,
     cur_dir: String,
-) -> Result<HashMap<ImgID, D3DImage>, WErr> {
+) -> Result<HashMap<&str, D3DImage>, WErr> {
     let mut map = HashMap::new();
     let res_dir = cur_dir + r"img\";
-    map.insert(
-        ImgID::BulFlan,
-        d3dapp.create_image_from_file(res_dir.clone() + "bu_flan.png")?,
-    );
-    map.insert(
-        ImgID::FlanB0,
-        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_b0.png")?,
-    );
-    map.insert(
-        ImgID::FlanR0,
-        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_r0.png")?,
-    );
-    map.insert(
-        ImgID::FlanL0,
-        d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_l0.png")?,
-    );
-    map.insert(
-        ImgID::RemiliaF0,
-        d3dapp.create_image_from_file(res_dir.clone() + "ch_remilia_f0.png")?,
-    );
-    map.insert(
-        ImgID::UiFrame,
-        d3dapp.create_image_from_file(res_dir.clone() + "ui_frame.png")?,
-    );
-    map.insert(
-        ImgID::StFlan,
-        d3dapp.create_image_from_file(res_dir.clone() + "st_flan0.png")?,
-    );
+    for i in IMGID_ARRAY {
+        map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
+    }
     Ok(map)
 }

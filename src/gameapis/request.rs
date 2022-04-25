@@ -10,7 +10,7 @@ pub mod text;
 
 pub enum Request {
     NoRequest,
-    SetImage(imgid::ImgID),
+    SetImage(&str),
     UnsetImage,
     SetCData(cdata::CDataDiff),
     DrawImage,
