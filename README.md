@@ -52,3 +52,6 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 `CreateFontSetBuilder2`メソッドで`IDWriteFontSetBuilder1`が作られるのは名前の付け方が酷い。
 
 `IDWriteLocalizedStrings::FindLocaleName`のトレイト境界が`IntoParam<'a, PCWSTR>`なんだけど、何がこれを満たしているねん。
+
+`IRestrictedErrorInfo::GetErrorDetails`の引数に`*mut windows::core::bindings::BSTR`が必須で、それが大事なんだが、`bindings`モジュールがprivateという。
+どんな開発してんだ。
