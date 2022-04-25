@@ -46,7 +46,7 @@ impl Enemy {
         let theta = 360.0 * self.hp[0].max(0) as f32 / self.hp[1] as f32;
         reqs.push_back(Request::UnsetImage);
         for i in 0..360 {
-            if i as f32 > theta {
+            if i as f32 >= theta {
                 break;
             }
             reqs.push_back(
