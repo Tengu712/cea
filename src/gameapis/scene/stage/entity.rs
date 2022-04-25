@@ -50,10 +50,10 @@ impl Entity {
         let mut reqs = LinkedList::new();
         // Update enemy
         let mut enemy = self.enemy.update();
-        reqs.append(&mut enemy.create_reqs_body());
+        reqs.append(&mut enemy.create_body_reqs());
         // Update player
         let player = self.player.update(inp);
-        reqs.append(&mut player.create_reqs_body());
+        reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
         let mut bullets = LinkedList::new();
         let mut flg_hit = 0;
@@ -83,6 +83,8 @@ impl Entity {
                 }
             }
         }
+        // Slowcircle
+        reqs.append(&mut player.create_slow_requests());
         // Launch bullet
         if is_shooting {
             pbullets.append(&mut player.shoot());

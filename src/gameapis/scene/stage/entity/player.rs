@@ -9,6 +9,8 @@ const PLAYER_RECT: [f32; 4] = [
 const P_SPD: f32 = 8.0;
 const INIT_POS: [f32; 2] = [0.0, -280.0];
 const SQUARE_SIZE: f32 = 100.0;
+const HITCIRCLE_SIZE: f32 = 16.0;
+const SLOWCIRCLE_SIZE: f32 = 140.0;
 const PLAYER_BULLET_VELOCITY: f32 = 40.0;
 const PLAYER_BULLET_POS_DIF: [f32; 2] = [20.0, 50.0];
 const PLAYER_BULLET_BASE_DAMAGE: i32 = 100;
@@ -46,7 +48,7 @@ impl Player {
         ];
         Self { pos, inp }
     }
-    pub(super) fn create_reqs_body(&self) -> LinkedList<Request> {
+    pub(super) fn create_body_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if self.inp.lr_ud[0] == 1 {
             reqs.push_back(IMGID_FLAN_R0.pack());
@@ -62,6 +64,50 @@ impl Player {
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);
+        reqs
+    }
+    pub(super) fn create_slow_requests(&self) -> LinkedList<Request> {
+        let mut reqs = LinkedList::new();
+        if self.inp.cnt_s <= 0 {
+            return reqs;
+        }
+        reqs.push_back(IMGID_HITCIRCLE.pack());
+        reqs.push_back(
+            CDataDiff::new()
+                .set_trs(self.pos)
+                .set_scl([HITCIRCLE_SIZE, HITCIRCLE_SIZE])
+                .set_rot([0.0, 0.0, (self.inp.cnt_s as f32 * 2.0).to_radians()])
+                .pack(),
+        );
+        reqs.push_back(Request::DrawImage);
+        reqs.push_back(IMGID_SLOWCIRCLE.pack());
+        if self.inp.cnt_s < 10 {
+            let size = (SLOWCIRCLE_SIZE + 1.0) * 2.0 * (1.0 - self.inp.cnt_s as f32 / 10.0);
+            reqs.push_back(
+                CDataDiff::new()
+                    .set_trs(self.pos)
+                    .set_scl([size, size])
+                    .pack(),
+            );
+            reqs.push_back(Request::DrawImage);
+        } else {
+            reqs.push_back(
+                CDataDiff::new()
+                    .set_trs(self.pos)
+                    .set_scl([SLOWCIRCLE_SIZE, SLOWCIRCLE_SIZE])
+                    .set_rot([0.0, 0.0, (self.inp.cnt_s as f32 * 4.0).to_radians()])
+                    .pack(),
+            );
+            reqs.push_back(Request::DrawImage);
+            reqs.push_back(
+                CDataDiff::new()
+                    .set_trs(self.pos)
+                    .set_scl([SLOWCIRCLE_SIZE, SLOWCIRCLE_SIZE])
+                    .set_rot([0.0, 0.0, -1.0 * (self.inp.cnt_s as f32 * 4.0).to_radians()])
+                    .pack(),
+            );
+            reqs.push_back(Request::DrawImage);
+        }
         reqs
     }
     pub(super) fn shoot(&self) -> LinkedList<Bullet> {

@@ -25,7 +25,7 @@ impl Enemy {
             pos,
         }
     }
-    pub(super) fn create_reqs_body(&self) -> LinkedList<Request> {
+    pub(super) fn create_body_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         let trs = [
             self.pos[0],
