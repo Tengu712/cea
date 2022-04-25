@@ -80,7 +80,7 @@ pub fn load_images(
     let mut map = HashMap::new();
     let res_dir = cur_dir + r"img\";
     for i in IMGID_ARRAY {
-        map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
+        map.insert(i.0, d3dapp.create_image_from_file(res_dir.clone() + i.0)?);
     }
     Ok(map)
 }

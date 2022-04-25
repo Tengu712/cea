@@ -56,11 +56,11 @@ impl Player {
     pub fn create_reqs_body(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if self.inp.lr_ud[0] == 1 {
-            reqs.push_back(ImgID::FlanR0.pack());
+            reqs.push_back(IMGID_FLAN_R0.pack());
         } else if self.inp.lr_ud[0] == -1 {
-            reqs.push_back(ImgID::FlanL0.pack());
+            reqs.push_back(IMGID_FLAN_L0.pack());
         } else {
-            reqs.push_back(ImgID::FlanB0.pack());
+            reqs.push_back(IMGID_FLAN_B0.pack());
         }
         reqs.push_back(
             CDataDiff::new()

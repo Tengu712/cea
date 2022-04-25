@@ -72,7 +72,7 @@ pub fn start_app() -> Result<(), WErr> {
         for i in reqs {
             match i {
                 Request::NoRequest => (),
-                Request::SetImage(n) => cdata = d3dapp.set_d3dimage(map_image.get(&n), cdata),
+                Request::SetImage(n) => cdata = d3dapp.set_d3dimage(map_image.get(n.0), cdata),
                 Request::UnsetImage => cdata = d3dapp.set_d3dimage(None, cdata),
                 Request::SetCData(n) => {
                     cdata = apply_cdata_diff(cdata, n);

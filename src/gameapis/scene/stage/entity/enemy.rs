@@ -31,7 +31,7 @@ impl Enemy {
             self.pos[0],
             self.pos[1] + (self.cnt as f32 * 4.0).to_radians().cos() * 10.0,
         ];
-        reqs.push_back(ImgID::RemiliaF0.pack());
+        reqs.push_back(IMGID_REMILIA_F0.pack());
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(trs)

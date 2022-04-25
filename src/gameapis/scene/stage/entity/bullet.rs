@@ -14,7 +14,7 @@ pub struct BulletKind {
     pub r: f32,
 }
 pub const BUL_FLAN: BulletKind = BulletKind {
-    imgid: ImgID::BulFlan,
+    imgid: IMGID_BUL_FLAN,
     size: 90.0,
     r: 100.0,
 };

@@ -88,7 +88,7 @@ impl Stage {
         };
         // Finish
         let mut reqs = reqs_entity;
-        reqs.push_back(ImgID::UiFrame.pack());
+        reqs.push_back(IMGID_FRAME.pack());
         reqs.push_back(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
         reqs.push_back(Request::DrawImage);
         reqs.push_back(Request::UnsetImage);

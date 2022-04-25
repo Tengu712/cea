@@ -4,10 +4,10 @@ use super::*;
 pub const STAGE1_LOG_SIZE: usize = 4;
 pub const STAGE1_START_LOG_SIZE: usize = 2;
 pub const STAGE1_LOG: [(&str, ImgID, bool); STAGE1_LOG_SIZE] = [
-    ("はろーわーるど", ImgID::StFlan, false),
-    ("ほげ", ImgID::StFlan, true),
-    ("ど", ImgID::StFlan, false),
-    ("ろ", ImgID::StFlan, false),
+    ("はろーわーるど", IMGID_FLAN_ST0, false),
+    ("ほげ", IMGID_FLAN_ST0, true),
+    ("ど", IMGID_FLAN_ST0, false),
+    ("ろ", IMGID_FLAN_ST0, false),
 ];
 pub const STAGE1_PHASE_SIZE: usize = 3;
 pub const STAGE1_TIMELIMIT: [u32; STAGE1_PHASE_SIZE] = [3600, 3600, 3600];
