@@ -7,19 +7,34 @@ const BULLET_RECT: [f32; 4] = [
     GAME_BOTTOM - 80.0,
 ];
 
+#[derive(Clone)]
+pub struct BulletKind {
+    imgid: ImgID,
+    size: f32,
+    pub r: f32,
+}
+pub const BUL_FLAN: BulletKind = BulletKind {
+    imgid: ImgID::BulFlan,
+    size: 90.0,
+    r: 100.0,
+};
+
+#[derive(Clone)]
 pub struct Bullet {
-    pub r: [f32; 2],
+    pub knd: BulletKind,
     pub vel: f32,
     pub deg: f32,
     pub pos: [f32; 2],
+    pub dmg: i32,
 }
 impl Bullet {
-    pub fn new() -> Self {
+    pub fn new(knd: BulletKind) -> Self {
         Self {
-            r: [0.0; 2],
+            knd,
             vel: 0.0,
             deg: 0.0,
             pos: [0.0; 2],
+            dmg: 0,
         }
     }
     pub fn set_pos(self, pos: [f32; 2]) -> Self {
@@ -37,6 +52,11 @@ impl Bullet {
         self_mut.deg = deg;
         self_mut
     }
+    pub fn set_dmg(self, dmg: i32) -> Self {
+        let mut self_mut = self;
+        self_mut.dmg = dmg;
+        self_mut
+    }
     pub fn update(self) -> Option<Self> {
         let pos = [
             self.pos[0] + self.vel * self.deg.to_radians().cos(),
@@ -50,20 +70,21 @@ impl Bullet {
             None
         } else {
             Some(Self {
-                r: self.r,
+                knd: self.knd,
                 vel: self.vel,
                 deg: self.deg,
                 pos,
+                dmg: self.dmg,
             })
         }
     }
     pub fn create_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
-        reqs.push_back(Request::UnsetImage);
+        reqs.push_back(self.knd.imgid.clone().pack());
         reqs.push_back(
             CDataDiff::new()
                 .set_trs(self.pos)
-                .set_scl([10.0, 10.0])
+                .set_scl([self.knd.size, self.knd.size])
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);

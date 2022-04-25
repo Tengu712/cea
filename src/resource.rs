@@ -80,6 +80,10 @@ pub fn load_images(
     let mut map = HashMap::new();
     let res_dir = cur_dir + r"img\";
     map.insert(
+        ImgID::BulFlan,
+        d3dapp.create_image_from_file(res_dir.clone() + "bu_flan.png")?,
+    );
+    map.insert(
         ImgID::FlanB0,
         d3dapp.create_image_from_file(res_dir.clone() + "ch_flan_b0.png")?,
     );

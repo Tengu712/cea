@@ -10,7 +10,6 @@ use super::{
     Scene,
 };
 use entity::{
-    bullet::Bullet,
     enemy::Enemy,
     player::{Player, PlayerInput},
     *,
@@ -57,14 +56,14 @@ impl Stage {
             let inp_y = (keystates.up > 0) as i32 - (keystates.down > 0) as i32;
             PlayerInput {
                 lr_ud: [inp_x, inp_y],
-                slow: keystates.s > 0,
-                snap: keystates.z == 1,
-                atack: keystates.x == 1,
+                cnt_s: keystates.s,
+                cnt_z: keystates.z,
+                cnt_x: keystates.x,
             }
         };
         // Update logue
         let logue = match self.state {
-            State::Start | State::End => self.logue.update(inp.snap),
+            State::Start | State::End => self.logue.update(inp.cnt_z == 1),
             _ => self.logue,
         };
         let state = match self.state {

@@ -12,7 +12,7 @@ const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
 const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
 
 use super::*;
-use bullet::Bullet;
+use bullet::*;
 use enemy::Enemy;
 use player::{Player, PlayerInput};
 
@@ -24,6 +24,7 @@ pub struct Entity {
     player: Player,
     enemy: Enemy,
     bullets: LinkedList<Bullet>,
+    pbullets: LinkedList<Bullet>,
 }
 impl Entity {
     pub fn new() -> Self {
@@ -35,6 +36,7 @@ impl Entity {
             player: Player::new(),
             enemy: Enemy::new(),
             bullets: LinkedList::new(),
+            pbullets: LinkedList::new(),
         }
     }
     pub fn update(
@@ -45,28 +47,42 @@ impl Entity {
     ) -> (Self, LinkedList<Request>) {
         let mut reqs = LinkedList::new();
         // Update enemy
-        let enemy = self.enemy.update();
+        let mut enemy = self.enemy.update();
         reqs.append(&mut enemy.create_reqs_body());
         // Update player
         let player = self.player.update(inp);
         reqs.append(&mut player.create_reqs_body());
-        // Update bullet and check hit
+        // Update enemy's bullet and check hit
         let mut bullets = LinkedList::new();
         let mut flg_hit = 0;
         let mut flg_graze = 0;
         for i in self.bullets {
             if let Some(n) = i.update() {
-                if player.check_hit(n.pos, n.r[0]) {
+                if check_hit(player.pos, n.pos, n.knd.r) {
                     flg_hit += 1;
                 } else {
-                    flg_graze += player.check_hit(n.pos, n.r[1]) as u32;
+                    flg_graze += check_hit(player.pos, n.pos, n.knd.r * 3.0) as u32;
                     reqs.append(&mut n.create_reqs());
                     bullets.push_back(n);
                 }
             }
         }
+        // Update player's bullet
+        let mut pbullets = LinkedList::new();
+        let mut damage_sum = 0;
+        for i in self.pbullets {
+            if let Some(n) = i.update() {
+                if check_hit(enemy.pos, n.pos, n.knd.r) {
+                    damage_sum += n.dmg;
+                } else {
+                    reqs.append(&mut n.create_reqs());
+                    pbullets.push_back(n);
+                }
+            }
+        }
         // Launch bullet
         if is_shooting {
+            pbullets.append(&mut player.shoot());
             if stage == 1 {
                 bullets.append(&mut create_stage1_bullet(
                     &player,
@@ -77,7 +93,8 @@ impl Entity {
             }
         }
         // Calculate
-        let (phase, cnt_phs) = if enemy.hp[0] == 0 {
+        enemy.hp[0] = enemy.hp[0] - damage_sum;
+        let (phase, cnt_phs) = if enemy.hp[0] <= 0 {
             (self.phase + 1, 0)
         } else {
             (self.phase, self.cnt_phs + is_shooting as u32)
@@ -120,6 +137,7 @@ impl Entity {
                 player,
                 enemy,
                 bullets,
+                pbullets,
             },
             reqs,
         )
@@ -138,4 +156,11 @@ fn get_time_count(stage: u32, phase: u32, cnt_phs: u32) -> u32 {
         1
     };
     (time_limit as i32 - cnt_phs as i32).max(0) as u32 / 60
+}
+fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {
+    if (pos1[0] - pos2[0]).powf(2.0) + (pos1[1] - pos2[1]).powf(2.0) < r.powf(2.0) {
+        true
+    } else {
+        false
+    }
 }

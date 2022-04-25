@@ -3,6 +3,7 @@ use super::*;
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub enum ImgID {
     Title,
+    BulFlan,
     FlanB0,
     FlanL0,
     FlanR0,

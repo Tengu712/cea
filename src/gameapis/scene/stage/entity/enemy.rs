@@ -6,7 +6,7 @@ const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
 pub struct Enemy {
     pub cnt: u32,
-    pub hp: [u32; 2],
+    pub hp: [i32; 2],
     pub pos: [f32; 2],
 }
 impl Enemy {
@@ -43,7 +43,7 @@ impl Enemy {
     }
     pub fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
-        let theta = 360.0 * self.hp[0] as f32 / self.hp[1] as f32;
+        let theta = 360.0 * self.hp[0].max(0) as f32 / self.hp[1] as f32;
         reqs.push_back(Request::UnsetImage);
         for i in 0..360 {
             if i as f32 > theta {
