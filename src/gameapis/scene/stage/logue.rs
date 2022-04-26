@@ -19,20 +19,23 @@ impl Logue {
     pub(super) fn new() -> Self {
         Self(0)
     }
-    pub(super) fn update(self, is_down_z: bool) -> Self {
-        if is_down_z {
+    pub(super) fn update(self, cnt_z: i16) -> Self {
+        if cnt_z == 1 || cnt_z > 20 {
             Self(self.0 + 1)
         } else {
             Self(self.0)
         }
     }
-    pub(super) fn create_reqs(&self, stage: u32) -> LinkedList<Request> {
+    pub(super) fn create_reqs(&self, stage: usize) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
-        if stage == 1 {
-            let (n, imgid_left, is_right) = &STAGE1_LOG[self.0];
-            reqs.push_back(imgid_left.clone().pack());
+        if self.is_end_log(stage) {
+            return reqs;
+        }
+        let (text, imgid_left, is_right) = LOG[stage][self.0].clone();
+        if let Some(n) = imgid_left {
+            reqs.push_back(n.pack());
             reqs.push_back(
-                if *is_right {
+                if is_right {
                     CDataDiff::new()
                         .set_trs(ST_LEFT_DISACT_POS)
                         .set_scl(ST_LEFT_DISACT_SCL)
@@ -45,29 +48,29 @@ impl Logue {
                 .pack(),
             );
             reqs.push_back(Request::DrawImage);
-            reqs.push_back(Request::UnsetImage);
-            reqs.push_back(
-                CDataDiff::new()
-                    .set_trs(LOGBOX_POS)
-                    .set_scl(LOGBOX_SCL)
-                    .set_col(LOGBOX_COL)
-                    .pack(),
-            );
-            reqs.push_back(Request::DrawImage);
-            reqs.push_back(
-                TextDesc::new()
-                    .set_text(n)
-                    .set_rect(LOG_RECT)
-                    .set_format(TextFormat::Normal)
-                    .pack(),
-            );
         }
+        reqs.push_back(Request::UnsetImage);
+        reqs.push_back(
+            CDataDiff::new()
+                .set_trs(LOGBOX_POS)
+                .set_scl(LOGBOX_SCL)
+                .set_col(LOGBOX_COL)
+                .pack(),
+        );
+        reqs.push_back(Request::DrawImage);
+        reqs.push_back(
+            TextDesc::new()
+                .set_text(text)
+                .set_rect(LOG_RECT)
+                .set_format(TextFormat::Normal)
+                .pack(),
+        );
         reqs
     }
-    pub(super) fn is_end_start_log(&self, stage: u32) -> bool {
-        self.0 >= if stage == 1 { STAGE1_START_LOG_SIZE } else { 0 }
+    pub(super) fn is_end_start_log(&self, stage: usize) -> bool {
+        stage >= STAGE_SIZE || self.0 >= LOG_MAX_SIZE || self.0 >= START_LOG_SIZE[stage]
     }
-    pub(super) fn is_end_log(&self, stage: u32) -> bool {
-        self.0 >= if stage == 1 { STAGE1_LOG_SIZE } else { 0 }
+    pub(super) fn is_end_log(&self, stage: usize) -> bool {
+        stage >= STAGE_SIZE || self.0 >= LOG_MAX_SIZE || self.0 >= END_LOG_SIZE[stage]
     }
 }

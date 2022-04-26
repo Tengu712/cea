@@ -20,7 +20,7 @@ const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
 
 pub(super) struct Entity {
     score: u64,
-    phase: u32,
+    phase: usize,
     cnt_phs: u32,
     graze: u32,
     player: Player,
@@ -44,7 +44,7 @@ impl Entity {
     pub(super) fn update(
         self,
         is_shooting: bool,
-        stage: u32,
+        stage: usize,
         inp: PlayerInput,
     ) -> (Self, LinkedList<Request>) {
         let mut reqs = LinkedList::new();
@@ -99,7 +99,9 @@ impl Entity {
         }
         // Calculate
         enemy.hp[0] = enemy.hp[0] - damage_sum;
-        let (phase, cnt_phs) = if enemy.hp[0] <= 0 {
+        let time_limit = get_time_limit(stage, self.phase);
+        let (phase, cnt_phs) = if enemy.hp[0] <= 0 || self.cnt_phs > time_limit {
+            enemy.hp[0] = get_max_hp(stage, self.phase + 1);
             (self.phase + 1, 0)
         } else {
             (self.phase, self.cnt_phs + is_shooting as u32)
@@ -111,7 +113,7 @@ impl Entity {
         if is_shooting {
             reqs.push_back(
                 TextDesc::new()
-                    .set_text(get_time_count(stage, phase, cnt_phs))
+                    .set_text((time_limit as i32 - cnt_phs as i32).max(0) / 60)
                     .set_rect(TIME_RECT)
                     .set_align(TextAlign::Right)
                     .set_format(TextFormat::Score)
@@ -120,14 +122,14 @@ impl Entity {
         }
         reqs.push_back(
             TextDesc::new()
-                .set_text(format!("{:>012}", self.score))
+                .set_text(format!("{:>012}", score))
                 .set_rect(SCORE_RECT)
                 .set_format(TextFormat::Score)
                 .pack(),
         );
         reqs.push_back(
             TextDesc::new()
-                .set_text(self.graze)
+                .set_text(graze)
                 .set_rect(GRAZE_RECT)
                 .set_format(TextFormat::Graze)
                 .pack(),
@@ -147,20 +149,26 @@ impl Entity {
             reqs,
         )
     }
-    pub(super) fn is_game_clear(&self, stage: u32) -> bool {
-        self.phase >= if stage == 1 { 3 } else { 0 }
+    pub(super) fn is_game_clear(&self, stage: usize) -> bool {
+        stage >= STAGE_SIZE || self.phase >= PHASE_SIZE[stage]
     }
     pub(super) fn is_game_over(&self) -> bool {
         false
     }
 }
-fn get_time_count(stage: u32, phase: u32, cnt_phs: u32) -> u32 {
-    let time_limit = if stage == 1 && phase < STAGE1_PHASE_SIZE as u32 {
-        STAGE1_TIMELIMIT[phase as usize]
-    } else {
+fn get_time_limit(stage: usize, phase: usize) -> u32 {
+    if stage >= STAGE_SIZE || phase >= PHASE_SIZE[stage] {
         1
-    };
-    (time_limit as i32 - cnt_phs as i32).max(0) as u32 / 60
+    } else {
+        TIMELIMIT[stage][phase]
+    }
+}
+fn get_max_hp(stage: usize, phase: usize) -> i32 {
+    if stage >= STAGE_SIZE || phase >= PHASE_SIZE[stage] {
+        0
+    } else {
+        MAXHP[stage][phase]
+    }
 }
 fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {
     if (pos1[0] - pos2[0]).powf(2.0) + (pos1[1] - pos2[1]).powf(2.0) < r.powf(2.0) {

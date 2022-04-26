@@ -26,8 +26,8 @@ enum State {
 }
 
 pub(in super::super) struct Stage {
-    stage: u32,
-    cnt_all: u32,
+    cnt: u32,
+    stage: usize,
     state: State,
     logue: logue::Logue,
     entity: entity::Entity,
@@ -35,15 +35,15 @@ pub(in super::super) struct Stage {
 impl Stage {
     pub(super) fn new() -> Self {
         Self {
-            stage: 1,
-            cnt_all: 0,
+            cnt: 0,
+            stage: 0,
             state: State::Start,
             logue: logue::Logue::new(),
             entity: entity::Entity::new(),
         }
     }
     pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
-        let cnt_all = self.cnt_all + 1;
+        let cnt = self.cnt + 1;
         // Do task that reacts with input
         let inp = {
             let inp_x = (keystates.right > 0) as i32 - (keystates.left > 0) as i32;
@@ -57,7 +57,7 @@ impl Stage {
         };
         // Update logue
         let logue = match self.state {
-            State::Start | State::End => self.logue.update(inp.cnt_z == 1),
+            State::Start | State::End => self.logue.update(inp.cnt_z),
             _ => self.logue,
         };
         let state = match self.state {
@@ -92,8 +92,8 @@ impl Stage {
         }
         (
             Scene::Stage(Stage {
+                cnt,
                 stage: self.stage,
-                cnt_all,
                 state,
                 logue,
                 entity,
