@@ -15,6 +15,8 @@ pub enum Request {
     SetView(cdata::ViewDesc),
     SetPerse(cdata::PerseDesc),
     SetOrtho(cdata::OrthoDesc),
+    Overlay,
+    Multiple,
     DrawImage,
     DrawText(text::TextDesc),
 }

@@ -55,6 +55,7 @@ impl Entity {
         let player = self.player.update(inp);
         reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
+        reqs.push_back(Request::Overlay);
         let mut e_buls = LinkedList::new();
         let mut is_hit = false;
         let mut cnt_graze = 0;
@@ -72,6 +73,7 @@ impl Entity {
                 }
             }
         }
+        reqs.push_back(Request::Multiple);
         // Update player's bullet
         let mut p_buls = LinkedList::new();
         let mut damage_sum = 0;

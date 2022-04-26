@@ -30,6 +30,7 @@ pub(super) struct Bullet {
     pub(super) vel: f32,
     pub(super) deg: f32,
     pub(super) pos: [f32; 2],
+    pub(super) col: [f32; 4],
     pub(super) dmg: i32,
     pub(super) is_grazed: bool,
 }
@@ -40,6 +41,7 @@ impl Bullet {
             vel: 0.0,
             deg: 0.0,
             pos: [0.0; 2],
+            col: [1.0; 4],
             dmg: 0,
             is_grazed: false,
         }
@@ -64,6 +66,11 @@ impl Bullet {
         self_mut.dmg = dmg;
         self_mut
     }
+    pub(super) fn set_col(self, col: [f32; 4]) -> Self {
+        let mut self_mut = self;
+        self_mut.col = col;
+        self_mut
+    }
     pub(super) fn update(self) -> Option<Self> {
         let pos = [
             self.pos[0] + self.vel * self.deg.to_radians().cos(),
@@ -81,6 +88,7 @@ impl Bullet {
                 vel: self.vel,
                 deg: self.deg,
                 pos,
+                col: self.col,
                 dmg: self.dmg,
                 is_grazed: self.is_grazed,
             })
@@ -93,6 +101,7 @@ impl Bullet {
             CDataDiff::new()
                 .set_trs(self.pos)
                 .set_scl([self.knd.size, self.knd.size])
+                .set_col(self.col)
                 .pack(),
         );
         reqs.push_back(Request::DrawImage);

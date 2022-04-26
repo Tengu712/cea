@@ -76,6 +76,14 @@ fn start_app() -> Result<(), winapis::WErr> {
                         winapis::math::Matrix4x4::new_ortho(n.l, n.r, n.t, n.b, n.n, n.f);
                     d3dapp.set_cdata(&cdata)?;
                 }
+                gameapis::request::Request::Multiple => {
+                    cdata.vec_prm[1] = 0.0;
+                    d3dapp.set_cdata(&cdata)?;
+                }
+                gameapis::request::Request::Overlay => {
+                    cdata.vec_prm[1] = 1.0;
+                    d3dapp.set_cdata(&cdata)?;
+                }
                 gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea)?,
                 gameapis::request::Request::DrawText(n) => {
                     let desc = winapis::directwrite::TextDesc::new()
