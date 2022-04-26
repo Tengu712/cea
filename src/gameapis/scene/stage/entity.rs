@@ -8,6 +8,8 @@ use super::player::Player;
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
 const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
+const HP_GAGE_R: f32 = 150.0;
+const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
 pub(super) struct Entity {
     score: u64,
@@ -157,8 +159,6 @@ fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {
         false
     }
 }
-const HP_GAGE_R: f32 = 150.0;
-const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 fn create_hp_gage_reqs(e_hp: [i32; 2], e_pos: [f32; 2]) -> LinkedList<Request> {
     let mut reqs = LinkedList::new();
     let theta = 360.0 * e_hp[0].max(0) as f32 / e_hp[1].max(1) as f32;
