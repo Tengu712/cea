@@ -1,9 +1,9 @@
 mod bullet;
+mod constant;
 mod enemy;
 mod entity;
 mod logue;
 mod player;
-mod stage1;
 
 use super::*;
 

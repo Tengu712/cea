@@ -1,9 +1,9 @@
 use super::*;
 
 use super::bullet::*;
+use super::constant::*;
 use super::enemy::Enemy;
 use super::player::Player;
-use super::stage1::*;
 
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];

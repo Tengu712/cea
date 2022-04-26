@@ -1,6 +1,6 @@
 use super::*;
 
-use super::stage1::*;
+use super::constant::*;
 
 // Stand character
 const ST_DISACT_COL: [f32; 4] = [0.8, 0.8, 0.8, 1.0];
