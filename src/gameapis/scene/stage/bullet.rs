@@ -31,6 +31,7 @@ pub(super) struct Bullet {
     pub(super) deg: f32,
     pub(super) pos: [f32; 2],
     pub(super) dmg: i32,
+    pub(super) is_grazed: bool,
 }
 impl Bullet {
     pub(super) fn new(knd: BulletKind) -> Self {
@@ -40,6 +41,7 @@ impl Bullet {
             deg: 0.0,
             pos: [0.0; 2],
             dmg: 0,
+            is_grazed: false,
         }
     }
     pub(super) fn set_pos(self, pos: [f32; 2]) -> Self {
@@ -80,6 +82,7 @@ impl Bullet {
                 deg: self.deg,
                 pos,
                 dmg: self.dmg,
+                is_grazed: self.is_grazed,
             })
         }
     }

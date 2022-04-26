@@ -2,8 +2,10 @@ mod bullet;
 mod constant;
 mod enemy;
 mod entity;
+mod hp;
 mod logue;
 mod player;
+mod rate;
 
 use super::*;
 
