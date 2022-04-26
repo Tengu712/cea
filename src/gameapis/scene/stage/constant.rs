@@ -67,13 +67,30 @@ pub(super) fn get_max_hp(stage: usize, phase: usize) -> i32 {
     }
 }
 
-pub(super) fn create_stage1_bullet(
+fn create_stage1_bullet(
     _: &Player,
     enemy: &Enemy,
     phase: usize,
     cnt_phs: u32,
 ) -> LinkedList<Bullet> {
     let mut bullets = LinkedList::new();
-    if phase == 0 {}
+    if phase == 0 {
+        if cnt_phs % 8 == 0 {
+            bullets.push_back(Bullet::new(BUL_CIRCLE).set_pos(enemy.pos).set_vel(5.0));
+        }
+    }
     bullets
+}
+pub(super) fn launch_bullet(
+    stage: usize,
+    player: &Player,
+    enemy: &Enemy,
+    phase: usize,
+    cnt_phs: u32,
+) -> LinkedList<Bullet> {
+    if stage == 0 {
+        create_stage1_bullet(player, enemy, phase, cnt_phs)
+    } else {
+        LinkedList::new()
+    }
 }

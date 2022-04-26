@@ -51,7 +51,6 @@ impl Entity {
         let mut flg_graze = 0;
         for i in self.e_buls {
             if let Some(n) = i.update() {
-                println!("{:p}", &n);
                 if check_hit(player.pos, n.pos, n.knd.r) {
                     flg_hit += 1;
                 } else {
@@ -79,14 +78,13 @@ impl Entity {
         // Launch bullet
         if is_shooting {
             p_buls.append(&mut player.shoot());
-            if stage == 1 {
-                e_buls.append(&mut create_stage1_bullet(
-                    &player,
-                    &enemy,
-                    self.phase,
-                    self.cnt_phs,
-                ));
-            }
+            e_buls.append(&mut launch_bullet(
+                stage,
+                &player,
+                &enemy,
+                self.phase,
+                self.cnt_phs,
+            ));
         }
         // Calculate
         enemy.hp[0] = enemy.hp[0] - damage_sum;

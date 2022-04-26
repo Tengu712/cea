@@ -18,6 +18,11 @@ pub(super) const BUL_FLAN: BulletKind = BulletKind {
     size: 90.0,
     r: 100.0,
 };
+pub(super) const BUL_CIRCLE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE,
+    size: 30.0,
+    r: 10.0,
+};
 
 #[derive(Clone)]
 pub(super) struct Bullet {
