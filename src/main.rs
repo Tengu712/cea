@@ -62,6 +62,20 @@ fn start_app() -> Result<(), winapis::WErr> {
                     cdata = apply_cdata_diff(cdata, n);
                     d3dapp.set_cdata(&cdata)?;
                 }
+                gameapis::request::Request::SetView(n) => {
+                    cdata.mat_view = winapis::math::Matrix4x4::new_view(n.pos, n.rot);
+                    d3dapp.set_cdata(&cdata)?;
+                }
+                gameapis::request::Request::SetPerse(n) => {
+                    cdata.mat_proj =
+                        winapis::math::Matrix4x4::new_perse(n.w, n.h, n.theta, n.n, n.f);
+                    d3dapp.set_cdata(&cdata)?;
+                }
+                gameapis::request::Request::SetOrtho(n) => {
+                    cdata.mat_proj =
+                        winapis::math::Matrix4x4::new_ortho(n.l, n.r, n.t, n.b, n.n, n.f);
+                    d3dapp.set_cdata(&cdata)?;
+                }
                 gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea)?,
                 gameapis::request::Request::DrawText(n) => {
                     let desc = winapis::directwrite::TextDesc::new()
@@ -163,9 +177,9 @@ fn apply_cdata_diff(
         mat_rty: winapis::math::Matrix4x4::new_rotation_y(cdata_diff.rot_xyz[1]),
         mat_rtz: winapis::math::Matrix4x4::new_rotation_z(cdata_diff.rot_xyz[2]),
         mat_trs: winapis::math::Matrix4x4::new_translation(
-            cdata_diff.trs_xy[0],
-            cdata_diff.trs_xy[1],
-            0.0,
+            cdata_diff.trs_xyz[0],
+            cdata_diff.trs_xyz[1],
+            cdata_diff.trs_xyz[2],
         ),
         mat_view: cdata.mat_view,
         mat_proj: cdata.mat_proj,

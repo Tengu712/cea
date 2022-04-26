@@ -1,3 +1,4 @@
+mod bg;
 mod bullet;
 mod constant;
 mod enemy;
@@ -16,6 +17,7 @@ const GAME_RIGHT: f32 = 392.0;
 const GAME_TOP: f32 = 480.0;
 const GAME_BOTTOM: f32 = -480.0;
 
+#[derive(Clone)]
 struct PlayerInput {
     lr_ud: [i32; 2],
     cnt_s: i16,
@@ -36,6 +38,7 @@ pub(in super::super) struct Stage {
     state: State,
     logue: logue::Logue,
     entity: entity::Entity,
+    bg: bg::Background,
 }
 impl Stage {
     pub(super) fn new() -> Self {
@@ -45,6 +48,7 @@ impl Stage {
             state: State::Start,
             logue: logue::Logue::new(),
             entity: entity::Entity::new(0, 0),
+            bg: bg::Background::new(),
         }
     }
     pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
@@ -77,7 +81,7 @@ impl Stage {
             State::Shoot => true,
             _ => false,
         };
-        let (entity, reqs_entity) = self.entity.update(is_shooting, self.stage, inp);
+        let (entity, mut reqs_entity) = self.entity.update(is_shooting, self.stage, inp.clone());
         let state = if is_shooting && entity.is_game_over() {
             State::GameOver
         } else if is_shooting && entity.is_game_clear(self.stage) {
@@ -85,8 +89,11 @@ impl Stage {
         } else {
             state
         };
+        // Back ground
+        let bg = self.bg.update(inp.lr_ud[0]);
+        let mut reqs = bg.create_reqs(cnt);
         // Finish
-        let mut reqs = reqs_entity;
+        reqs.append(&mut reqs_entity);
         reqs.push_back(IMGID_FRAME.pack());
         reqs.push_back(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
         reqs.push_back(Request::DrawImage);
@@ -101,6 +108,7 @@ impl Stage {
                 state,
                 logue,
                 entity,
+                bg,
             }),
             reqs,
         )

@@ -12,6 +12,9 @@ pub enum Request {
     SetImage(imgid::ImgID),
     UnsetImage,
     SetCData(cdata::CDataDiff),
+    SetView(cdata::ViewDesc),
+    SetPerse(cdata::PerseDesc),
+    SetOrtho(cdata::OrthoDesc),
     DrawImage,
     DrawText(text::TextDesc),
 }
