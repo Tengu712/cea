@@ -29,14 +29,14 @@ pub(super) struct Entity {
     pbullets: LinkedList<Bullet>,
 }
 impl Entity {
-    pub(super) fn new() -> Self {
+    pub(super) fn new(stage: usize) -> Self {
         Self {
             score: 0,
             phase: 0,
             cnt_phs: 0,
             graze: 0,
             player: Player::new(),
-            enemy: Enemy::new(),
+            enemy: Enemy::new(get_max_hp(stage, 0)),
             bullets: LinkedList::new(),
             pbullets: LinkedList::new(),
         }
@@ -102,12 +102,13 @@ impl Entity {
         let time_limit = get_time_limit(stage, self.phase);
         let (phase, cnt_phs) = if enemy.hp[0] <= 0 || self.cnt_phs > time_limit {
             enemy.hp[0] = get_max_hp(stage, self.phase + 1);
+            enemy.hp[1] = get_max_hp(stage, self.phase + 1);
             (self.phase + 1, 0)
         } else {
             (self.phase, self.cnt_phs + is_shooting as u32)
         };
-        let graze = flg_graze;
-        let score = flg_graze as u64 * 10;
+        let graze = self.graze + flg_graze;
+        let score = self.score + flg_graze as u64 * 10;
         // UI
         reqs.append(&mut enemy.create_reqs_hp_gage());
         if is_shooting {

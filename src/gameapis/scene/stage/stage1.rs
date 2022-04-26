@@ -36,7 +36,7 @@ pub(super) const TIMELIMIT: [[u32; PHASE_MAX_SIZE]; STAGE_SIZE] = [
     [3600, 3600, 3600, 0, 0],
 ];
 pub(super) const MAXHP: [[i32; PHASE_MAX_SIZE]; STAGE_SIZE] = [
-    [10000, 10000, 10000, 0, 0],
+    [2000, 2000, 10000, 0, 0],
     [10000, 10000, 10000, 0, 0],
     [10000, 10000, 10000, 0, 0],
 ];

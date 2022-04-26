@@ -39,7 +39,7 @@ impl Stage {
             stage: 0,
             state: State::Start,
             logue: logue::Logue::new(),
-            entity: entity::Entity::new(),
+            entity: entity::Entity::new(0),
         }
     }
     pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {

@@ -10,10 +10,10 @@ pub(in super::super) struct Enemy {
     pub(super) pos: [f32; 2],
 }
 impl Enemy {
-    pub(super) fn new() -> Self {
+    pub(super) fn new(hp: i32) -> Self {
         Self {
             cnt: 0,
-            hp: [2000; 2],
+            hp: [hp; 2],
             pos: [0.0, 280.0],
         }
     }
@@ -43,7 +43,7 @@ impl Enemy {
     }
     pub(super) fn create_reqs_hp_gage(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
-        let theta = 360.0 * self.hp[0].max(0) as f32 / self.hp[1] as f32;
+        let theta = 360.0 * self.hp[0].max(0) as f32 / self.hp[1].max(1) as f32;
         reqs.push_back(Request::UnsetImage);
         for i in 0..360 {
             if i as f32 >= theta {

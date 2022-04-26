@@ -20,7 +20,7 @@ impl Logue {
         Self(0)
     }
     pub(super) fn update(self, cnt_z: i16) -> Self {
-        if cnt_z == 1 || cnt_z > 20 {
+        if cnt_z == 1 {
             Self(self.0 + 1)
         } else {
             Self(self.0)
