@@ -4,7 +4,7 @@ const ENEMY_SQUARE_SIZE: f32 = 140.0;
 const HP_GAGE_R: f32 = 150.0;
 const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
 
-pub(in super::super) struct Enemy {
+pub(super) struct Enemy {
     pub(super) cnt: u32,
     pub(super) hp: [i32; 2],
     pub(super) pos: [f32; 2],

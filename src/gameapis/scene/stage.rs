@@ -1,5 +1,8 @@
+mod bullet;
+mod enemy;
 mod entity;
 mod logue;
+mod player;
 mod stage1;
 
 use super::*;
@@ -39,7 +42,7 @@ impl Stage {
             stage: 0,
             state: State::Start,
             logue: logue::Logue::new(),
-            entity: entity::Entity::new(0),
+            entity: entity::Entity::new(0, 0),
         }
     }
     pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {

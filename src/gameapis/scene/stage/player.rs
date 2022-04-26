@@ -1,5 +1,7 @@
 use super::*;
 
+use super::bullet::*;
+
 const PLAYER_RECT: [f32; 4] = [
     GAME_LEFT + 10.0,
     GAME_RIGHT - 10.0,
@@ -15,7 +17,7 @@ const PLAYER_BULLET_VELOCITY: f32 = 40.0;
 const PLAYER_BULLET_POS_DIF: [f32; 2] = [20.0, 50.0];
 const PLAYER_BULLET_BASE_DAMAGE: i32 = 100;
 
-pub(in super::super) struct Player {
+pub(super) struct Player {
     pub(super) pos: [f32; 2],
     pub(super) inp: PlayerInput,
 }

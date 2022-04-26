@@ -1,18 +1,9 @@
-/// [essensial]
-pub(super) mod bullet;
-/// [essensial]
-/// The enemy moves according to an instruction.
-pub(super) mod enemy;
-/// [essensial]
-/// The player moves according to an input information.
-pub(super) mod player;
-
 use super::*;
 
+use super::bullet::*;
+use super::enemy::Enemy;
+use super::player::Player;
 use super::stage1::*;
-use bullet::*;
-use enemy::Enemy;
-use player::Player;
 
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
@@ -25,20 +16,20 @@ pub(super) struct Entity {
     graze: u32,
     player: Player,
     enemy: Enemy,
-    bullets: LinkedList<Bullet>,
-    pbullets: LinkedList<Bullet>,
+    e_buls: LinkedList<Bullet>,
+    p_buls: LinkedList<Bullet>,
 }
 impl Entity {
-    pub(super) fn new(stage: usize) -> Self {
+    pub(super) fn new(stage: usize, score: u64) -> Self {
         Self {
-            score: 0,
+            score,
             phase: 0,
             cnt_phs: 0,
             graze: 0,
             player: Player::new(),
             enemy: Enemy::new(get_max_hp(stage, 0)),
-            bullets: LinkedList::new(),
-            pbullets: LinkedList::new(),
+            e_buls: LinkedList::new(),
+            p_buls: LinkedList::new(),
         }
     }
     pub(super) fn update(
@@ -55,10 +46,10 @@ impl Entity {
         let player = self.player.update(inp);
         reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
-        let mut bullets = LinkedList::new();
+        let mut e_buls = LinkedList::new();
         let mut flg_hit = 0;
         let mut flg_graze = 0;
-        for i in self.bullets {
+        for i in self.e_buls {
             if let Some(n) = i.update() {
                 println!("{:p}", &n);
                 if check_hit(player.pos, n.pos, n.knd.r) {
@@ -66,20 +57,20 @@ impl Entity {
                 } else {
                     flg_graze += check_hit(player.pos, n.pos, n.knd.r * 3.0) as u32;
                     reqs.append(&mut n.create_reqs());
-                    bullets.push_back(n);
+                    e_buls.push_back(n);
                 }
             }
         }
         // Update player's bullet
-        let mut pbullets = LinkedList::new();
+        let mut p_buls = LinkedList::new();
         let mut damage_sum = 0;
-        for i in self.pbullets {
+        for i in self.p_buls {
             if let Some(n) = i.update() {
                 if check_hit(enemy.pos, n.pos, n.knd.r) {
                     damage_sum += n.dmg;
                 } else {
                     reqs.append(&mut n.create_reqs());
-                    pbullets.push_back(n);
+                    p_buls.push_back(n);
                 }
             }
         }
@@ -87,9 +78,9 @@ impl Entity {
         reqs.append(&mut player.create_slow_requests());
         // Launch bullet
         if is_shooting {
-            pbullets.append(&mut player.shoot());
+            p_buls.append(&mut player.shoot());
             if stage == 1 {
-                bullets.append(&mut create_stage1_bullet(
+                e_buls.append(&mut create_stage1_bullet(
                     &player,
                     &enemy,
                     self.phase,
@@ -144,31 +135,17 @@ impl Entity {
                 graze,
                 player,
                 enemy,
-                bullets,
-                pbullets,
+                e_buls,
+                p_buls,
             },
             reqs,
         )
     }
     pub(super) fn is_game_clear(&self, stage: usize) -> bool {
-        stage >= STAGE_SIZE || self.phase >= PHASE_SIZE[stage]
+        is_game_clear(stage, self.phase)
     }
     pub(super) fn is_game_over(&self) -> bool {
         false
-    }
-}
-fn get_time_limit(stage: usize, phase: usize) -> u32 {
-    if stage >= STAGE_SIZE || phase >= PHASE_SIZE[stage] {
-        1
-    } else {
-        TIMELIMIT[stage][phase]
-    }
-}
-fn get_max_hp(stage: usize, phase: usize) -> i32 {
-    if stage >= STAGE_SIZE || phase >= PHASE_SIZE[stage] {
-        0
-    } else {
-        MAXHP[stage][phase]
     }
 }
 fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {

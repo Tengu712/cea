@@ -31,7 +31,7 @@ impl Logue {
         if self.is_end_log(stage) {
             return reqs;
         }
-        let (text, imgid_left, is_right) = LOG[stage][self.0].clone();
+        let (text, imgid_left, is_right) = get_log(stage, self.0);
         if let Some(n) = imgid_left {
             reqs.push_back(n.pack());
             reqs.push_back(
@@ -68,9 +68,9 @@ impl Logue {
         reqs
     }
     pub(super) fn is_end_start_log(&self, stage: usize) -> bool {
-        stage >= STAGE_SIZE || self.0 >= LOG_MAX_SIZE || self.0 >= START_LOG_SIZE[stage]
+        is_end_start_log(stage, self.0)
     }
     pub(super) fn is_end_log(&self, stage: usize) -> bool {
-        stage >= STAGE_SIZE || self.0 >= LOG_MAX_SIZE || self.0 >= END_LOG_SIZE[stage]
+        is_end_log(stage, self.0)
     }
 }

@@ -20,7 +20,7 @@ pub(super) const BUL_FLAN: BulletKind = BulletKind {
 };
 
 #[derive(Clone)]
-pub(in super::super) struct Bullet {
+pub(super) struct Bullet {
     pub(super) knd: BulletKind,
     pub(super) vel: f32,
     pub(super) deg: f32,
