@@ -88,7 +88,6 @@ impl Stage {
         reqs.push_back(IMGID_FRAME.pack());
         reqs.push_back(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
         reqs.push_back(Request::DrawImage);
-        reqs.push_back(Request::UnsetImage);
         match state {
             State::Start | State::End => reqs.append(&mut logue.create_reqs(self.stage)),
             _ => (),
