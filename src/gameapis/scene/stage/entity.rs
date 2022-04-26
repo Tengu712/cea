@@ -16,6 +16,7 @@ pub(super) struct Entity {
     graze: u32,
     player: Player,
     enemy: Enemy,
+    e_hp: [i32; 2],
     e_buls: LinkedList<Bullet>,
     p_buls: LinkedList<Bullet>,
 }
@@ -27,7 +28,8 @@ impl Entity {
             cnt_phs: 0,
             graze: 0,
             player: Player::new(),
-            enemy: Enemy::new(get_max_hp(stage, 0)),
+            enemy: Enemy::new(),
+            e_hp: [get_max_hp(stage, 0); 2],
             e_buls: LinkedList::new(),
             p_buls: LinkedList::new(),
         }
@@ -40,7 +42,7 @@ impl Entity {
     ) -> (Self, LinkedList<Request>) {
         let mut reqs = LinkedList::new();
         // Update enemy
-        let mut enemy = self.enemy.update();
+        let enemy = self.enemy.update();
         reqs.append(&mut enemy.create_body_reqs());
         // Update player
         let player = self.player.update(inp);
@@ -73,8 +75,6 @@ impl Entity {
                 }
             }
         }
-        // Slowcircle
-        reqs.append(&mut player.create_slow_requests());
         // Launch bullet
         if is_shooting {
             p_buls.append(&mut player.shoot());
@@ -87,19 +87,22 @@ impl Entity {
             ));
         }
         // Calculate
-        enemy.hp[0] = enemy.hp[0] - damage_sum;
+        let e_hp_0 = self.e_hp[0] - damage_sum;
         let time_limit = get_time_limit(stage, self.phase);
-        let (phase, cnt_phs) = if enemy.hp[0] <= 0 || self.cnt_phs > time_limit {
-            enemy.hp[0] = get_max_hp(stage, self.phase + 1);
-            enemy.hp[1] = get_max_hp(stage, self.phase + 1);
-            (self.phase + 1, 0)
+        let (e_hp, phase, cnt_phs) = if e_hp_0 <= 0 || self.cnt_phs > time_limit {
+            ([get_max_hp(stage, self.phase + 1); 2], self.phase + 1, 0)
         } else {
-            (self.phase, self.cnt_phs + is_shooting as u32)
+            (
+                [e_hp_0, self.e_hp[1]],
+                self.phase,
+                self.cnt_phs + is_shooting as u32,
+            )
         };
         let graze = self.graze + flg_graze;
         let score = self.score + flg_graze as u64 * 10;
         // UI
-        reqs.append(&mut enemy.create_reqs_hp_gage());
+        reqs.append(&mut create_hp_gage_reqs(e_hp, enemy.pos));
+        reqs.append(&mut player.create_slow_requests());
         if is_shooting {
             reqs.push_back(
                 TextDesc::new()
@@ -133,6 +136,7 @@ impl Entity {
                 graze,
                 player,
                 enemy,
+                e_hp,
                 e_buls,
                 p_buls,
             },
@@ -152,4 +156,28 @@ fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {
     } else {
         false
     }
+}
+const HP_GAGE_R: f32 = 150.0;
+const HP_GAGE_SQUARE_SIZE: f32 = 4.0;
+fn create_hp_gage_reqs(e_hp: [i32; 2], e_pos: [f32; 2]) -> LinkedList<Request> {
+    let mut reqs = LinkedList::new();
+    let theta = 360.0 * e_hp[0].max(0) as f32 / e_hp[1].max(1) as f32;
+    reqs.push_back(Request::UnsetImage);
+    for i in 0..360 {
+        if i as f32 >= theta {
+            break;
+        }
+        reqs.push_back(
+            CDataDiff::new()
+                .set_trs([
+                    e_pos[0] - HP_GAGE_R * (i as f32).to_radians().sin(),
+                    e_pos[1] + HP_GAGE_R * (i as f32).to_radians().cos(),
+                ])
+                .set_rot([0.0, 0.0, (i as f32).to_radians()])
+                .set_scl([HP_GAGE_SQUARE_SIZE, HP_GAGE_SQUARE_SIZE])
+                .pack(),
+        );
+        reqs.push_back(Request::DrawImage);
+    }
+    reqs
 }
