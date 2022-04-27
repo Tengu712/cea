@@ -7,8 +7,11 @@ mod hp;
 mod logue;
 mod player;
 mod rate;
+mod requests;
 
 use super::*;
+
+use requests::Requests;
 
 const WIDTH: f32 = 1280.0;
 const HEIGHT: f32 = 960.0;
@@ -51,7 +54,7 @@ impl Stage {
             bg: bg::Background::new(),
         }
     }
-    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
+    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, Vec<Request>) {
         let cnt = self.cnt + 1;
         // Do task that reacts with input
         let inp = {
@@ -72,7 +75,7 @@ impl Stage {
         let state = match self.state {
             State::Start if logue.is_end_start_log(self.stage) => State::Shoot,
             State::End if logue.is_end_log(self.stage) => {
-                return (Scene::Stage(Stage::new()), LinkedList::new());
+                return (Scene::Stage(Stage::new()), Vec::new());
             }
             _ => self.state,
         };
@@ -81,7 +84,7 @@ impl Stage {
             State::Shoot => true,
             _ => false,
         };
-        let (entity, mut reqs_entity) = self.entity.update(is_shooting, self.stage, inp.clone());
+        let entity = self.entity.update(is_shooting, self.stage, inp.clone());
         let state = if is_shooting && entity.is_game_over() {
             State::GameOver
         } else if is_shooting && entity.is_game_clear(self.stage) {
@@ -91,14 +94,15 @@ impl Stage {
         };
         // Back ground
         let bg = self.bg.update(inp.lr_ud[0], inp.cnt_s > 0);
-        let mut reqs = bg.create_reqs(cnt);
-        // Finish
-        reqs.append(&mut reqs_entity);
-        reqs.push_back(IMGID_FRAME.pack());
-        reqs.push_back(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
-        reqs.push_back(Request::DrawImage);
+        // ========== Drawing ========== //
+        let mut reqs = Requests::new();
+        bg.push_reqs(&mut reqs, cnt);
+        entity.push_reqs(&mut reqs);
+        reqs.push(IMGID_FRAME.pack());
+        reqs.push(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
+        reqs.push(Request::DrawImage);
         match state {
-            State::Start | State::End => reqs.append(&mut logue.create_reqs(self.stage)),
+            State::Start | State::End => logue.push_reqs(&mut reqs, self.stage),
             _ => (),
         }
         (
@@ -110,7 +114,7 @@ impl Stage {
                 entity,
                 bg,
             }),
-            reqs,
+            reqs.0,
         )
     }
 }

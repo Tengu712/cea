@@ -19,10 +19,10 @@ impl Game {
     pub fn update(
         self,
         keystates: &input::KeyStates,
-    ) -> (Self, std::collections::LinkedList<request::Request>) {
+    ) -> (Self, Vec<request::Request>) {
         let (scene, mut reqs) = self.0.update(keystates);
         let fpsdata = self.1.update();
-        reqs.push_back(request::Request::DrawText(
+        reqs.push(request::Request::DrawText(
             request::text::TextDesc::new()
                 .set_text(format!("{:.1}fps", fpsdata.get_fps()))
                 .set_rect([0.0, 1270.0, 920.0, 960.0])

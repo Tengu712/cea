@@ -44,30 +44,21 @@ impl Entity {
             p_buls: PlayerBullets::new(),
         }
     }
-    pub(super) fn update(
-        self,
-        is_shooting: bool,
-        stage: usize,
-        inp: PlayerInput,
-    ) -> (Self, LinkedList<Request>) {
-        let mut reqs = LinkedList::new();
+    pub(super) fn update(self, is_shooting: bool, stage: usize, inp: PlayerInput) -> Self {
         // Update enemy
         let enemy = self.enemy.update();
-        reqs.append(&mut enemy.create_body_reqs());
         // Update player
         let player = if self.cnt_hit_fragile == 0 {
             self.player.update(inp.clone())
         } else {
             self.player
         };
-        reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
-        reqs.push_back(Request::Overlay);
         let mut e_buls = EnemyBullets::new();
         let mut is_hit = false;
         let mut is_hit_fragile = false;
         let mut cnt_graze = 0;
-        for i in 0..ENEMY_BULLETS_SIZE {
+        for i in 0..self.e_buls.len() {
             if let Some(mut n) = self.e_buls.update_nth(i) {
                 if check_hit(player.pos, n.pos, n.knd.r) {
                     if n.knd.is_fragile {
@@ -80,28 +71,20 @@ impl Entity {
                         cnt_graze += 1;
                         n.is_grazed = true;
                     }
-                    reqs.append(&mut n.create_reqs());
                     e_buls.push(n);
                 }
-            } else {
-                println!("{}", i);
-                break;
             }
         }
-        reqs.push_back(Request::Multiple);
         // Update player's bullet
         let mut p_buls = PlayerBullets::new();
         let mut damage_sum = 0;
-        for i in 0..PLAYER_BULLETS_SIZE {
+        for i in 0..self.p_buls.len() {
             if let Some(n) = self.p_buls.update_nth(i) {
                 if check_hit(enemy.pos, n.pos, n.knd.r) {
                     damage_sum += n.dmg;
                 } else {
-                    reqs.append(&mut n.create_reqs());
                     p_buls.push(n);
                 }
-            } else {
-                break;
             }
         }
         // Launch bullet
@@ -146,35 +129,18 @@ impl Entity {
             (hp, self.phase, self.cnt_phs + is_shooting as u32)
         };
         // UI
-        reqs.append(&mut player.create_slow_requests());
-        reqs.append(&mut rate.create_reqs(player.pos));
-        reqs.append(&mut hp.create_reqs(enemy.pos));
         if is_shooting {
-            reqs.push_back(
+            /*
+            reqs.push(
                 TextDesc::new()
                     .set_text((time_limit as i32 - cnt_phs as i32).max(0) / 60)
                     .set_rect(TIME_RECT)
                     .set_align(TextAlign::Right)
                     .set_format(TextFormat::Score)
                     .pack(),
-            );
+            );*/
         }
-        reqs.push_back(
-            TextDesc::new()
-                .set_text(format!("{:>012}", score))
-                .set_rect(SCORE_RECT)
-                .set_format(TextFormat::Score)
-                .pack(),
-        );
-        reqs.push_back(
-            TextDesc::new()
-                .set_text(graze)
-                .set_rect(GRAZE_RECT)
-                .set_format(TextFormat::Graze)
-                .pack(),
-        );
         // Finish
-        (
             Self {
                 // Counter
                 phase,
@@ -190,9 +156,30 @@ impl Entity {
                 enemy,
                 e_buls,
                 p_buls,
-            },
-            reqs,
-        )
+            }
+    }
+    pub(super) fn push_reqs(&self, reqs: &mut Requests) {
+        self.enemy.push_reqs(reqs);
+        self.player.push_body_reqs(reqs);
+        reqs.push(Request::Overlay);
+        reqs.push(Request::Multiple);
+        self.player.push_slow_reqs(reqs);
+        self.rate.push_reqs(reqs, self.player.pos);
+        self.hp.push_reqs(reqs, self.enemy.pos);
+        reqs.push(
+            TextDesc::new()
+                .set_text(format!("{:>012}", self.score))
+                .set_rect(SCORE_RECT)
+                .set_format(TextFormat::Score)
+                .pack(),
+        );
+        reqs.push(
+            TextDesc::new()
+                .set_text(self.graze)
+                .set_rect(GRAZE_RECT)
+                .set_format(TextFormat::Graze)
+                .pack(),
+        );
     }
     pub(super) fn is_game_clear(&self, stage: usize) -> bool {
         is_game_clear(stage, self.phase)

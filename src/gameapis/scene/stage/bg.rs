@@ -19,11 +19,10 @@ impl Background {
             Self(self.0 / abs * (abs - 5))
         }
     }
-    pub(super) fn create_reqs(&self, cnt: u32) -> LinkedList<Request> {
+    pub(super) fn push_reqs(&self, reqs: &mut Requests, cnt: u32) {
         let rot_y = -(self.0 as f32 / 10.0).to_radians();
         let rot_z = (self.0 as f32 / 20.0).to_radians();
-        let mut reqs = LinkedList::new();
-        reqs.push_back(
+        reqs.push(
             PerseDesc {
                 w: WIDTH,
                 h: HEIGHT,
@@ -33,36 +32,36 @@ impl Background {
             }
             .pack(),
         );
-        reqs.push_back(
+        reqs.push(
             ViewDesc {
                 pos: [0.0, (cnt % (FLOOR_SQUARE_SIZE as u32)) as f32, 0.0],
                 rot: [-30.0f32.to_radians(), rot_y, rot_z],
             }
             .pack(),
         );
-        reqs.push_back(IMGID_FLOOR.pack());
-        reqs.push_back(
+        reqs.push(IMGID_FLOOR.pack());
+        reqs.push(
             CDataDiff::new()
                 .set_trs_xyz([0.0, 0.0, 50.0])
                 .set_scl([FLOOR_SQUARE_SIZE, FLOOR_SQUARE_SIZE])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs.push_back(
+        reqs.push(Request::DrawImage);
+        reqs.push(
             CDataDiff::new()
                 .set_trs_xyz([0.0, FLOOR_SQUARE_SIZE, 50.0])
                 .set_scl([FLOOR_SQUARE_SIZE, FLOOR_SQUARE_SIZE])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs.push_back(
+        reqs.push(Request::DrawImage);
+        reqs.push(
             CDataDiff::new()
                 .set_trs_xyz([0.0, FLOOR_SQUARE_SIZE * 2.0, 50.0])
                 .set_scl([FLOOR_SQUARE_SIZE, FLOOR_SQUARE_SIZE])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs.push_back(
+        reqs.push(Request::DrawImage);
+        reqs.push(
             OrthoDesc {
                 l: 0.0,
                 r: WIDTH,
@@ -73,13 +72,12 @@ impl Background {
             }
             .pack(),
         );
-        reqs.push_back(
+        reqs.push(
             ViewDesc {
                 pos: [0.0; 3],
                 rot: [0.0; 3],
             }
             .pack(),
         );
-        reqs
     }
 }

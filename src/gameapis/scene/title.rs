@@ -2,14 +2,16 @@ use super::*;
 
 use super::stage::Stage;
 
+const REQUESTS_SIZE: usize = 4;
+
 pub(in super::super) struct Title(u32);
 impl Title {
     pub(super) fn new() -> Self {
         Self(0)
     }
-    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, LinkedList<Request>) {
-        let mut reqs = LinkedList::new();
-        reqs.push_back(
+    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, Vec<Request>) {
+        let mut reqs = Vec::with_capacity(REQUESTS_SIZE);
+        reqs.push(
             TextDesc::new()
                 .set_text("PRESS ANY KEY TO START")
                 .set_rect([0.0, 1280.0, 720.0, 960.0])

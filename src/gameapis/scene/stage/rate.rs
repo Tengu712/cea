@@ -35,15 +35,14 @@ impl Rate {
     pub(super) fn die(self) -> Self {
         Self(0, 0)
     }
-    pub(super) fn create_reqs(&self, p_pos: [f32; 2]) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_reqs(&self, reqs: &mut Requests, p_pos: [f32; 2]) {
         let theta = 360.0 * self.0.max(0) as f32 / RATE_GAGE_MAX as f32;
-        reqs.push_back(Request::UnsetImage);
+        reqs.push(Request::UnsetImage);
         for i in 0..360 {
             if i as f32 >= theta {
                 break;
             }
-            reqs.push_back(
+            reqs.push(
                 CDataDiff::new()
                     .set_trs([
                         p_pos[0] - RATE_GAGE_R * (i as f32).to_radians().sin(),
@@ -53,8 +52,7 @@ impl Rate {
                     .set_scl([RATE_GAGE_SQUARE_SIZE, RATE_GAGE_SQUARE_SIZE])
                     .pack(),
             );
-            reqs.push_back(Request::DrawImage);
+            reqs.push(Request::DrawImage);
         }
-        reqs
     }
 }

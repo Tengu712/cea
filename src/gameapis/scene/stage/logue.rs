@@ -26,15 +26,14 @@ impl Logue {
             Self(self.0)
         }
     }
-    pub(super) fn create_reqs(&self, stage: usize) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_reqs(&self, reqs: &mut Requests, stage: usize) {
         if self.is_end_log(stage) {
-            return reqs;
+            return;
         }
         let (text, imgid_left, is_right) = get_log(stage, self.0);
         if let Some(n) = imgid_left {
-            reqs.push_back(n.pack());
-            reqs.push_back(
+            reqs.push(n.pack());
+            reqs.push(
                 if is_right {
                     CDataDiff::new()
                         .set_trs(ST_LEFT_DISACT_POS)
@@ -47,25 +46,24 @@ impl Logue {
                 }
                 .pack(),
             );
-            reqs.push_back(Request::DrawImage);
+            reqs.push(Request::DrawImage);
         }
-        reqs.push_back(Request::UnsetImage);
-        reqs.push_back(
+        reqs.push(Request::UnsetImage);
+        reqs.push(
             CDataDiff::new()
                 .set_trs(LOGBOX_POS)
                 .set_scl(LOGBOX_SCL)
                 .set_col(LOGBOX_COL)
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs.push_back(
+        reqs.push(Request::DrawImage);
+        reqs.push(
             TextDesc::new()
                 .set_text(text)
                 .set_rect(LOG_RECT)
                 .set_format(TextFormat::Normal)
                 .pack(),
         );
-        reqs
     }
     pub(super) fn is_end_start_log(&self, stage: usize) -> bool {
         is_end_start_log(stage, self.0)

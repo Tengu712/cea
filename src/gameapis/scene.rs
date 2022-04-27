@@ -12,7 +12,7 @@ pub(super) enum Scene {
     Stage(stage::Stage),
 }
 impl Scene {
-    pub(super) fn update(self, keystates: &KeyStates) -> (Self, LinkedList<Request>) {
+    pub(super) fn update(self, keystates: &KeyStates) -> (Self, Vec<Request>) {
         match self {
             Scene::Title(n) => n.update(keystates),
             Scene::Stage(n) => n.update(keystates),

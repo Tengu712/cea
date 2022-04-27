@@ -6,8 +6,8 @@ const BULLET_RECT: [f32; 4] = [
     GAME_TOP + 80.0,
     GAME_BOTTOM - 80.0,
 ];
-pub(super) const ENEMY_BULLETS_SIZE: usize = 2;
-pub(super) const PLAYER_BULLETS_SIZE: usize = 6;
+const ENEMY_BULLETS_SIZE: usize = 2;
+const PLAYER_BULLETS_SIZE: usize = 6;
 
 #[derive(Clone)]
 pub(super) struct BulletKind {
@@ -155,6 +155,9 @@ impl EnemyBullets {
         }
         self.0.push(bul);
     }
+    pub(super) fn len(&self) -> usize {
+        self.0.len()
+    }
     pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
         match self.0.get(idx) {
             Some(n) => n.update(),
@@ -175,6 +178,9 @@ impl PlayerBullets {
             return;
         }
         self.0.push(bul);
+    }
+    pub(super) fn len(&self) -> usize {
+        self.0.len()
     }
     pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
         match self.0.get(idx) {

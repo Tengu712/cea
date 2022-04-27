@@ -20,20 +20,18 @@ impl Enemy {
             pos,
         }
     }
-    pub(super) fn create_body_reqs(&self) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_reqs(&self, reqs: &mut Requests) {
         let trs = [
             self.pos[0],
             self.pos[1] + (self.cnt as f32 * 4.0).to_radians().cos() * 10.0,
         ];
-        reqs.push_back(IMGID_REMILIA_F0.pack());
-        reqs.push_back(
+        reqs.push(IMGID_REMILIA_F0.pack());
+        reqs.push(
             CDataDiff::new()
                 .set_trs(trs)
                 .set_scl([ENEMY_SQUARE_SIZE, ENEMY_SQUARE_SIZE])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs
+        reqs.push(Request::DrawImage);
     }
 }

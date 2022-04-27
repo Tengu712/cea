@@ -17,15 +17,14 @@ impl Hp {
     pub(super) fn is_dead(&self) -> bool {
         self.0 <= 0
     }
-    pub(super) fn create_reqs(&self, e_pos: [f32; 2]) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_reqs(&self, reqs: &mut Requests, e_pos: [f32; 2]) {
         let theta = 360.0 * self.0.max(0) as f32 / self.1.max(1) as f32;
-        reqs.push_back(Request::UnsetImage);
+        reqs.push(Request::UnsetImage);
         for i in 0..360 {
             if i as f32 >= theta {
                 break;
             }
-            reqs.push_back(
+            reqs.push(
                 CDataDiff::new()
                     .set_trs([
                         e_pos[0] - HP_GAGE_R * (i as f32).to_radians().sin(),
@@ -35,8 +34,7 @@ impl Hp {
                     .set_scl([HP_GAGE_SQUARE_SIZE, HP_GAGE_SQUARE_SIZE])
                     .pack(),
             );
-            reqs.push_back(Request::DrawImage);
+            reqs.push(Request::DrawImage);
         }
-        reqs
     }
 }

@@ -56,67 +56,63 @@ impl Player {
             inp: self.inp,
         }
     }
-    pub(super) fn create_body_reqs(&self) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_body_reqs(&self, reqs: &mut Requests) {
         if self.inp.lr_ud[0] == 1 {
-            reqs.push_back(IMGID_FLAN_R0.pack());
+            reqs.push(IMGID_FLAN_R0.pack());
         } else if self.inp.lr_ud[0] == -1 {
-            reqs.push_back(IMGID_FLAN_L0.pack());
+            reqs.push(IMGID_FLAN_L0.pack());
         } else {
-            reqs.push_back(IMGID_FLAN_B0.pack());
+            reqs.push(IMGID_FLAN_B0.pack());
         }
-        reqs.push_back(
+        reqs.push(
             CDataDiff::new()
                 .set_trs(self.pos)
                 .set_scl([SQUARE_SIZE, SQUARE_SIZE])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs
+        reqs.push(Request::DrawImage);
     }
-    pub(super) fn create_slow_requests(&self) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
+    pub(super) fn push_slow_reqs(&self, reqs: &mut Requests) {
         if self.inp.cnt_s <= 0 {
-            return reqs;
+            return;
         }
-        reqs.push_back(IMGID_HITCIRCLE.pack());
-        reqs.push_back(
+        reqs.push(IMGID_HITCIRCLE.pack());
+        reqs.push(
             CDataDiff::new()
                 .set_trs(self.pos)
                 .set_scl([HITCIRCLE_SIZE, HITCIRCLE_SIZE])
                 .set_rot([0.0, 0.0, (self.inp.cnt_s as f32 * 2.0).to_radians()])
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs.push_back(IMGID_SLOWCIRCLE.pack());
+        reqs.push(Request::DrawImage);
+        reqs.push(IMGID_SLOWCIRCLE.pack());
         if self.inp.cnt_s < 10 {
             let size = (SLOWCIRCLE_SIZE + 1.0) * 2.0 * (1.0 - self.inp.cnt_s as f32 / 10.0);
-            reqs.push_back(
+            reqs.push(
                 CDataDiff::new()
                     .set_trs(self.pos)
                     .set_scl([size, size])
                     .pack(),
             );
-            reqs.push_back(Request::DrawImage);
+            reqs.push(Request::DrawImage);
         } else {
-            reqs.push_back(
+            reqs.push(
                 CDataDiff::new()
                     .set_trs(self.pos)
                     .set_scl([SLOWCIRCLE_SIZE, SLOWCIRCLE_SIZE])
                     .set_rot([0.0, 0.0, (self.inp.cnt_s as f32 * 4.0).to_radians()])
                     .pack(),
             );
-            reqs.push_back(Request::DrawImage);
-            reqs.push_back(
+            reqs.push(Request::DrawImage);
+            reqs.push(
                 CDataDiff::new()
                     .set_trs(self.pos)
                     .set_scl([SLOWCIRCLE_SIZE, SLOWCIRCLE_SIZE])
                     .set_rot([0.0, 0.0, -1.0 * (self.inp.cnt_s as f32 * 4.0).to_radians()])
                     .pack(),
             );
-            reqs.push_back(Request::DrawImage);
+            reqs.push(Request::DrawImage);
         }
-        reqs
     }
     pub(super) fn shoot(&self, p_buls: &mut PlayerBullets) {
         if !self.is_shootable() {
