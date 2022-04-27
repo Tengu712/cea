@@ -32,6 +32,30 @@ pub(super) const BUL_CIRCLE_FRAGILE: BulletKind = BulletKind {
     r: 10.0,
     is_fragile: true,
 };
+pub(super) const BUL_MID_CIRCLE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE,
+    size: 50.0,
+    r: 20.0,
+    is_fragile: false,
+};
+pub(super) const BUL_MID_CIRCLE_FRAGILE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE_FRAGILE,
+    size: 50.0,
+    r: 20.0,
+    is_fragile: true,
+};
+pub(super) const BUL_BIG_CIRCLE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_BIG_CIRCLE,
+    size: 110.0,
+    r: 20.0,
+    is_fragile: false,
+};
+pub(super) const BUL_BIG_CIRCLE_FRAGILE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_BIG_CIRCLE_FRAGILE,
+    size: 110.0,
+    r: 20.0,
+    is_fragile: true,
+};
 
 #[derive(Clone)]
 pub(super) struct Bullet {

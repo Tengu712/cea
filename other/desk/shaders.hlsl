@@ -56,8 +56,8 @@ float4 ps_main(PSInput input) : SV_TARGET
     if (input.prm.x != 0.0) {
         float4 col = diffuseTexture.Sample(diffuseTextureSampler, input.tex);
         if (input.prm.y == 1.0) {
-            if (col.x + col.y + col.z < 1.5)
-                return input.col * col;
+            if (col.x + col.y + col.z + col.w < 2.0)
+                return col * input.col * 2.0;
             else
                 return 2.0 * (col + input.col - col * input.col) - 1.0;
         }
