@@ -1,7 +1,7 @@
 use super::cbuffer::CData;
 use std::{fs::File, io::Read, mem::size_of};
 use windows::{
-    core::{Error, Result, HRESULT, PCSTR},
+    core::{Error, Result, HRESULT, HSTRING, PCSTR},
     Win32::Graphics::{Direct3D11::*, Dxgi::Common::*},
 };
 
@@ -18,9 +18,19 @@ impl ShaderComs {
         // Open vshader.cso here for input layout creation
         let mut vshader_bytebuf = Vec::new();
         File::open(dir.clone() + "vshader.cso")
-            .map_err(|_| Error::fast_error(HRESULT(1)))?
+            .map_err(|e| {
+                Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from(e.to_string() + " : vshader.cso"),
+                )
+            })?
             .read_to_end(&mut vshader_bytebuf)
-            .map_err(|_| Error::fast_error(HRESULT(1)))?;
+            .map_err(|e| {
+                Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from(e.to_string() + " : vshader.cso"),
+                )
+            })?;
         let vshader_bytecode = vshader_bytebuf.as_ptr() as *const _ as *const ::core::ffi::c_void;
         // Vertex shader
         let vshader =
@@ -29,9 +39,19 @@ impl ShaderComs {
         let pshader = unsafe {
             let mut buf = Vec::new();
             File::open(dir.clone() + "pshader.cso")
-                .map_err(|_| Error::fast_error(HRESULT(1)))?
+                .map_err(|e| {
+                    Error::new(
+                        HRESULT(0x80004005u32 as i32),
+                        HSTRING::from(e.to_string() + " : pshader.cso"),
+                    )
+                })?
                 .read_to_end(&mut buf)
-                .map_err(|_| Error::fast_error(HRESULT(1)))?;
+                .map_err(|e| {
+                    Error::new(
+                        HRESULT(0x80004005u32 as i32),
+                        HSTRING::from(e.to_string() + " : pshader.cso"),
+                    )
+                })?;
             let bytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
             device.CreatePixelShader(bytecode, buf.len(), None)?
         };

@@ -1,6 +1,6 @@
 use super::{super::winapi::WindowsApplication, shader::ShaderComs, D3DApplication};
 use windows::{
-    core::{Error, Result, HRESULT},
+    core::{Error, Result, HRESULT, HSTRING},
     Win32::{
         Foundation::{BOOL, HINSTANCE},
         Graphics::{
@@ -40,8 +40,14 @@ impl D3DApplication {
                 &mut ppimmediatecontext,
             )?;
             (
-                ppdevice.ok_or(Error::fast_error(HRESULT(1)))?,
-                ppimmediatecontext.ok_or(Error::fast_error(HRESULT(1)))?,
+                ppdevice.ok_or(Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from("Failed to create D3D11Device."),
+                ))?,
+                ppimmediatecontext.ok_or(Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from("Failed to create D3D11DeviceContext."),
+                ))?,
             )
         };
         // Create swapchain

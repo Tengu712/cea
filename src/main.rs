@@ -12,7 +12,15 @@ const HEIGHT: u32 = 960;
 fn main() {
     match start_app() {
         Ok(_) => (),
-        Err(e) => winapis::winapi::show_messagebox(e.message().to_string_lossy(), "Error"),
+        Err(e) => {
+            let message = format!(
+                "Error code : 0x{:X}\n{}",
+                e.code().0,
+                e.message().to_string_lossy()
+            );
+            println!("{}", message);
+            winapis::winapi::show_messagebox(message, "Error")
+        }
     }
 }
 /// Start application.

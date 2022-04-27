@@ -1,5 +1,5 @@
 use super::{super::math::Matrix4x4, D3DApplication};
-use windows::core::{Error, Result, HRESULT};
+use windows::core::{Error, Result, HRESULT, HSTRING};
 
 /// Constant buffer data.
 pub struct CData {
@@ -19,7 +19,10 @@ impl D3DApplication {
     pub fn set_cdata(&self, cdata: &CData) -> Result<()> {
         unsafe {
             self.context.UpdateSubresource(
-                self.cbuffer.as_ref().ok_or(Error::fast_error(HRESULT(1)))?,
+                self.cbuffer.as_ref().ok_or(Error::new(
+                    HRESULT(0x80004003u32 as i32),
+                    HSTRING::from("Failed to get reference of constant buffer."),
+                ))?,
                 0,
                 std::ptr::null(),
                 std::mem::transmute(cdata),

@@ -3,7 +3,7 @@ use super::{
     D3DApplication,
 };
 use windows::{
-    core::{Error, Interface, Result, HRESULT},
+    core::{Error, Interface, Result, HRESULT, HSTRING},
     Win32::{
         Graphics::{
             Direct2D::{
@@ -29,7 +29,10 @@ impl D3DApplication {
                 &D2D1_FACTORY_OPTIONS::default(),
                 std::mem::transmute(&mut ppifactory),
             )?;
-            ppifactory.ok_or(Error::fast_error(HRESULT(1)))?
+            ppifactory.ok_or(Error::new(
+                HRESULT(0x80004005u32 as i32),
+                HSTRING::from("Failed to create ID2D1Factory for DirectWrite."),
+            ))?
         };
         // Create d2context from factory
         let d2context = unsafe {

@@ -1,5 +1,5 @@
 use windows::{
-    core::{Error, Result, HRESULT, PCWSTR},
+    core::{Error, Result, HRESULT, HSTRING, PCWSTR},
     Win32::{
         Foundation::*,
         Graphics::Gdi::ValidateRect,
@@ -63,7 +63,10 @@ impl WindowsApplication {
         // Get instance handle
         let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
-            return Err(Error::fast_error(HRESULT(0x80070006u32 as i32)));
+            return Err(Error::new(
+                HRESULT(0x80070006u32 as i32),
+                HSTRING::from("Failed to get instance handle."),
+            ));
         }
         // Register window class
         let wcex = WNDCLASSEXW {
@@ -81,7 +84,10 @@ impl WindowsApplication {
             ..Default::default()
         };
         if unsafe { RegisterClassExW(&wcex) == 0 } {
-            return Err(Error::fast_error(HRESULT(1)));
+            return Err(Error::new(
+                HRESULT(0x80070006u32 as i32),
+                HSTRING::from("Failed to register window class."),
+            ));
         }
         // Adjust window size
         let mut window_rect = RECT {
@@ -109,7 +115,10 @@ impl WindowsApplication {
             )
         };
         if hwnd.is_invalid() {
-            return Err(Error::fast_error(HRESULT(1)));
+            return Err(Error::new(
+                HRESULT(0x80070006u32 as i32),
+                HSTRING::from("Failed to create window handle."),
+            ));
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
