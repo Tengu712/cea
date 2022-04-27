@@ -20,6 +20,7 @@ pub(super) struct Entity {
     // Value
     rate: Rate,
     hp: Hp,
+    zanki: i32,
     graze: u32,
     score: u64,
     // Entity
@@ -36,6 +37,7 @@ impl Entity {
             cnt_hit_fragile: 0,
             rate: Rate::new(),
             hp: Hp::new(stage, 0),
+            zanki: 3,
             graze: 0,
             score,
             player: Player::new(),
@@ -44,7 +46,13 @@ impl Entity {
             p_buls: PlayerBullets::new(),
         }
     }
-    pub(super) fn update(self, is_shooting: bool, stage: usize, inp: PlayerInput) -> Self {
+    pub(super) fn update(
+        self,
+        is_shooting: bool,
+        is_game_over: bool,
+        stage: usize,
+        inp: PlayerInput,
+    ) -> Self {
         // Update enemy
         let enemy = self.enemy.update();
         // Update player
@@ -60,7 +68,7 @@ impl Entity {
         let mut cnt_graze = 0;
         for i in 0..self.e_buls.len() {
             if let Some(mut n) = self.e_buls.update_nth(i) {
-                if check_hit(player.pos, n.pos, n.knd.r) {
+                if check_hit(player.pos, n.pos, n.knd.r) && !is_game_over {
                     if n.knd.is_fragile {
                         is_hit_fragile = true;
                     } else {
@@ -102,22 +110,33 @@ impl Entity {
             );
         }
         // Calculate
-        let (cnt_hit_fragile, player, rate) = if is_hit || self.cnt_hit_fragile >= DELAY_HIT_FRAGILE
-        {
-            (0, player.die(), self.rate.die())
-        } else if self.cnt_hit_fragile > 0 || is_hit_fragile {
-            if inp.cnt_z == 1 {
-                (0, player, self.rate.update_while_hit_fragile(true))
+        let (cnt_hit_fragile, player, rate, zanki) =
+            if is_hit || self.cnt_hit_fragile >= DELAY_HIT_FRAGILE {
+                (0, player.die(), self.rate.die(), self.zanki - 1)
+            } else if self.cnt_hit_fragile > 0 || is_hit_fragile {
+                if inp.cnt_z == 1 {
+                    (
+                        0,
+                        player,
+                        self.rate.update_while_hit_fragile(true),
+                        self.zanki,
+                    )
+                } else {
+                    (
+                        self.cnt_hit_fragile + 1,
+                        player,
+                        self.rate.update_while_hit_fragile(false),
+                        self.zanki,
+                    )
+                }
             } else {
                 (
-                    self.cnt_hit_fragile + 1,
+                    0,
                     player,
-                    self.rate.update_while_hit_fragile(false),
+                    self.rate.update(cnt_graze, inp.cnt_z),
+                    self.zanki,
                 )
-            }
-        } else {
-            (0, player, self.rate.update(cnt_graze, inp.cnt_z))
-        };
+            };
         let hp = self.hp.update(damage_sum);
         let graze = self.graze + cnt_graze;
         let score = self.score + cnt_graze as u64 * 10;
@@ -137,6 +156,7 @@ impl Entity {
             // Value
             rate,
             hp,
+            zanki,
             graze,
             score,
             // Entity
@@ -146,9 +166,17 @@ impl Entity {
             p_buls,
         }
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>, stage: usize, is_shooting: bool) {
+    pub(super) fn push_reqs(
+        &self,
+        reqs: &mut Vec<Request>,
+        stage: usize,
+        is_shooting: bool,
+        is_game_over: bool,
+    ) {
         self.enemy.push_reqs(reqs);
-        self.player.push_body_reqs(reqs);
+        if !is_game_over {
+            self.player.push_body_reqs(reqs);
+        }
         reqs.push(Request::Overlay);
         for i in self.e_buls.get_vec() {
             i.push_reqs(reqs);
@@ -158,7 +186,9 @@ impl Entity {
             i.push_reqs(reqs);
         }
         self.player.push_slow_reqs(reqs);
-        self.rate.push_reqs(reqs, self.player.pos);
+        if !is_game_over {
+            self.rate.push_reqs(reqs, self.player.pos);
+        }
         self.hp.push_reqs(reqs, self.enemy.pos);
         reqs.push(
             TextDesc::new()
@@ -190,7 +220,7 @@ impl Entity {
         is_game_clear(stage, self.phase)
     }
     pub(super) fn is_game_over(&self) -> bool {
-        false
+        self.zanki == 0
     }
 }
 fn check_hit(pos1: [f32; 2], pos2: [f32; 2], r: f32) -> bool {

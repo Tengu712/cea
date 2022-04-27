@@ -70,6 +70,10 @@ pub fn load_font_collection(
         TextFormat::Graze,
         dwapp.create_text_format(config.numbers_font.as_str(), None, 56.0)?,
     );
+    map.insert(
+        TextFormat::GameOver,
+        dwapp.create_text_format(config.dialogue_font.as_str(), None, 56.0)?,
+    );
     Ok(map)
 }
 

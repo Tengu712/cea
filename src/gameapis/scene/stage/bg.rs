@@ -7,9 +7,9 @@ impl Background {
     pub(super) fn new() -> Self {
         Self(0)
     }
-    pub(super) fn update(self, lr: i32, is_slow: bool) -> Self {
+    pub(super) fn update(self, lr: i32, is_slow: bool, is_game_over: bool) -> Self {
         let abs = self.0.abs();
-        if is_slow {
+        if is_slow || is_game_over {
             Self(self.0)
         } else if lr != 0 {
             Self((self.0 + lr * 5).min(60).max(-60))

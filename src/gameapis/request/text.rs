@@ -6,6 +6,7 @@ pub enum TextFormat {
     Fps,
     Score,
     Graze,
+    GameOver,
 }
 
 pub enum TextAlign {
