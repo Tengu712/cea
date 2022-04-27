@@ -1,8 +1,7 @@
 use super::cbuffer::CData;
-use super::*;
 use std::{fs::File, io::Read, mem::size_of};
 use windows::{
-    core::PCSTR,
+    core::{Error, Result, HRESULT, HSTRING, PCSTR},
     Win32::Graphics::{Direct3D11::*, Dxgi::Common::*},
 };
 
@@ -15,31 +14,46 @@ pub(super) struct ShaderComs {
 }
 impl ShaderComs {
     /// A function for create coms around shader effectively.
-    pub(super) fn new(device: &ID3D11Device, dir: &String) -> Result<Self, WErr> {
+    pub(super) fn new(device: &ID3D11Device, dir: &String) -> Result<Self> {
         // Open vshader.cso here for input layout creation
         let mut vshader_bytebuf = Vec::new();
         File::open(dir.clone() + "vshader.cso")
-            .map_err(|_| raise_err(EKnd::Io, "Open vshader.cso failed"))?
+            .map_err(|e| {
+                Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from(e.to_string() + " : vshader.cso"),
+                )
+            })?
             .read_to_end(&mut vshader_bytebuf)
-            .map_err(|_| raise_err(EKnd::Io, "Read vshader.cso failed"))?;
+            .map_err(|e| {
+                Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from(e.to_string() + " : vshader.cso"),
+                )
+            })?;
         let vshader_bytecode = vshader_bytebuf.as_ptr() as *const _ as *const ::core::ffi::c_void;
         // Vertex shader
-        let vshader = unsafe {
-            device
-                .CreateVertexShader(vshader_bytecode, vshader_bytebuf.len(), None)
-                .map_err(|_| raise_err(EKnd::Creation, "vshader"))?
-        };
+        let vshader =
+            unsafe { device.CreateVertexShader(vshader_bytecode, vshader_bytebuf.len(), None)? };
         // Pixel shader
         let pshader = unsafe {
             let mut buf = Vec::new();
             File::open(dir.clone() + "pshader.cso")
-                .map_err(|_| raise_err(EKnd::Io, "Open pshader.cso failed"))?
+                .map_err(|e| {
+                    Error::new(
+                        HRESULT(0x80004005u32 as i32),
+                        HSTRING::from(e.to_string() + " : pshader.cso"),
+                    )
+                })?
                 .read_to_end(&mut buf)
-                .map_err(|_| raise_err(EKnd::Io, "Read pshader.cso failed"))?;
+                .map_err(|e| {
+                    Error::new(
+                        HRESULT(0x80004005u32 as i32),
+                        HSTRING::from(e.to_string() + " : pshader.cso"),
+                    )
+                })?;
             let bytecode = buf.as_ptr() as *const _ as *const ::core::ffi::c_void;
-            device
-                .CreatePixelShader(bytecode, buf.len(), None)
-                .map_err(|_| raise_err(EKnd::Creation, "pshader"))?
+            device.CreatePixelShader(bytecode, buf.len(), None)?
         };
         // Input layout
         let ilayout = unsafe {
@@ -72,14 +86,12 @@ impl ShaderComs {
                     InstanceDataStepRate: 0,
                 },
             ];
-            device
-                .CreateInputLayout(
-                    pinputelementdescs.as_ptr(),
-                    pinputelementdescs.len() as u32,
-                    vshader_bytecode,
-                    vshader_bytebuf.len(),
-                )
-                .map_err(|_| raise_err(EKnd::Creation, "InputLayout"))?
+            device.CreateInputLayout(
+                pinputelementdescs.as_ptr(),
+                pinputelementdescs.len() as u32,
+                vshader_bytecode,
+                vshader_bytebuf.len(),
+            )?
         };
         // Constant buffer
         let cbuffer = unsafe {
@@ -91,9 +103,7 @@ impl ShaderComs {
                 MiscFlags: 0,
                 StructureByteStride: 0,
             };
-            device
-                .CreateBuffer(&cbuf_desc, std::ptr::null())
-                .map_err(|_| raise_err(EKnd::Creation, "Cbuffer"))?
+            device.CreateBuffer(&cbuf_desc, std::ptr::null())?
         };
         Ok(Self {
             vshader,

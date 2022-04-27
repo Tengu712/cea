@@ -1,5 +1,6 @@
-use super::*;
+use super::{super::winapi::WindowsApplication, shader::ShaderComs, D3DApplication};
 use windows::{
+    core::{Error, Result, HRESULT, HSTRING},
     Win32::{
         Foundation::{BOOL, HINSTANCE},
         Graphics::{
@@ -15,16 +16,13 @@ use windows::{
 
 impl D3DApplication {
     pub fn new(
-        winapp: &super::winapi::WindowsApplication,
+        winapp: &WindowsApplication,
         width: u32,
         height: u32,
         shader_dir: &str,
-    ) -> Result<Self, WErr> {
+    ) -> Result<Self> {
         // Create factory
-        let factory = unsafe {
-            CreateDXGIFactory::<IDXGIFactory>()
-                .map_err(|_| raise_err(EKnd::Creation, "DXGIFactory"))?
-        };
+        let factory = unsafe { CreateDXGIFactory::<IDXGIFactory>()? };
         // Create device
         let (device, context) = unsafe {
             let mut ppdevice = None;
@@ -40,11 +38,16 @@ impl D3DApplication {
                 &mut ppdevice,
                 std::ptr::null_mut(),
                 &mut ppimmediatecontext,
-            )
-            .map_err(|_| raise_err(EKnd::Common, "D3D11CreateDevice failed"))?;
+            )?;
             (
-                ppdevice.ok_or(raise_err(EKnd::Creation, "D3D11Device"))?,
-                ppimmediatecontext.ok_or(raise_err(EKnd::Creation, "D3D11DeviceContext"))?,
+                ppdevice.ok_or(Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from("Failed to create D3D11Device."),
+                ))?,
+                ppimmediatecontext.ok_or(Error::new(
+                    HRESULT(0x80004005u32 as i32),
+                    HSTRING::from("Failed to create D3D11DeviceContext."),
+                ))?,
             )
         };
         // Create swapchain
@@ -73,21 +76,15 @@ impl D3DApplication {
                 SwapEffect: DXGI_SWAP_EFFECT_DISCARD,
                 Flags: 2,
             };
-            factory
-                .CreateSwapChain(&device, &pdesc)
-                .map_err(|_| raise_err(EKnd::Creation, "SwapChain"))?
+            factory.CreateSwapChain(&device, &pdesc)?
         };
         // Create back buffer rtv
         let rtv_bbuf = unsafe {
-            let bbuf = swapchain
-                .GetBuffer::<ID3D11Texture2D>(0)
-                .map_err(|_| raise_err(EKnd::Get, "RTV of backbuffer"))?;
-            device
-                .CreateRenderTargetView(bbuf, std::ptr::null())
-                .map_err(|_| raise_err(EKnd::Creation, "RTV of backbuffer"))?
+            let bbuf = swapchain.GetBuffer::<ID3D11Texture2D>(0)?;
+            device.CreateRenderTargetView(bbuf, std::ptr::null())?
         };
         // Create shaders
-        let shader_coms = shader::ShaderComs::new(&device, &shader_dir.to_string())?;
+        let shader_coms = ShaderComs::new(&device, &shader_dir.to_string())?;
         // Set render configure
         let viewport = D3D11_VIEWPORT {
             TopLeftX: 0.0,
@@ -116,11 +113,7 @@ impl D3DApplication {
                 RenderTarget: render_targets,
             }
         };
-        let blend_state = unsafe {
-            device
-                .CreateBlendState(&blend_desc)
-                .map_err(|_| raise_err(EKnd::Creation, "BlendState"))?
-        };
+        let blend_state = unsafe { device.CreateBlendState(&blend_desc)? };
         unsafe { context.OMSetBlendState(blend_state, [1.0, 1.0, 1.0, 1.0].as_ptr(), 0xffffffff) };
         unsafe { context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) };
         unsafe { context.IASetInputLayout(shader_coms.ilayout) };
@@ -147,11 +140,7 @@ impl D3DApplication {
         };
     }
     /// Swap and wait vsync.
-    pub fn swap(&self) -> Result<(), WErr> {
-        unsafe {
-            self.swapchain
-                .Present(1, 0)
-                .map_err(|_| raise_err(EKnd::Runtime, "Backbuffer swap failed"))
-        }
+    pub fn swap(&self) -> Result<()> {
+        unsafe { self.swapchain.Present(1, 0) }
     }
 }

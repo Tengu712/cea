@@ -1,9 +1,9 @@
 use super::{
-    super::{directwrite::DWriteApp, winapi::WindowsApplication, *},
-    raise_err, D3DApplication,
+    super::{directwrite::DWriteApp, winapi::WindowsApplication},
+    D3DApplication,
 };
 use windows::{
-    core::Interface,
+    core::{Error, Interface, Result, HRESULT, HSTRING},
     Win32::{
         Graphics::{
             Direct2D::{
@@ -19,7 +19,7 @@ use windows::{
 
 impl D3DApplication {
     /// Create DirectWrite coms based on Direct3D coms.
-    pub fn create_text_module(&self, winapp: &WindowsApplication) -> Result<DWriteApp, WErr> {
+    pub fn create_text_module(&self, winapp: &WindowsApplication) -> Result<DWriteApp> {
         // Create factory first of all
         let factory: ID2D1Factory3 = unsafe {
             let mut ppifactory = None;
@@ -28,29 +28,23 @@ impl D3DApplication {
                 &ID2D1Factory3::IID,
                 &D2D1_FACTORY_OPTIONS::default(),
                 std::mem::transmute(&mut ppifactory),
-            )
-            .map_err(|_| raise_err(EKnd::Creation, "ID2D1Factory for DWrite"))?;
-            ppifactory.ok_or(raise_err(EKnd::Common, "ID2D1Factory for DWrite is none"))?
+            )?;
+            ppifactory.ok_or(Error::new(
+                HRESULT(0x80004005u32 as i32),
+                HSTRING::from("Failed to create ID2D1Factory for DirectWrite."),
+            ))?
         };
         // Create d2context from factory
         let d2context = unsafe {
-            let dxdevice = self
-                .device
-                .cast::<IDXGIDevice>()
-                .map_err(|_| raise_err(EKnd::Creation, "IDXGIDevice for DWrite"))?;
+            let dxdevice = self.device.cast::<IDXGIDevice>()?;
             factory
-                .CreateDevice(&dxdevice)
-                .map_err(|_| raise_err(EKnd::Creation, "ID2D1Device for DWrite"))?
-                .CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE)
-                .map_err(|_| raise_err(EKnd::Creation, "ID2D1DeviceContext for DWrite"))?
+                .CreateDevice(&dxdevice)?
+                .CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE)?
         };
         // Create bitmap from d2context
         let bitmap = unsafe {
             let dpi = GetDpiForWindow(*winapp.get_window_handle());
-            let backbuffer = self
-                .swapchain
-                .GetBuffer::<IDXGISurface>(0)
-                .map_err(|_| raise_err(EKnd::Get, "backbuffer for DWrite"))?;
+            let backbuffer = self.swapchain.GetBuffer::<IDXGISurface>(0)?;
             let bitmapproperties = D2D1_BITMAP_PROPERTIES1 {
                 pixelFormat: D2D1_PIXEL_FORMAT {
                     format: DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -61,15 +55,11 @@ impl D3DApplication {
                 bitmapOptions: D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
                 colorContext: None,
             };
-            d2context
-                .CreateBitmapFromDxgiSurface(&backbuffer, &bitmapproperties)
-                .map_err(|_| raise_err(EKnd::Creation, "Bitmap for DWrite"))?
+            d2context.CreateBitmapFromDxgiSurface(&backbuffer, &bitmapproperties)?
         };
         // Create dwfactory
-        let dwfactory = unsafe {
-            DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory5::IID)
-                .map_err(|_| raise_err(EKnd::Creation, "DWrite factory"))?
-        };
+        let dwfactory =
+            unsafe { DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory5::IID)? };
         let dwfactory: IDWriteFactory5 = unsafe { std::mem::transmute(dwfactory) };
         // Finish
         Ok(DWriteApp::from(d2context, dwfactory, bitmap))

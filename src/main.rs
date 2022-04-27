@@ -12,13 +12,23 @@ const HEIGHT: u32 = 960;
 fn main() {
     match start_app() {
         Ok(_) => (),
-        Err(e) => winapis::winapi::show_messagebox(e.get_message(), e.get_title()),
+        Err(e) => {
+            let message = format!(
+                "Error code : 0x{:X}\n{}",
+                e.code().0,
+                e.message().to_string_lossy()
+            );
+            println!("{}", message);
+            winapis::winapi::show_messagebox(message, "Error")
+        }
     }
 }
 /// Start application.
-fn start_app() -> Result<(), winapis::WErr> {
+fn start_app() -> Result<(), windows::core::Error> {
+    println!("Start the game.");
     let cur_dir = get_curdir_for_winapp().unwrap_or(String::from(r"\"));
     // Create window app
+    println!("Create window.");
     let winapp = winapis::winapi::WindowsApplication::new(
         "",
         WIDTH as i32,
@@ -26,18 +36,22 @@ fn start_app() -> Result<(), winapis::WErr> {
         winapis::winapi::ask_yesno("Start with a fullscreen window?", "question"),
     )?;
     // Create drawing app
+    println!("Create Direct3D Components.");
     let d3dapp =
         winapis::direct3d::D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
+    println!("Create DirectWrite Components.");
     let dwapp = d3dapp.create_text_module(&winapp)?;
     // Load
+    println!("Start loading.");
     let config = resource::load_config(cur_dir.clone());
     let default_text_format = dwapp.create_text_format(" ", None, 64.0)?;
     let map_text_format = resource::load_font_collection(&dwapp, &config)?;
     let map_image = resource::load_images(&d3dapp, cur_dir.clone())?;
-    // Run the app
     let idea = create_idea(&d3dapp)?;
-    let mut cdata = create_default_cdata();
+    // Run the app
+    println!("Run the game.");
     let mut game = gameapis::Game::new();
+    let mut cdata = create_default_cdata();
     let mut keystates = gameapis::input::KeyStates::default();
     d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
@@ -84,7 +98,7 @@ fn start_app() -> Result<(), winapis::WErr> {
                     cdata.vec_prm[1] = 1.0;
                     d3dapp.set_cdata(&cdata)?;
                 }
-                gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea)?,
+                gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea),
                 gameapis::request::Request::DrawText(n) => {
                     let desc = winapis::directwrite::TextDesc::new()
                         .set_text(n.text)
@@ -123,7 +137,7 @@ fn get_curdir_for_winapp() -> Result<String, ()> {
 /// Create idea sprite.
 fn create_idea(
     d3dapp: &winapis::direct3d::D3DApplication,
-) -> Result<winapis::direct3d::model::ModelBuffer, winapis::WErr> {
+) -> Result<winapis::direct3d::model::ModelBuffer, windows::core::Error> {
     let data_vtx = [
         winapis::direct3d::model::Vertex {
             pos: [-0.5, -0.5, 0.0],

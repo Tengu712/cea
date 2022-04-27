@@ -1,6 +1,5 @@
-use super::*;
 use windows::{
-    core::PCWSTR,
+    core::{Result, PCWSTR},
     Foundation::Numerics::Matrix3x2,
     Win32::Graphics::{
         Direct2D::{
@@ -10,14 +9,6 @@ use windows::{
         DirectWrite::*,
     },
 };
-
-fn raise_err(errknd: EKnd, message: &str) -> WErr {
-    WErr::from(
-        errknd,
-        String::from(message),
-        String::from("DirectWrite App"),
-    )
-}
 
 /// Use it when drawing text.
 pub struct TextDesc {
@@ -75,7 +66,7 @@ impl DWriteApp {
         }
     }
     /// Draw text. To call it, user give it DrawTextDesc struct.
-    pub fn draw_text(&self, desc: &TextDesc, format: &IDWriteTextFormat) -> Result<(), WErr> {
+    pub fn draw_text(&self, desc: &TextDesc, format: &IDWriteTextFormat) -> Result<()> {
         let alignment = if desc.align == 1 {
             DWRITE_TEXT_ALIGNMENT_CENTER
         } else if desc.align == 2 {
@@ -83,11 +74,7 @@ impl DWriteApp {
         } else {
             DWRITE_TEXT_ALIGNMENT_LEADING
         };
-        unsafe {
-            format
-                .SetTextAlignment(alignment)
-                .map_err(|_| raise_err(EKnd::Runtime, "Set text alignment"))?
-        };
+        unsafe { format.SetTextAlignment(alignment)? };
         let brush = unsafe {
             let color = D2D1_COLOR_F {
                 r: desc.rgba[0],
@@ -100,8 +87,7 @@ impl DWriteApp {
                 transform: Matrix3x2::identity(),
             };
             self.d2context
-                .CreateSolidColorBrush(&color, &brushproperties)
-                .map_err(|_| raise_err(EKnd::Runtime, "Creation text brush failed"))?
+                .CreateSolidColorBrush(&color, &brushproperties)?
         };
         let layoutrect = D2D_RECT_F {
             left: desc.rect[0],
@@ -123,8 +109,7 @@ impl DWriteApp {
                 DWRITE_MEASURING_MODE_NATURAL,
             );
             self.d2context
-                .EndDraw(std::ptr::null_mut(), std::ptr::null_mut())
-                .map_err(|e| raise_err(EKnd::Runtime, e.to_string().as_str()))?;
+                .EndDraw(std::ptr::null_mut(), std::ptr::null_mut())?
         };
         Ok(())
     }
@@ -134,7 +119,7 @@ impl DWriteApp {
         font: &str,
         fontcollection: T,
         size: f32,
-    ) -> Result<IDWriteTextFormat, WErr>
+    ) -> Result<IDWriteTextFormat>
     where
         T: ::windows::core::IntoParam<'a, IDWriteFontCollection>,
     {
@@ -149,6 +134,5 @@ impl DWriteApp {
                 PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
             )
         }
-        .map_err(|_| raise_err(EKnd::Runtime, "Creation text format failed"))
     }
 }
