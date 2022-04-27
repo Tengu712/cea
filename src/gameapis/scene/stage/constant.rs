@@ -17,18 +17,26 @@ pub(super) fn is_end_log(stage: usize, cnt: usize) -> bool {
 }
 
 const LOG_MAX_SIZE: usize = 4;
-const DEFAULT_LOG: (&'static str, Option<ImgID>, bool) = ("", None, false);
-const LOG: [[(&'static str, Option<ImgID>, bool); LOG_MAX_SIZE]; STAGE_SIZE] = [
+const DEFAULT_LOG: (&'static str, Option<ImgID>, Option<ImgID>, bool) = ("", None, None, false);
+const LOG: [[(&'static str, Option<ImgID>, Option<ImgID>, bool); LOG_MAX_SIZE]; STAGE_SIZE] = [
     [
-        ("はろーわーるど", Some(IMGID_FLAN_ST0), false),
-        ("ほげ", Some(IMGID_FLAN_ST0), true),
+        (
+            "はろーわーるど",
+            Some(IMGID_FLAN_ST0),
+            Some(IMGID_REMILIA_ST0),
+            false,
+        ),
+        ("ほげ", Some(IMGID_FLAN_ST0), Some(IMGID_REMILIA_ST0), true),
         DEFAULT_LOG,
         DEFAULT_LOG,
     ],
     [DEFAULT_LOG, DEFAULT_LOG, DEFAULT_LOG, DEFAULT_LOG],
     [DEFAULT_LOG, DEFAULT_LOG, DEFAULT_LOG, DEFAULT_LOG],
 ];
-pub(super) fn get_log(stage: usize, cnt: usize) -> (&'static str, Option<ImgID>, bool) {
+pub(super) fn get_log(
+    stage: usize,
+    cnt: usize,
+) -> (&'static str, Option<ImgID>, Option<ImgID>, bool) {
     if stage >= STAGE_SIZE || cnt >= END_LOG_SIZE[stage] || cnt >= LOG_MAX_SIZE {
         DEFAULT_LOG
     } else {

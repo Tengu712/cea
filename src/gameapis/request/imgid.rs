@@ -20,6 +20,7 @@ pub const IMGID_FLAN_R0: ImgID = ImgID("ch_flan_r0.png");
 pub const IMGID_FLAN_ST0: ImgID = ImgID("st_flan_0.png");
 // Remilia
 pub const IMGID_REMILIA_F0: ImgID = ImgID("ch_remilia_f0.png");
+pub const IMGID_REMILIA_ST0: ImgID = ImgID("st_remilia_0.png");
 // UI
 pub const IMGID_SLOWCIRCLE: ImgID = ImgID("ch_slowcircle.png");
 pub const IMGID_HITCIRCLE: ImgID = ImgID("ch_hitcircle.png");
@@ -28,7 +29,7 @@ pub const IMGID_HP_Q: ImgID = ImgID("ui_hp_q.png");
 pub const IMGID_FRAME: ImgID = ImgID("ui_frame.png");
 // Back ground
 pub const IMGID_FLOOR: ImgID = ImgID("bg_floor.png");
-pub const IMG_RESOURCE_SIZE: usize = 16;
+pub const IMG_RESOURCE_SIZE: usize = 17;
 pub const IMGID_ARRAY: [ImgID; IMG_RESOURCE_SIZE] = [
     IMGID_BUL_FLAN,
     IMGID_BUL_CIRCLE,
@@ -40,6 +41,7 @@ pub const IMGID_ARRAY: [ImgID; IMG_RESOURCE_SIZE] = [
     IMGID_FLAN_R0,
     IMGID_FLAN_ST0,
     IMGID_REMILIA_F0,
+    IMGID_REMILIA_ST0,
     IMGID_SLOWCIRCLE,
     IMGID_HITCIRCLE,
     IMGID_HP,

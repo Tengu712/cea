@@ -8,6 +8,10 @@ const ST_LEFT_ACT_POS: [f32; 2] = [-360.0, -60.0];
 const ST_LEFT_ACT_SCL: [f32; 2] = [840.0, 840.0];
 const ST_LEFT_DISACT_POS: [f32; 2] = [-380.0, -80.0];
 const ST_LEFT_DISACT_SCL: [f32; 2] = [800.0, 800.0];
+const ST_RIGHT_ACT_POS: [f32; 2] = [360.0, -60.0];
+const ST_RIGHT_ACT_SCL: [f32; 2] = [840.0, 840.0];
+const ST_RIGHT_DISACT_POS: [f32; 2] = [380.0, -80.0];
+const ST_RIGHT_DISACT_SCL: [f32; 2] = [800.0, 800.0];
 // Logue
 const LOGBOX_POS: [f32; 2] = [0.0, -300.0];
 const LOGBOX_SCL: [f32; 2] = [(GAME_RIGHT - GAME_LEFT) as f32 * 0.85, 120.0];
@@ -30,7 +34,7 @@ impl Logue {
         if self.is_end_log(stage) {
             return;
         }
-        let (text, imgid_left, is_right) = get_log(stage, self.0);
+        let (text, imgid_left, imgid_right, is_right) = get_log(stage, self.0);
         if let Some(n) = imgid_left {
             reqs.push(n.pack());
             reqs.push(
@@ -43,6 +47,23 @@ impl Logue {
                     CDataDiff::new()
                         .set_trs(ST_LEFT_ACT_POS)
                         .set_scl(ST_LEFT_ACT_SCL)
+                }
+                .pack(),
+            );
+            reqs.push(Request::DrawImage);
+        }
+        if let Some(n) = imgid_right {
+            reqs.push(n.pack());
+            reqs.push(
+                if is_right {
+                    CDataDiff::new()
+                        .set_trs(ST_RIGHT_ACT_POS)
+                        .set_scl(ST_RIGHT_ACT_SCL)
+                } else {
+                    CDataDiff::new()
+                        .set_trs(ST_RIGHT_DISACT_POS)
+                        .set_scl(ST_RIGHT_DISACT_SCL)
+                        .set_col(ST_DISACT_COL)
                 }
                 .pack(),
             );
