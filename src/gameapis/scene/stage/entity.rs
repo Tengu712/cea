@@ -68,14 +68,15 @@ impl Entity {
         let mut cnt_graze = 0;
         for i in 0..self.e_buls.len() {
             if let Some(mut n) = self.e_buls.update_nth(i) {
-                if check_hit(player.pos, n.pos, n.knd.r) && !is_game_over {
+                if !is_game_over && check_hit(player.pos, n.pos, n.knd.r) {
                     if n.knd.is_fragile {
                         is_hit_fragile = true;
                     } else {
                         is_hit = true;
                     }
                 } else {
-                    if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
+                    if !is_game_over && !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0)
+                    {
                         cnt_graze += 1;
                         n.is_grazed = true;
                     }
