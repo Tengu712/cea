@@ -2,7 +2,6 @@ use super::gameapis::request::{imgid::*, text::TextFormat};
 use super::winapis::{
     direct3d::{image::D3DImage, D3DApplication},
     directwrite::DWriteApp,
-    WErr,
 };
 use std::{
     collections::HashMap,
@@ -53,7 +52,7 @@ pub fn load_config(cur_dir: String) -> Config {
 pub fn load_font_collection(
     dwapp: &DWriteApp,
     config: &Config,
-) -> Result<HashMap<TextFormat, IDWriteTextFormat>, WErr> {
+) -> Result<HashMap<TextFormat, IDWriteTextFormat>, windows::core::Error> {
     let mut map = HashMap::new();
     map.insert(
         TextFormat::Normal,
@@ -77,7 +76,7 @@ pub fn load_font_collection(
 pub fn load_images(
     d3dapp: &D3DApplication,
     cur_dir: String,
-) -> Result<HashMap<&str, D3DImage>, WErr> {
+) -> Result<HashMap<&str, D3DImage>, windows::core::Error> {
     let mut map = HashMap::new();
     let res_dir = cur_dir + r"img\";
     for i in IMGID_ARRAY {

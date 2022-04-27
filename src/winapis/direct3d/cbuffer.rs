@@ -1,7 +1,5 @@
-use super::{
-    super::{math::Matrix4x4, *},
-    raise_err, D3DApplication,
-};
+use super::{super::math::Matrix4x4, D3DApplication};
+use windows::core::{Error, Result, HRESULT};
 
 /// Constant buffer data.
 pub struct CData {
@@ -18,12 +16,10 @@ pub struct CData {
 
 impl D3DApplication {
     /// Set constant data to constant buffer.
-    pub fn set_cdata(&self, cdata: &CData) -> Result<(), WErr> {
+    pub fn set_cdata(&self, cdata: &CData) -> Result<()> {
         unsafe {
             self.context.UpdateSubresource(
-                self.cbuffer
-                    .as_ref()
-                    .ok_or(raise_err(EKnd::Runtime, "Cbuffer is None"))?,
+                self.cbuffer.as_ref().ok_or(Error::fast_error(HRESULT(1)))?,
                 0,
                 std::ptr::null(),
                 std::mem::transmute(cdata),

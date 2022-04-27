@@ -18,19 +18,6 @@ pub mod model;
 /// This provides easy way to call apis about shader.
 mod shader;
 
-use super::*;
-
-fn raise_err(errknd: EKnd, message: &str) -> WErr {
-    WErr::from(errknd, String::from(message), String::from("Direct3D App"))
-}
-fn raise_err_arg(errknd: EKnd, arg: &String, message: &str) -> WErr {
-    WErr::from(
-        errknd,
-        arg.clone() + " : " + message,
-        String::from("Direct3D App"),
-    )
-}
-
 pub struct D3DApplication {
     device: windows::Win32::Graphics::Direct3D11::ID3D11Device,
     context: windows::Win32::Graphics::Direct3D11::ID3D11DeviceContext,

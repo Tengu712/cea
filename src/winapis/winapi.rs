@@ -1,6 +1,5 @@
-use super::*;
 use windows::{
-    core::PCWSTR,
+    core::{Error, Result, HRESULT, PCWSTR},
     Win32::{
         Foundation::*,
         Graphics::Gdi::ValidateRect,
@@ -9,18 +8,11 @@ use windows::{
     },
 };
 
-fn raise_err(errknd: EKnd, message: &str) -> WErr {
-    WErr::from(
-        errknd,
-        String::from(message),
-        String::from("Windows Common App"),
-    )
-}
-
 /// Show a message box.
-pub fn show_messagebox<'a, T>(message: T, title: T)
+pub fn show_messagebox<'a, T, U>(message: T, title: U)
 where
     T: windows::core::IntoParam<'a, windows::core::PCWSTR>,
+    U: windows::core::IntoParam<'a, windows::core::PCWSTR>,
 {
     unsafe { MessageBoxW(None, message, title, MB_OK | MB_ICONERROR) };
 }
@@ -62,12 +54,7 @@ extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: L
 pub struct WindowsApplication(HWND);
 impl WindowsApplication {
     /// Create WindowsApplication struct that is only way to use api with window handle.
-    pub fn new(
-        title: &str,
-        width: i32,
-        height: i32,
-        windowed: bool,
-    ) -> Result<Self, WErr> {
+    pub fn new(title: &str, width: i32, height: i32, windowed: bool) -> Result<Self> {
         let (window_style, window_show) = if windowed {
             (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
         } else {
@@ -76,7 +63,7 @@ impl WindowsApplication {
         // Get instance handle
         let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
-            return Err(raise_err(EKnd::Get, "instance handle"));
+            return Err(Error::fast_error(HRESULT(0x80070006u32 as i32)));
         }
         // Register window class
         let wcex = WNDCLASSEXW {
@@ -94,7 +81,7 @@ impl WindowsApplication {
             ..Default::default()
         };
         if unsafe { RegisterClassExW(&wcex) == 0 } {
-            return Err(raise_err(EKnd::Common, "Registration window class failed"));
+            return Err(Error::fast_error(HRESULT(1)));
         }
         // Adjust window size
         let mut window_rect = RECT {
@@ -122,7 +109,7 @@ impl WindowsApplication {
             )
         };
         if hwnd.is_invalid() {
-            return Err(raise_err(EKnd::Creation, "window"));
+            return Err(Error::fast_error(HRESULT(1)));
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
