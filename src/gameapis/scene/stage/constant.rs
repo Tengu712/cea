@@ -77,7 +77,8 @@ fn create_stage1_bullet(
     if phase == 0 {
         if cnt_phs % 8 == 0 {
             bullets.push_back(
-                Bullet::new(BUL_CIRCLE)
+                Bullet::new(BUL_CIRCLE_FRAGILE)
+                    .set_deg(270.0)
                     .set_pos(enemy.pos)
                     .set_col([1.0, 0.0, 0.0, 1.0])
                     .set_vel(5.0),

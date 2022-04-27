@@ -1,5 +1,6 @@
 use super::*;
 
+const DELAY: i32 = 60;
 const RATE_GAGE_MAX: i32 = 1000;
 const RATE_GAGE_R: f32 = 80.0;
 const RATE_GAGE_SQUARE_SIZE: f32 = 4.0;
@@ -9,12 +10,9 @@ impl Rate {
     pub(super) fn new() -> Self {
         Self(0, 0)
     }
-    pub(super) fn update(self, is_hit: bool, cnt_graze: u32, cnt_z: i16) -> Self {
-        if is_hit {
-            return Self(0, 0);
-        }
+    pub(super) fn update(self, cnt_graze: u32, cnt_z: i16) -> Self {
         let rate_delay = if cnt_graze > 0 {
-            60
+            DELAY
         } else {
             (self.1 - 1).max(0)
         };
@@ -24,6 +22,18 @@ impl Rate {
             - (rate_delay <= 0) as i32;
         let rate = rate.max(0).min(RATE_GAGE_MAX);
         Self(rate, rate_delay)
+    }
+    pub(super) fn update_while_hit_fragile(self, is_snap: bool) -> Self {
+        if is_snap {
+            let rate = self.0 + 100;
+            let rate = rate.max(0).min(RATE_GAGE_MAX);
+            Self(rate, DELAY)
+        } else {
+            self
+        }
+    }
+    pub(super) fn die(self) -> Self {
+        Self(0, 0)
     }
     pub(super) fn create_reqs(&self, p_pos: [f32; 2]) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();

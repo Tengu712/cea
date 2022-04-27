@@ -50,6 +50,12 @@ impl Player {
         ];
         Self { pos, inp }
     }
+    pub(super) fn die(self) -> Self {
+        Self {
+            pos: INIT_POS,
+            inp: self.inp,
+        }
+    }
     pub(super) fn create_body_reqs(&self) -> LinkedList<Request> {
         let mut reqs = LinkedList::new();
         if self.inp.lr_ud[0] == 1 {

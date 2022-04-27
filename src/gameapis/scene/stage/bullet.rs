@@ -12,16 +12,25 @@ pub(super) struct BulletKind {
     imgid: ImgID,
     size: f32,
     pub(super) r: f32,
+    pub(super) is_fragile: bool,
 }
 pub(super) const BUL_FLAN: BulletKind = BulletKind {
     imgid: IMGID_BUL_FLAN,
     size: 90.0,
     r: 100.0,
+    is_fragile: false,
 };
 pub(super) const BUL_CIRCLE: BulletKind = BulletKind {
     imgid: IMGID_BUL_CIRCLE,
     size: 30.0,
     r: 10.0,
+    is_fragile: false,
+};
+pub(super) const BUL_CIRCLE_FRAGILE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE_FRAGILE,
+    size: 30.0,
+    r: 10.0,
+    is_fragile: true,
 };
 
 #[derive(Clone)]
@@ -72,26 +81,19 @@ impl Bullet {
         self_mut
     }
     pub(super) fn update(self) -> Option<Self> {
-        let pos = [
-            self.pos[0] + self.vel * self.deg.to_radians().cos(),
-            self.pos[1] + self.vel * self.deg.to_radians().sin(),
+        let mut self_mut = self;
+        self_mut.pos = [
+            self_mut.pos[0] + self_mut.vel * self_mut.deg.to_radians().cos(),
+            self_mut.pos[1] + self_mut.vel * self_mut.deg.to_radians().sin(),
         ];
-        if self.pos[0] < BULLET_RECT[0]
-            || self.pos[0] > BULLET_RECT[1]
-            || self.pos[1] > BULLET_RECT[2]
-            || self.pos[1] < BULLET_RECT[3]
+        if self_mut.pos[0] < BULLET_RECT[0]
+            || self_mut.pos[0] > BULLET_RECT[1]
+            || self_mut.pos[1] > BULLET_RECT[2]
+            || self_mut.pos[1] < BULLET_RECT[3]
         {
             None
         } else {
-            Some(Self {
-                knd: self.knd,
-                vel: self.vel,
-                deg: self.deg,
-                pos,
-                col: self.col,
-                dmg: self.dmg,
-                is_grazed: self.is_grazed,
-            })
+            Some(self_mut)
         }
     }
     pub(super) fn create_reqs(&self) -> LinkedList<Request> {

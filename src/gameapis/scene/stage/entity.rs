@@ -7,6 +7,7 @@ use super::hp::Hp;
 use super::player::Player;
 use super::rate::Rate;
 
+const DELAY_HIT_FRAGILE: u32 = 10;
 const SCORE_RECT: [f32; 4] = [280.0, WIDTH, 0.0, HEIGHT];
 const GRAZE_RECT: [f32; 4] = [280.0, WIDTH, 60.0, HEIGHT];
 const TIME_RECT: [f32; 4] = [0.0, WIDTH - 280.0, 0.0, HEIGHT];
@@ -15,6 +16,7 @@ pub(super) struct Entity {
     // Counter
     phase: usize,
     cnt_phs: u32,
+    cnt_hit_fragile: u32,
     // Value
     rate: Rate,
     hp: Hp,
@@ -31,6 +33,7 @@ impl Entity {
         Self {
             phase: 0,
             cnt_phs: 0,
+            cnt_hit_fragile: 0,
             rate: Rate::new(),
             hp: Hp::new(stage, 0),
             graze: 0,
@@ -52,17 +55,26 @@ impl Entity {
         let enemy = self.enemy.update();
         reqs.append(&mut enemy.create_body_reqs());
         // Update player
-        let player = self.player.update(inp);
+        let player = if self.cnt_hit_fragile == 0 {
+            self.player.update(inp.clone())
+        } else {
+            self.player
+        };
         reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
         reqs.push_back(Request::Overlay);
         let mut e_buls = LinkedList::new();
         let mut is_hit = false;
+        let mut is_hit_fragile = false;
         let mut cnt_graze = 0;
         for i in self.e_buls {
             if let Some(mut n) = i.update() {
                 if check_hit(player.pos, n.pos, n.knd.r) {
-                    is_hit = true;
+                    if n.knd.is_fragile {
+                        is_hit_fragile = true;
+                    } else {
+                        is_hit = true;
+                    }
                 } else {
                     if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
                         cnt_graze += 1;
@@ -89,7 +101,9 @@ impl Entity {
         }
         // Launch bullet
         if is_shooting {
-            p_buls.append(&mut player.shoot());
+            if !is_hit && !is_hit_fragile && self.cnt_hit_fragile == 0 {
+                p_buls.append(&mut player.shoot());
+            }
             e_buls.append(&mut launch_bullet(
                 stage,
                 &player,
@@ -99,7 +113,22 @@ impl Entity {
             ));
         }
         // Calculate
-        let rate = self.rate.update(is_hit, cnt_graze, player.inp.cnt_z);
+        let (cnt_hit_fragile, player, rate) = if is_hit || self.cnt_hit_fragile >= DELAY_HIT_FRAGILE
+        {
+            (0, player.die(), self.rate.die())
+        } else if self.cnt_hit_fragile > 0 || is_hit_fragile {
+            if inp.cnt_z == 1 {
+                (0, player, self.rate.update_while_hit_fragile(true))
+            } else {
+                (
+                    self.cnt_hit_fragile + 1,
+                    player,
+                    self.rate.update_while_hit_fragile(false),
+                )
+            }
+        } else {
+            (0, player, self.rate.update(cnt_graze, inp.cnt_z))
+        };
         let hp = self.hp.update(damage_sum);
         let graze = self.graze + cnt_graze;
         let score = self.score + cnt_graze as u64 * 10;
@@ -141,12 +170,16 @@ impl Entity {
         // Finish
         (
             Self {
-                score,
+                // Counter
                 phase,
                 cnt_phs,
-                graze,
+                cnt_hit_fragile,
+                // Value
                 rate,
                 hp,
+                graze,
+                score,
+                // Entity
                 player,
                 enemy,
                 e_buls,

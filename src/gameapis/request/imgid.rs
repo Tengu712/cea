@@ -10,6 +10,7 @@ impl PackingRequest for ImgID {
 // Bullet
 pub const IMGID_BUL_FLAN: ImgID = ImgID("bu_flan.png");
 pub const IMGID_BUL_CIRCLE: ImgID = ImgID("bu_circle.png");
+pub const IMGID_BUL_CIRCLE_FRAGILE: ImgID = ImgID("bu_circle_fragile.png");
 // Flan
 pub const IMGID_FLAN_B0: ImgID = ImgID("ch_flan_b0.png");
 pub const IMGID_FLAN_L0: ImgID = ImgID("ch_flan_l0.png");
@@ -23,10 +24,11 @@ pub const IMGID_HITCIRCLE: ImgID = ImgID("ch_hitcircle.png");
 pub const IMGID_FRAME: ImgID = ImgID("ui_frame.png");
 // Back ground
 pub const IMGID_FLOOR: ImgID = ImgID("bg_floor.png");
-pub const IMG_RESOURCE_SIZE: usize = 11;
+pub const IMG_RESOURCE_SIZE: usize = 12;
 pub const IMGID_ARRAY: [ImgID; IMG_RESOURCE_SIZE] = [
     IMGID_BUL_FLAN,
     IMGID_BUL_CIRCLE,
+    IMGID_BUL_CIRCLE_FRAGILE,
     IMGID_FLAN_B0,
     IMGID_FLAN_L0,
     IMGID_FLAN_R0,
