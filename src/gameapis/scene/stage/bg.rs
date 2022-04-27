@@ -7,14 +7,17 @@ impl Background {
     pub(super) fn new() -> Self {
         Self(0)
     }
-    pub(super) fn update(self, lr: i32) -> Self {
+    pub(super) fn update(self, lr: i32, is_slow: bool) -> Self {
         let abs = self.0.abs();
-        let rot = if abs == 0 {
-            0
+        if is_slow {
+            Self(self.0)
+        } else if lr != 0 {
+            Self((self.0 + lr * 5).min(60).max(-60))
+        } else if abs == 0 {
+            Self(0)
         } else {
-            self.0 / abs * (abs - 5)
-        };
-        Self((rot + lr * 10).min(60).max(-60))
+            Self(self.0 / abs * (abs - 5))
+        }
     }
     pub(super) fn create_reqs(&self, cnt: u32) -> LinkedList<Request> {
         let rot_y = -(self.0 as f32 / 10.0).to_radians();

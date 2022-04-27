@@ -90,7 +90,7 @@ impl Stage {
             state
         };
         // Back ground
-        let bg = self.bg.update(inp.lr_ud[0]);
+        let bg = self.bg.update(inp.lr_ud[0], inp.cnt_s > 0);
         let mut reqs = bg.create_reqs(cnt);
         // Finish
         reqs.append(&mut reqs_entity);
