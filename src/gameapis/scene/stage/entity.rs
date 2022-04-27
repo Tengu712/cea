@@ -185,8 +185,8 @@ impl Entity {
         for i in self.p_buls.get_vec() {
             i.push_reqs(reqs);
         }
-        self.player.push_slow_reqs(reqs);
         if !is_game_over {
+            self.player.push_slow_reqs(reqs);
             self.rate.push_reqs(reqs, self.player.pos);
         }
         self.hp.push_reqs(reqs, self.enemy.pos);
