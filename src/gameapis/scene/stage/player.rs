@@ -118,24 +118,30 @@ impl Player {
         }
         reqs
     }
-    pub(super) fn shoot(&self) -> LinkedList<Bullet> {
-        let mut res = LinkedList::new();
+    pub(super) fn shoot(&self, p_buls: &mut PlayerBullets) {
         if !self.is_shootable() {
-            return res;
+            return;
         }
-        let bul = Bullet::new(BUL_FLAN)
-            .set_deg(90.0)
-            .set_vel(PLAYER_BULLET_VELOCITY)
-            .set_dmg(PLAYER_BULLET_BASE_DAMAGE);
-        res.push_back(bul.clone().set_pos([
-            self.pos[0] - PLAYER_BULLET_POS_DIF[0],
-            self.pos[1] + PLAYER_BULLET_POS_DIF[1],
-        ]));
-        res.push_back(bul.set_pos([
-            self.pos[0] + PLAYER_BULLET_POS_DIF[0],
-            self.pos[1] + PLAYER_BULLET_POS_DIF[1],
-        ]));
-        res
+        p_buls.push(
+            Bullet::new(BUL_FLAN)
+                .set_deg(90.0)
+                .set_vel(PLAYER_BULLET_VELOCITY)
+                .set_dmg(PLAYER_BULLET_BASE_DAMAGE)
+                .set_pos([
+                    self.pos[0] - PLAYER_BULLET_POS_DIF[0],
+                    self.pos[1] + PLAYER_BULLET_POS_DIF[1],
+                ]),
+        );
+        p_buls.push(
+            Bullet::new(BUL_FLAN)
+                .set_deg(90.0)
+                .set_vel(PLAYER_BULLET_VELOCITY)
+                .set_dmg(PLAYER_BULLET_BASE_DAMAGE)
+                .set_pos([
+                    self.pos[0] + PLAYER_BULLET_POS_DIF[0],
+                    self.pos[1] + PLAYER_BULLET_POS_DIF[1],
+                ]),
+        );
     }
     pub(super) fn is_shootable(&self) -> bool {
         self.inp.cnt_z % 6 == 1

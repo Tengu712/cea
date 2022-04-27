@@ -68,12 +68,12 @@ pub(super) fn get_max_hp(stage: usize, phase: usize) -> i32 {
 }
 
 fn create_stage1_bullet(
+    e_buls: &mut EnemyBullets,
     _: &Player,
     enemy: &Enemy,
     phase: usize,
     cnt_phs: u32,
-) -> LinkedList<Bullet> {
-    let mut bullets = LinkedList::new();
+) {
     if phase == 0 {
         if cnt_phs % 10 == 0 {
             for i in 0..6 {
@@ -90,7 +90,7 @@ fn create_stage1_bullet(
                         BUL_BIG_CIRCLE
                     }
                 };
-                bullets.push_back(
+                e_buls.push(
                     Bullet::new(knd)
                         .set_pos(enemy.pos)
                         .set_deg(i as f32 * 60.0 + 45.0 - cnt_phs as f32)
@@ -112,7 +112,7 @@ fn create_stage1_bullet(
                         BUL_MID_CIRCLE
                     }
                 };
-                bullets.push_back(
+                e_buls.push(
                     Bullet::new(knd)
                         .set_pos(enemy.pos)
                         .set_deg(i as f32 * 60.0 - cnt_phs as f32)
@@ -121,7 +121,7 @@ fn create_stage1_bullet(
                 );
             }
             for i in 0..5 {
-                bullets.push_back(
+                e_buls.push(
                     Bullet::new(BUL_CIRCLE)
                         .set_pos(enemy.pos)
                         .set_deg(-3.0 * (2 + i) as f32 + cnt_phs as f32 * 3.6)
@@ -131,18 +131,16 @@ fn create_stage1_bullet(
             }
         }
     }
-    bullets
 }
 pub(super) fn launch_bullet(
+    e_buls: &mut EnemyBullets,
     stage: usize,
     player: &Player,
     enemy: &Enemy,
     phase: usize,
     cnt_phs: u32,
-) -> LinkedList<Bullet> {
+) {
     if stage == 0 {
-        create_stage1_bullet(player, enemy, phase, cnt_phs)
-    } else {
-        LinkedList::new()
+        create_stage1_bullet(e_buls, player, enemy, phase, cnt_phs);
     }
 }

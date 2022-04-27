@@ -6,6 +6,8 @@ const BULLET_RECT: [f32; 4] = [
     GAME_TOP + 80.0,
     GAME_BOTTOM - 80.0,
 ];
+pub(super) const ENEMY_BULLETS_SIZE: usize = 512;
+pub(super) const PLAYER_BULLETS_SIZE: usize = 16;
 
 #[derive(Clone)]
 pub(super) struct BulletKind {
@@ -105,19 +107,26 @@ impl Bullet {
         self_mut
     }
     pub(super) fn update(self) -> Option<Self> {
-        let mut self_mut = self;
-        self_mut.pos = [
-            self_mut.pos[0] + self_mut.vel * self_mut.deg.to_radians().cos(),
-            self_mut.pos[1] + self_mut.vel * self_mut.deg.to_radians().sin(),
+        let pos = [
+            self.pos[0] + self.vel * self.deg.to_radians().cos(),
+            self.pos[1] + self.vel * self.deg.to_radians().sin(),
         ];
-        if self_mut.pos[0] < BULLET_RECT[0]
-            || self_mut.pos[0] > BULLET_RECT[1]
-            || self_mut.pos[1] > BULLET_RECT[2]
-            || self_mut.pos[1] < BULLET_RECT[3]
+        if pos[0] < BULLET_RECT[0]
+            || pos[0] > BULLET_RECT[1]
+            || pos[1] > BULLET_RECT[2]
+            || pos[1] < BULLET_RECT[3]
         {
             None
         } else {
-            Some(self_mut)
+            Some(Self {
+                knd: self.knd,
+                vel: self.vel,
+                deg: self.deg,
+                pos,
+                col: self.col,
+                dmg: self.dmg,
+                is_grazed: self.is_grazed,
+            })
         }
     }
     pub(super) fn create_reqs(&self) -> LinkedList<Request> {
@@ -132,5 +141,47 @@ impl Bullet {
         );
         reqs.push_back(Request::DrawImage);
         reqs
+    }
+}
+
+pub(super) struct EnemyBullets(Vec<Bullet>, usize);
+impl EnemyBullets {
+    pub(super) fn new() -> Self {
+        Self(Vec::with_capacity(ENEMY_BULLETS_SIZE), 0)
+    }
+    pub(super) fn push(&mut self, bul: Bullet) {
+        if self.1 >= ENEMY_BULLETS_SIZE {
+            return;
+        }
+        self.0.push(bul);
+        self.1 += 1;
+    }
+    pub(super) fn nth(&self, idx: usize) -> Option<&Bullet> {
+        if idx >= self.1 {
+            None
+        } else {
+            Some(&self.0[idx])
+        }
+    }
+}
+
+pub(super) struct PlayerBullets(Vec<Bullet>, usize);
+impl PlayerBullets {
+    pub(super) fn new() -> Self {
+        Self(Vec::with_capacity(PLAYER_BULLETS_SIZE), 0)
+    }
+    pub(super) fn push(&mut self, bul: Bullet) {
+        if self.1 >= PLAYER_BULLETS_SIZE {
+            return;
+        }
+        self.0.push(bul);
+        self.1 += 1;
+    }
+    pub(super) fn nth(&self, idx: usize) -> Option<&Bullet> {
+        if idx >= self.1 {
+            None
+        } else {
+            Some(&self.0[idx])
+        }
     }
 }

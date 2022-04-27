@@ -25,8 +25,8 @@ pub(super) struct Entity {
     // Entity
     player: Player,
     enemy: Enemy,
-    e_buls: LinkedList<Bullet>,
-    p_buls: LinkedList<Bullet>,
+    e_buls: EnemyBullets,
+    p_buls: PlayerBullets,
 }
 impl Entity {
     pub(super) fn new(stage: usize, score: u64) -> Self {
@@ -40,8 +40,8 @@ impl Entity {
             score,
             player: Player::new(),
             enemy: Enemy::new(),
-            e_buls: LinkedList::new(),
-            p_buls: LinkedList::new(),
+            e_buls: EnemyBullets::new(),
+            p_buls: PlayerBullets::new(),
         }
     }
     pub(super) fn update(
@@ -63,54 +63,63 @@ impl Entity {
         reqs.append(&mut player.create_body_reqs());
         // Update enemy's bullet and check hit
         reqs.push_back(Request::Overlay);
-        let mut e_buls = LinkedList::new();
+        let mut e_buls = EnemyBullets::new();
         let mut is_hit = false;
         let mut is_hit_fragile = false;
         let mut cnt_graze = 0;
-        for i in self.e_buls {
-            if let Some(mut n) = i.update() {
-                if check_hit(player.pos, n.pos, n.knd.r) {
-                    if n.knd.is_fragile {
-                        is_hit_fragile = true;
+        for i in 0..ENEMY_BULLETS_SIZE {
+            if let Some(b) = self.e_buls.nth(i) {
+                if let Some(mut n) = b.clone().update() {
+                    if check_hit(player.pos, n.pos, n.knd.r) {
+                        if n.knd.is_fragile {
+                            is_hit_fragile = true;
+                        } else {
+                            is_hit = true;
+                        }
                     } else {
-                        is_hit = true;
+                        if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
+                            cnt_graze += 1;
+                            n.is_grazed = true;
+                        }
+                        reqs.append(&mut n.create_reqs());
+                        e_buls.push(n);
                     }
-                } else {
-                    if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
-                        cnt_graze += 1;
-                        n.is_grazed = true;
-                    }
-                    reqs.append(&mut n.create_reqs());
-                    e_buls.push_back(n);
                 }
+            } else {
+                break;
             }
         }
         reqs.push_back(Request::Multiple);
         // Update player's bullet
-        let mut p_buls = LinkedList::new();
+        let mut p_buls = PlayerBullets::new();
         let mut damage_sum = 0;
-        for i in self.p_buls {
-            if let Some(n) = i.update() {
-                if check_hit(enemy.pos, n.pos, n.knd.r) {
-                    damage_sum += n.dmg;
-                } else {
-                    reqs.append(&mut n.create_reqs());
-                    p_buls.push_back(n);
+        for i in 0..PLAYER_BULLETS_SIZE {
+            if let Some(b) = self.p_buls.nth(i) {
+                if let Some(n) = b.clone().update() {
+                    if check_hit(enemy.pos, n.pos, n.knd.r) {
+                        damage_sum += n.dmg;
+                    } else {
+                        reqs.append(&mut n.create_reqs());
+                        p_buls.push(n.clone());
+                    }
                 }
+            } else {
+                break;
             }
         }
         // Launch bullet
         if is_shooting {
             if !is_hit && !is_hit_fragile && self.cnt_hit_fragile == 0 {
-                p_buls.append(&mut player.shoot());
+                player.shoot(&mut p_buls);
             }
-            e_buls.append(&mut launch_bullet(
+            launch_bullet(
+                &mut e_buls,
                 stage,
                 &player,
                 &enemy,
                 self.phase,
                 self.cnt_phs,
-            ));
+            );
         }
         // Calculate
         let (cnt_hit_fragile, player, rate) = if is_hit || self.cnt_hit_fragile >= DELAY_HIT_FRAGILE
