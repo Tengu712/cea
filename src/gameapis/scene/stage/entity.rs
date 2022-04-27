@@ -128,41 +128,35 @@ impl Entity {
         } else {
             (hp, self.phase, self.cnt_phs + is_shooting as u32)
         };
-        // UI
-        if is_shooting {
-            /*
-            reqs.push(
-                TextDesc::new()
-                    .set_text((time_limit as i32 - cnt_phs as i32).max(0) / 60)
-                    .set_rect(TIME_RECT)
-                    .set_align(TextAlign::Right)
-                    .set_format(TextFormat::Score)
-                    .pack(),
-            );*/
-        }
         // Finish
-            Self {
-                // Counter
-                phase,
-                cnt_phs,
-                cnt_hit_fragile,
-                // Value
-                rate,
-                hp,
-                graze,
-                score,
-                // Entity
-                player,
-                enemy,
-                e_buls,
-                p_buls,
-            }
+        Self {
+            // Counter
+            phase,
+            cnt_phs,
+            cnt_hit_fragile,
+            // Value
+            rate,
+            hp,
+            graze,
+            score,
+            // Entity
+            player,
+            enemy,
+            e_buls,
+            p_buls,
+        }
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Requests) {
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>, stage: usize, is_shooting: bool) {
         self.enemy.push_reqs(reqs);
         self.player.push_body_reqs(reqs);
         reqs.push(Request::Overlay);
+        for i in self.e_buls.get_vec() {
+            i.push_reqs(reqs);
+        }
         reqs.push(Request::Multiple);
+        for i in self.p_buls.get_vec() {
+            i.push_reqs(reqs);
+        }
         self.player.push_slow_reqs(reqs);
         self.rate.push_reqs(reqs, self.player.pos);
         self.hp.push_reqs(reqs, self.enemy.pos);
@@ -180,6 +174,17 @@ impl Entity {
                 .set_format(TextFormat::Graze)
                 .pack(),
         );
+        if is_shooting {
+            let time_limit = get_time_limit(stage, self.phase);
+            reqs.push(
+                TextDesc::new()
+                    .set_text((time_limit as i32 - self.cnt_phs as i32).max(0) / 60)
+                    .set_rect(TIME_RECT)
+                    .set_align(TextAlign::Right)
+                    .set_format(TextFormat::Score)
+                    .pack(),
+            );
+        }
     }
     pub(super) fn is_game_clear(&self, stage: usize) -> bool {
         is_game_clear(stage, self.phase)

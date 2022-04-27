@@ -8,6 +8,8 @@ pub mod imgid;
 /// This defines Text struct.
 pub mod text;
 
+pub const REQUESTS_SIZE: usize = 2048;
+
 pub enum Request {
     SetImage(imgid::ImgID),
     UnsetImage,

@@ -6,7 +6,7 @@ const BULLET_RECT: [f32; 4] = [
     GAME_TOP + 80.0,
     GAME_BOTTOM - 80.0,
 ];
-const ENEMY_BULLETS_SIZE: usize = 2;
+const ENEMY_BULLETS_SIZE: usize = 620;
 const PLAYER_BULLETS_SIZE: usize = 6;
 
 #[derive(Clone)]
@@ -129,18 +129,16 @@ impl Bullet {
             })
         }
     }
-    pub(super) fn create_reqs(&self) -> LinkedList<Request> {
-        let mut reqs = LinkedList::new();
-        reqs.push_back(self.knd.imgid.clone().pack());
-        reqs.push_back(
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>) {
+        reqs.push(self.knd.imgid.clone().pack());
+        reqs.push(
             CDataDiff::new()
                 .set_trs(self.pos)
                 .set_scl([self.knd.size, self.knd.size])
                 .set_col(self.col)
                 .pack(),
         );
-        reqs.push_back(Request::DrawImage);
-        reqs
+        reqs.push(Request::DrawImage);
     }
 }
 
@@ -158,12 +156,13 @@ impl EnemyBullets {
     pub(super) fn len(&self) -> usize {
         self.0.len()
     }
+    pub(super) fn get_vec(&self) -> &Vec<Bullet> {
+        &self.0
+    }
     pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
         match self.0.get(idx) {
             Some(n) => n.update(),
-            None =>{
-                None  
-            }
+            None => None,
         }
     }
 }
@@ -181,6 +180,9 @@ impl PlayerBullets {
     }
     pub(super) fn len(&self) -> usize {
         self.0.len()
+    }
+    pub(super) fn get_vec(&self) -> &Vec<Bullet> {
+        &self.0
     }
     pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
         match self.0.get(idx) {

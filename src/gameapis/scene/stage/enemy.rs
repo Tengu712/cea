@@ -20,7 +20,7 @@ impl Enemy {
             pos,
         }
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Requests) {
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>) {
         let trs = [
             self.pos[0],
             self.pos[1] + (self.cnt as f32 * 4.0).to_radians().cos() * 10.0,

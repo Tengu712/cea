@@ -35,20 +35,20 @@ impl Rate {
     pub(super) fn die(self) -> Self {
         Self(0, 0)
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Requests, p_pos: [f32; 2]) {
-        let theta = 360.0 * self.0.max(0) as f32 / RATE_GAGE_MAX as f32;
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>, p_pos: [f32; 2]) {
+        let theta = 180.0 * self.0.max(0) as f32 / RATE_GAGE_MAX as f32;
         reqs.push(Request::UnsetImage);
-        for i in 0..360 {
+        for i in 0..180 {
             if i as f32 >= theta {
                 break;
             }
             reqs.push(
                 CDataDiff::new()
                     .set_trs([
-                        p_pos[0] - RATE_GAGE_R * (i as f32).to_radians().sin(),
-                        p_pos[1] + RATE_GAGE_R * (i as f32).to_radians().cos(),
+                        p_pos[0] - RATE_GAGE_R * (i as f32 * 2.0).to_radians().sin(),
+                        p_pos[1] + RATE_GAGE_R * (i as f32 * 2.0).to_radians().cos(),
                     ])
-                    .set_rot([0.0, 0.0, (i as f32).to_radians()])
+                    .set_rot([0.0, 0.0, (i as f32 * 2.0).to_radians()])
                     .set_scl([RATE_GAGE_SQUARE_SIZE, RATE_GAGE_SQUARE_SIZE])
                     .pack(),
             );

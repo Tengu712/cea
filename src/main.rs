@@ -55,6 +55,7 @@ fn start_app() -> Result<(), windows::core::Error> {
     let mut keystates = gameapis::input::KeyStates::default();
     d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
+        let mut reqs = Vec::with_capacity(gameapis::request::REQUESTS_SIZE);
         keystates.z = winapis::winapi::get_next_keystate(0x5A, keystates.z);
         keystates.x = winapis::winapi::get_next_keystate(0x58, keystates.x);
         keystates.s = winapis::winapi::get_next_keystate(0xA0, keystates.s);
@@ -65,7 +66,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         keystates.down = winapis::winapi::get_next_keystate(0x28, keystates.down);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let (next, reqs) = game.update(&keystates);
+        let next = game.update(&mut reqs, &keystates);
         for i in reqs {
             match i {
                 gameapis::request::Request::SetImage(n) => {

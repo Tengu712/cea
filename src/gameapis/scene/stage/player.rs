@@ -56,7 +56,7 @@ impl Player {
             inp: self.inp,
         }
     }
-    pub(super) fn push_body_reqs(&self, reqs: &mut Requests) {
+    pub(super) fn push_body_reqs(&self, reqs: &mut Vec<Request>) {
         if self.inp.lr_ud[0] == 1 {
             reqs.push(IMGID_FLAN_R0.pack());
         } else if self.inp.lr_ud[0] == -1 {
@@ -72,7 +72,7 @@ impl Player {
         );
         reqs.push(Request::DrawImage);
     }
-    pub(super) fn push_slow_reqs(&self, reqs: &mut Requests) {
+    pub(super) fn push_slow_reqs(&self, reqs: &mut Vec<Request>) {
         if self.inp.cnt_s <= 0 {
             return;
         }

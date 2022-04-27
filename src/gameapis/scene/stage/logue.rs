@@ -26,7 +26,7 @@ impl Logue {
             Self(self.0)
         }
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Requests, stage: usize) {
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>, stage: usize) {
         if self.is_end_log(stage) {
             return;
         }

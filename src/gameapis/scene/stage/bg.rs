@@ -19,7 +19,7 @@ impl Background {
             Self(self.0 / abs * (abs - 5))
         }
     }
-    pub(super) fn push_reqs(&self, reqs: &mut Requests, cnt: u32) {
+    pub(super) fn push_reqs(&self, reqs: &mut Vec<Request>, cnt: u32) {
         let rot_y = -(self.0 as f32 / 10.0).to_radians();
         let rot_z = (self.0 as f32 / 20.0).to_radians();
         reqs.push(

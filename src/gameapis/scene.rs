@@ -5,17 +5,16 @@ use super::{
     input::KeyStates,
     request::{cdata::*, imgid::*, text::*, *},
 };
-use std::collections::LinkedList;
 
 pub(super) enum Scene {
     Title(title::Title),
     Stage(stage::Stage),
 }
 impl Scene {
-    pub(super) fn update(self, keystates: &KeyStates) -> (Self, Vec<Request>) {
+    pub(super) fn update(self, reqs: &mut Vec<Request>, keystates: &KeyStates) -> Self {
         match self {
-            Scene::Title(n) => n.update(keystates),
-            Scene::Stage(n) => n.update(keystates),
+            Scene::Title(n) => n.update(reqs, keystates),
+            Scene::Stage(n) => n.update(reqs, keystates),
         }
     }
 }

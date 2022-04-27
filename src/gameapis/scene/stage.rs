@@ -7,11 +7,8 @@ mod hp;
 mod logue;
 mod player;
 mod rate;
-mod requests;
 
 use super::*;
-
-use requests::Requests;
 
 const WIDTH: f32 = 1280.0;
 const HEIGHT: f32 = 960.0;
@@ -54,7 +51,7 @@ impl Stage {
             bg: bg::Background::new(),
         }
     }
-    pub(super) fn update(self, keystates: &KeyStates) -> (Scene, Vec<Request>) {
+    pub(super) fn update(self, reqs: &mut Vec<Request>, keystates: &KeyStates) -> Scene {
         let cnt = self.cnt + 1;
         // Do task that reacts with input
         let inp = {
@@ -74,9 +71,7 @@ impl Stage {
         };
         let state = match self.state {
             State::Start if logue.is_end_start_log(self.stage) => State::Shoot,
-            State::End if logue.is_end_log(self.stage) => {
-                return (Scene::Stage(Stage::new()), Vec::new());
-            }
+            State::End if logue.is_end_log(self.stage) => return Scene::Stage(Stage::new()),
             _ => self.state,
         };
         // Update entity
@@ -95,26 +90,22 @@ impl Stage {
         // Back ground
         let bg = self.bg.update(inp.lr_ud[0], inp.cnt_s > 0);
         // ========== Drawing ========== //
-        let mut reqs = Requests::new();
-        bg.push_reqs(&mut reqs, cnt);
-        entity.push_reqs(&mut reqs);
+        bg.push_reqs(reqs, cnt);
+        entity.push_reqs(reqs, self.stage, is_shooting);
         reqs.push(IMGID_FRAME.pack());
         reqs.push(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
         reqs.push(Request::DrawImage);
         match state {
-            State::Start | State::End => logue.push_reqs(&mut reqs, self.stage),
+            State::Start | State::End => logue.push_reqs(reqs, self.stage),
             _ => (),
         }
-        (
-            Scene::Stage(Stage {
-                cnt,
-                stage: self.stage,
-                state,
-                logue,
-                entity,
-                bg,
-            }),
-            reqs.0,
-        )
+        Scene::Stage(Stage {
+            cnt,
+            stage: self.stage,
+            state,
+            logue,
+            entity,
+            bg,
+        })
     }
 }
