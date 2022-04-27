@@ -6,8 +6,8 @@ const BULLET_RECT: [f32; 4] = [
     GAME_TOP + 80.0,
     GAME_BOTTOM - 80.0,
 ];
-pub(super) const ENEMY_BULLETS_SIZE: usize = 512;
-pub(super) const PLAYER_BULLETS_SIZE: usize = 16;
+pub(super) const ENEMY_BULLETS_SIZE: usize = 2;
+pub(super) const PLAYER_BULLETS_SIZE: usize = 6;
 
 #[derive(Clone)]
 pub(super) struct BulletKind {
@@ -106,7 +106,7 @@ impl Bullet {
         self_mut.col = col;
         self_mut
     }
-    pub(super) fn update(self) -> Option<Self> {
+    pub(super) fn update(&self) -> Option<Self> {
         let pos = [
             self.pos[0] + self.vel * self.deg.to_radians().cos(),
             self.pos[1] + self.vel * self.deg.to_radians().sin(),
@@ -119,7 +119,7 @@ impl Bullet {
             None
         } else {
             Some(Self {
-                knd: self.knd,
+                knd: self.knd.clone(),
                 vel: self.vel,
                 deg: self.deg,
                 pos,
@@ -144,44 +144,42 @@ impl Bullet {
     }
 }
 
-pub(super) struct EnemyBullets(Vec<Bullet>, usize);
+pub(super) struct EnemyBullets(Vec<Bullet>);
 impl EnemyBullets {
     pub(super) fn new() -> Self {
-        Self(Vec::with_capacity(ENEMY_BULLETS_SIZE), 0)
+        Self(Vec::with_capacity(ENEMY_BULLETS_SIZE))
     }
     pub(super) fn push(&mut self, bul: Bullet) {
-        if self.1 >= ENEMY_BULLETS_SIZE {
+        if self.0.len() >= ENEMY_BULLETS_SIZE {
             return;
         }
         self.0.push(bul);
-        self.1 += 1;
     }
-    pub(super) fn nth(&self, idx: usize) -> Option<&Bullet> {
-        if idx >= self.1 {
-            None
-        } else {
-            Some(&self.0[idx])
+    pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
+        match self.0.get(idx) {
+            Some(n) => n.update(),
+            None =>{
+                None  
+            }
         }
     }
 }
 
-pub(super) struct PlayerBullets(Vec<Bullet>, usize);
+pub(super) struct PlayerBullets(Vec<Bullet>);
 impl PlayerBullets {
     pub(super) fn new() -> Self {
-        Self(Vec::with_capacity(PLAYER_BULLETS_SIZE), 0)
+        Self(Vec::with_capacity(PLAYER_BULLETS_SIZE))
     }
     pub(super) fn push(&mut self, bul: Bullet) {
-        if self.1 >= PLAYER_BULLETS_SIZE {
+        if self.0.len() >= PLAYER_BULLETS_SIZE {
             return;
         }
         self.0.push(bul);
-        self.1 += 1;
     }
-    pub(super) fn nth(&self, idx: usize) -> Option<&Bullet> {
-        if idx >= self.1 {
-            None
-        } else {
-            Some(&self.0[idx])
+    pub(super) fn update_nth(&self, idx: usize) -> Option<Bullet> {
+        match self.0.get(idx) {
+            Some(n) => n.update(),
+            None => None,
         }
     }
 }

@@ -68,24 +68,23 @@ impl Entity {
         let mut is_hit_fragile = false;
         let mut cnt_graze = 0;
         for i in 0..ENEMY_BULLETS_SIZE {
-            if let Some(b) = self.e_buls.nth(i) {
-                if let Some(mut n) = b.clone().update() {
-                    if check_hit(player.pos, n.pos, n.knd.r) {
-                        if n.knd.is_fragile {
-                            is_hit_fragile = true;
-                        } else {
-                            is_hit = true;
-                        }
+            if let Some(mut n) = self.e_buls.update_nth(i) {
+                if check_hit(player.pos, n.pos, n.knd.r) {
+                    if n.knd.is_fragile {
+                        is_hit_fragile = true;
                     } else {
-                        if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
-                            cnt_graze += 1;
-                            n.is_grazed = true;
-                        }
-                        reqs.append(&mut n.create_reqs());
-                        e_buls.push(n);
+                        is_hit = true;
                     }
+                } else {
+                    if !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0) {
+                        cnt_graze += 1;
+                        n.is_grazed = true;
+                    }
+                    reqs.append(&mut n.create_reqs());
+                    e_buls.push(n);
                 }
             } else {
+                println!("{}", i);
                 break;
             }
         }
@@ -94,14 +93,12 @@ impl Entity {
         let mut p_buls = PlayerBullets::new();
         let mut damage_sum = 0;
         for i in 0..PLAYER_BULLETS_SIZE {
-            if let Some(b) = self.p_buls.nth(i) {
-                if let Some(n) = b.clone().update() {
-                    if check_hit(enemy.pos, n.pos, n.knd.r) {
-                        damage_sum += n.dmg;
-                    } else {
-                        reqs.append(&mut n.create_reqs());
-                        p_buls.push(n.clone());
-                    }
+            if let Some(n) = self.p_buls.update_nth(i) {
+                if check_hit(enemy.pos, n.pos, n.knd.r) {
+                    damage_sum += n.dmg;
+                } else {
+                    reqs.append(&mut n.create_reqs());
+                    p_buls.push(n);
                 }
             } else {
                 break;
