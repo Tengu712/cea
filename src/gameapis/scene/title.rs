@@ -7,7 +7,7 @@ impl Title {
     pub(super) fn new() -> Self {
         Self(0)
     }
-    pub(super) fn update(self, reqs: &mut Vec<Request>, keystates: &KeyStates) -> Scene {
+    pub(super) fn update(self, reqs: &mut Vec<Request>, input: &Input) -> Scene {
         reqs.push(
             TextDesc::new()
                 .set_text("PRESS ANY KEY TO START")
@@ -17,7 +17,7 @@ impl Title {
                 .set_align(TextAlign::Center)
                 .pack(),
         );
-        if keystates.z == 1 {
+        if input.z == 1 {
             return Scene::Stage(Stage::new());
         }
         Scene::Title(Self(self.0 + 1))

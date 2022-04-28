@@ -51,13 +51,13 @@ impl Entity {
         is_shooting: bool,
         is_game_over: bool,
         stage: usize,
-        inp: PlayerInput,
+        input: &Input,
     ) -> Self {
         // Update enemy
         let enemy = self.enemy.update();
         // Update player
         let player = if self.cnt_hit_fragile == 0 {
-            self.player.update(inp.clone())
+            self.player.update(input)
         } else {
             self.player
         };
@@ -68,14 +68,14 @@ impl Entity {
         let mut cnt_graze = 0;
         for i in 0..self.e_buls.len() {
             if let Some(mut n) = self.e_buls.update_nth(i) {
-                if !is_game_over && check_hit(player.pos, n.pos, n.knd.r) {
+                if !is_game_over && false {
                     if n.knd.is_fragile {
                         is_hit_fragile = true;
                     } else {
                         is_hit = true;
                     }
                 } else {
-                    if !is_game_over && !n.is_grazed && check_hit(player.pos, n.pos, n.knd.r * 3.0)
+                    if !is_game_over && !n.is_grazed && false
                     {
                         cnt_graze += 1;
                         n.is_grazed = true;
@@ -115,7 +115,7 @@ impl Entity {
             if is_hit || self.cnt_hit_fragile >= DELAY_HIT_FRAGILE {
                 (0, player.die(), self.rate.die(), self.zanki - 1)
             } else if self.cnt_hit_fragile > 0 || is_hit_fragile {
-                if inp.cnt_z == 1 {
+                if input.z == 1 {
                     (
                         0,
                         player,
@@ -134,7 +134,7 @@ impl Entity {
                 (
                     0,
                     player,
-                    self.rate.update(cnt_graze, inp.cnt_z),
+                    self.rate.update(cnt_graze, input.z),
                     self.zanki,
                 )
             };
@@ -188,7 +188,7 @@ impl Entity {
         }
         if !is_game_over {
             self.player.push_slow_reqs(reqs);
-            self.rate.push_reqs(reqs, self.player.pos);
+            //self.rate.push_reqs(reqs, self.player.pos);
         }
         self.hp.push_reqs(reqs, self.enemy.pos);
         reqs.push(

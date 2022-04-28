@@ -18,14 +18,6 @@ const GAME_RIGHT: f32 = 392.0;
 const GAME_TOP: f32 = 480.0;
 const GAME_BOTTOM: f32 = -480.0;
 
-#[derive(Clone)]
-struct PlayerInput {
-    lr_ud: [i32; 2],
-    cnt_s: i16,
-    cnt_z: i16,
-    cnt_x: i16,
-}
-
 enum State {
     Start,
     Shoot,
@@ -54,21 +46,11 @@ impl Stage {
             gameover: gameover::GameOver::new(),
         }
     }
-    pub(super) fn update(self, reqs: &mut Vec<Request>, keystates: &KeyStates) -> Scene {
+    pub(super) fn update(self, reqs: &mut Vec<Request>, input: &Input) -> Scene {
         let cnt = self.cnt + 1;
-        // Do task that reacts with input
-        let inp = {
-            let inp_x = (keystates.right > 0) as i32 - (keystates.left > 0) as i32;
-            let inp_y = (keystates.up > 0) as i32 - (keystates.down > 0) as i32;
-            PlayerInput {
-                lr_ud: [inp_x, inp_y],
-                cnt_s: keystates.s,
-                cnt_z: keystates.z,
-                cnt_x: keystates.x,
-            }
-        };
+        // ========== ========== //
         let logue = match self.state {
-            State::Start | State::End => self.logue.update(inp.cnt_z),
+            State::Start | State::End => self.logue.update(input.z),
             _ => self.logue,
         };
         let state = match self.state {
@@ -91,7 +73,8 @@ impl Stage {
             State::GameOver => true,
             _ => false,
         };
-        let entity = self.entity.update(is_shooting, is_game_over, self.stage, inp.clone());
+        // 
+        let entity = self.entity.update(is_shooting, is_game_over, self.stage, input);
         let state = if is_shooting && entity.is_game_over() {
             State::GameOver
         } else if is_shooting && entity.is_game_clear(self.stage) {
@@ -100,7 +83,7 @@ impl Stage {
             state
         };
         // Back ground
-        let bg = self.bg.update(inp.lr_ud[0], inp.cnt_s > 0, is_game_over);
+        let bg = self.bg;
         // ========== Drawing ========== //
         bg.push_reqs(reqs, cnt);
         entity.push_reqs(reqs, self.stage, is_shooting, is_game_over);

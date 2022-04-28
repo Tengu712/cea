@@ -2,12 +2,14 @@ use super::*;
 
 use super::bullet::*;
 
-const PLAYER_RECT: [f32; 4] = [
-    GAME_LEFT + 10.0,
-    GAME_RIGHT - 10.0,
-    GAME_TOP - 150.0,
-    GAME_BOTTOM + 20.0,
-];
+const RECT: Rect = Rect {
+    l: GAME_LEFT + 10.0,
+    r: GAME_RIGHT - 10.0,
+    t: GAME_TOP - 150.0,
+    b: GAME_BOTTOM + 20.0,
+    n: 0.0,
+    f: 0.0,
+};
 const P_SPD: f32 = 8.0;
 const INIT_POS: [f32; 2] = [0.0, -280.0];
 const SQUARE_SIZE: f32 = 100.0;
@@ -18,62 +20,40 @@ const PLAYER_BULLET_POS_DIF: [f32; 2] = [20.0, 50.0];
 const PLAYER_BULLET_BASE_DAMAGE: i32 = 100;
 
 pub(super) struct Player {
-    pub(super) pos: [f32; 2],
-    pub(super) inp: PlayerInput,
+    pub(super) pos: Position,
 }
 impl Player {
     pub(super) fn new() -> Self {
         Self {
-            pos: INIT_POS,
-            inp: PlayerInput {
-                lr_ud: [0; 2],
-                cnt_s: 0,
-                cnt_z: 0,
-                cnt_x: 0,
+            pos: Position {
+                x: INIT_POS[0],
+                y: INIT_POS[1],
+                z: 0.0,
             },
         }
     }
-    pub(super) fn update(self, inp: PlayerInput) -> Self {
-        let c_spd = if inp.cnt_s > 0 { 0.5 } else { 1.0 }
-            / if inp.lr_ud[0].abs() + inp.lr_ud[1].abs() == 2 {
-                std::f32::consts::SQRT_2
-            } else {
-                1.0
-            };
-        let pos = [
-            self.pos[0] + inp.lr_ud[0] as f32 * P_SPD * c_spd,
-            self.pos[1] + inp.lr_ud[1] as f32 * P_SPD * c_spd,
-        ];
-        let pos = [
-            pos[0].max(PLAYER_RECT[0]).min(PLAYER_RECT[1]),
-            pos[1].max(PLAYER_RECT[3]).min(PLAYER_RECT[2]),
-        ];
-        Self { pos, inp }
+    pub(super) fn update(self, input: &Input) -> Self {
+        let vel = Velocity::from_input(input);
+        let spd = P_SPD * if input.s > 0 { 0.5 } else { 1.0 };
+        let pos = self.pos.update_with_velocity(&vel, spd);
+        let pos = pos.restrict(&RECT);
+        Self { pos }
     }
     pub(super) fn die(self) -> Self {
-        Self {
-            pos: INIT_POS,
-            inp: self.inp,
-        }
+        Player::new()
     }
     pub(super) fn push_body_reqs(&self, reqs: &mut Vec<Request>) {
-        if self.inp.lr_ud[0] == 1 {
-            reqs.push(IMGID_FLAN_R0.pack());
-        } else if self.inp.lr_ud[0] == -1 {
-            reqs.push(IMGID_FLAN_L0.pack());
-        } else {
-            reqs.push(IMGID_FLAN_B0.pack());
-        }
+        reqs.push(IMGID_FLAN_B0.pack());
         reqs.push(
             CDataDiff::new()
-                .set_trs(self.pos)
+                .set_trs([self.pos.x, self.pos.y])
                 .set_scl([SQUARE_SIZE, SQUARE_SIZE])
                 .pack(),
         );
         reqs.push(Request::DrawImage);
     }
     pub(super) fn push_slow_reqs(&self, reqs: &mut Vec<Request>) {
-        if self.inp.cnt_s <= 0 {
+        /*if self.inp.cnt_s <= 0 {
             return;
         }
         reqs.push(IMGID_HITCIRCLE.pack());
@@ -113,6 +93,7 @@ impl Player {
             );
             reqs.push(Request::DrawImage);
         }
+        */
     }
     pub(super) fn shoot(&self, p_buls: &mut PlayerBullets) {
         if !self.is_shootable() {
@@ -124,8 +105,8 @@ impl Player {
                 .set_vel(PLAYER_BULLET_VELOCITY)
                 .set_dmg(PLAYER_BULLET_BASE_DAMAGE)
                 .set_pos([
-                    self.pos[0] - PLAYER_BULLET_POS_DIF[0],
-                    self.pos[1] + PLAYER_BULLET_POS_DIF[1],
+                    self.pos.x - PLAYER_BULLET_POS_DIF[0],
+                    self.pos.y + PLAYER_BULLET_POS_DIF[1],
                 ]),
         );
         p_buls.push(
@@ -134,12 +115,13 @@ impl Player {
                 .set_vel(PLAYER_BULLET_VELOCITY)
                 .set_dmg(PLAYER_BULLET_BASE_DAMAGE)
                 .set_pos([
-                    self.pos[0] + PLAYER_BULLET_POS_DIF[0],
-                    self.pos[1] + PLAYER_BULLET_POS_DIF[1],
+                    self.pos.x + PLAYER_BULLET_POS_DIF[0],
+                    self.pos.y + PLAYER_BULLET_POS_DIF[1],
                 ]),
         );
     }
     pub(super) fn is_shootable(&self) -> bool {
-        self.inp.cnt_z % 6 == 1
+        //self.inp.cnt_z % 6 == 1
+        false
     }
 }

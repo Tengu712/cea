@@ -1,9 +1,8 @@
 /// [essensial]
+pub mod component;
+/// [essensial]
 /// This provides a way to get fps.
 mod fps;
-/// [essensial]
-/// This provides a way to get key input states.
-pub mod input;
 /// [essensial]
 /// This defines request.
 pub mod request;
@@ -16,8 +15,8 @@ impl Game {
     pub fn new() -> Self {
         Self(scene::create_first_scene(), fps::FpsData::new())
     }
-    pub fn update(self, reqs: &mut Vec<request::Request>, keystates: &input::KeyStates) -> Self {
-        let scene = self.0.update(reqs, keystates);
+    pub fn update(self, reqs: &mut Vec<request::Request>, input: &component::Input) -> Self {
+        let scene = self.0.update(reqs, input);
         let fpsdata = self.1.update();
         reqs.push(request::Request::DrawText(
             request::text::TextDesc::new()

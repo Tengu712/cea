@@ -52,21 +52,20 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!("Run the game.");
     let mut game = gameapis::Game::new();
     let mut cdata = create_default_cdata();
-    let mut keystates = gameapis::input::KeyStates::default();
+    let mut input = gameapis::component::Input::default();
     d3dapp.set_cdata(&cdata)?;
     while !winapp.do_event() {
         let mut reqs = Vec::with_capacity(gameapis::request::REQUESTS_SIZE);
-        keystates.z = winapis::winapi::get_next_keystate(0x5A, keystates.z);
-        keystates.x = winapis::winapi::get_next_keystate(0x58, keystates.x);
-        keystates.s = winapis::winapi::get_next_keystate(0xA0, keystates.s);
-        keystates.e = winapis::winapi::get_next_keystate(0x1B, keystates.e);
-        keystates.left = winapis::winapi::get_next_keystate(0x25, keystates.left);
-        keystates.up = winapis::winapi::get_next_keystate(0x26, keystates.up);
-        keystates.right = winapis::winapi::get_next_keystate(0x27, keystates.right);
-        keystates.down = winapis::winapi::get_next_keystate(0x28, keystates.down);
+        input.z = winapis::winapi::get_next_keystate(0x5A, input.z);
+        input.x = winapis::winapi::get_next_keystate(0x58, input.x);
+        input.s = winapis::winapi::get_next_keystate(0xA0, input.s);
+        input.left = winapis::winapi::get_next_keystate(0x25, input.left);
+        input.up = winapis::winapi::get_next_keystate(0x26, input.up);
+        input.right = winapis::winapi::get_next_keystate(0x27, input.right);
+        input.down = winapis::winapi::get_next_keystate(0x28, input.down);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let next = game.update(&mut reqs, &keystates);
+        let next = game.update(&mut reqs, &input);
         for i in reqs {
             match i {
                 gameapis::request::Request::SetImage(n) => {
