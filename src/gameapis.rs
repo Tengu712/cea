@@ -1,5 +1,6 @@
-/// [essensial]
+pub mod asset;
 pub mod component;
+pub mod entity;
 /// [essensial]
 /// This provides a way to get fps.
 mod fps;

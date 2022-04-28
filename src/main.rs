@@ -5,6 +5,10 @@ mod resource;
 /// This provides apis to call WindowsAPI.
 mod winapis;
 
+use gameapis::{asset::*, component::*, entity::*};
+use std::collections::{BTreeMap, HashMap};
+use winapis::{direct3d::*, winapi::*};
+
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 960;
 
@@ -19,102 +23,69 @@ fn main() {
                 e.message().to_string_lossy()
             );
             println!("{}", message);
-            winapis::winapi::show_messagebox(message, "Error")
+            show_messagebox(message, "Error")
         }
     }
 }
 /// Start application.
 fn start_app() -> Result<(), windows::core::Error> {
-    println!("Start the game.");
+    println!("\n==================================================");
+    println!("            \"TITLE\"");
+    println!("      SkyDog Assoc of WordSpiritism, Tengu712");
+    println!("==================================================");
+    println!("Starts up ...");
     let cur_dir = get_curdir_for_winapp().unwrap_or(String::from(r"\"));
-    // Create window app
-    println!("Create window.");
-    let winapp = winapis::winapi::WindowsApplication::new(
+    println!(" - Create a window");
+    let winapp = WindowsApplication::new(
         "",
         WIDTH as i32,
         HEIGHT as i32,
-        winapis::winapi::ask_yesno("Start with a fullscreen window?", "question"),
+        ask_yesno("Start with a fullscreen window?", "question"),
     )?;
-    // Create drawing app
-    println!("Create Direct3D Components.");
-    let d3dapp =
-        winapis::direct3d::D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
-    println!("Create DirectWrite Components.");
-    let dwapp = d3dapp.create_text_module(&winapp)?;
-    // Load
-    println!("Start loading.");
-    let config = resource::load_config(cur_dir.clone());
-    let default_text_format = dwapp.create_text_format(" ", None, 64.0)?;
-    let map_text_format = resource::load_font_collection(&dwapp, &config)?;
-    let map_image = resource::load_images(&d3dapp, cur_dir.clone())?;
+    println!(" - Create Direct3D Components");
+    let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
+    //println!(" - Create DirectWrite Components");
+    //let dwapp = d3dapp.create_text_module(&winapp)?;
+    println!(" - Load resources");
+    let map_image = {
+        let mut map = HashMap::new();
+        let res_dir = cur_dir + r"img\";
+        for i in IMGID_ARRAY {
+            map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
+        }
+        map
+    };
+    println!(" - Create game components");
+    let mut components = Components::default();
+    create_player(&mut components);
     let idea = create_idea(&d3dapp)?;
-    // Run the app
-    println!("Run the game.");
-    let mut game = gameapis::Game::new();
     let mut cdata = create_default_cdata();
-    let mut input = gameapis::component::Input::default();
     d3dapp.set_cdata(&cdata)?;
+    println!("\nAll clear. The game is starting.\n");
     while !winapp.do_event() {
-        let mut reqs = Vec::with_capacity(gameapis::request::REQUESTS_SIZE);
-        input.z = winapis::winapi::get_next_keystate(0x5A, input.z);
-        input.x = winapis::winapi::get_next_keystate(0x58, input.x);
-        input.s = winapis::winapi::get_next_keystate(0xA0, input.s);
-        input.left = winapis::winapi::get_next_keystate(0x25, input.left);
-        input.up = winapis::winapi::get_next_keystate(0x26, input.up);
-        input.right = winapis::winapi::get_next_keystate(0x27, input.right);
-        input.down = winapis::winapi::get_next_keystate(0x28, input.down);
+        components.input.z = get_next_keystate(0x5A, components.input.z);
+        components.input.x = get_next_keystate(0x58, components.input.x);
+        components.input.s = get_next_keystate(0xA0, components.input.s);
+        components.input.left = get_next_keystate(0x25, components.input.left);
+        components.input.up = get_next_keystate(0x26, components.input.up);
+        components.input.right = get_next_keystate(0x27, components.input.right);
+        components.input.down = get_next_keystate(0x28, components.input.down);
+        ComponentUpdater::process(&mut components.positions, &components.velocities);
+        ComponentUpdater::process(&mut components.sprites, &components.positions);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let next = game.update(&mut reqs, &input);
-        for i in reqs {
-            match i {
-                gameapis::request::Request::SetImage(n) => {
-                    cdata = d3dapp.set_d3dimage(map_image.get(n.0), cdata)
-                }
-                gameapis::request::Request::UnsetImage => cdata = d3dapp.set_d3dimage(None, cdata),
-                gameapis::request::Request::SetCData(n) => {
-                    cdata = apply_cdata_diff(cdata, n);
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::SetView(n) => {
-                    cdata.mat_view = winapis::math::Matrix4x4::new_view(n.pos, n.rot);
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::SetPerse(n) => {
-                    cdata.mat_proj =
-                        winapis::math::Matrix4x4::new_perse(n.w, n.h, n.theta, n.n, n.f);
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::SetOrtho(n) => {
-                    cdata.mat_proj =
-                        winapis::math::Matrix4x4::new_ortho(n.l, n.r, n.t, n.b, n.n, n.f);
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::Multiple => {
-                    cdata.vec_prm[1] = 0.0;
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::Overlay => {
-                    cdata.vec_prm[1] = 1.0;
-                    d3dapp.set_cdata(&cdata)?;
-                }
-                gameapis::request::Request::DrawImage => d3dapp.draw_model(&idea),
-                gameapis::request::Request::DrawText(n) => {
-                    let desc = winapis::directwrite::TextDesc::new()
-                        .set_text(n.text)
-                        .set_rect(n.rect)
-                        .set_rgba(n.rgba)
-                        .set_align(n.align as u32);
-                    dwapp.draw_text(
-                        &desc,
-                        map_text_format
-                            .get(&n.format)
-                            .unwrap_or(&default_text_format),
-                    )?;
-                }
-            }
+        let mut btmap = BTreeMap::new();
+        for (_, v) in components.sprites.iter() {
+            btmap.insert(v.layer, v);
         }
-        game = next;
+        for (_, v) in btmap.into_iter() {
+            if let Some(imgid) = v.imgid {
+                cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata);
+            }
+            cdata = apply_cdata_diff(cdata, v);
+            d3dapp.set_cdata(&cdata)?;
+            d3dapp.draw_model(&idea);
+        }
         d3dapp.swap()?;
     }
     Ok(())
@@ -135,26 +106,24 @@ fn get_curdir_for_winapp() -> Result<String, ()> {
     Ok(dir)
 }
 /// Create idea sprite.
-fn create_idea(
-    d3dapp: &winapis::direct3d::D3DApplication,
-) -> Result<winapis::direct3d::model::ModelBuffer, windows::core::Error> {
+fn create_idea(d3dapp: &D3DApplication) -> Result<model::ModelBuffer, windows::core::Error> {
     let data_vtx = [
-        winapis::direct3d::model::Vertex {
+        model::Vertex {
             pos: [-0.5, -0.5, 0.0],
             col: [1.0; 4],
             tex: [0.0, 1.0],
         },
-        winapis::direct3d::model::Vertex {
+        model::Vertex {
             pos: [-0.5, 0.5, 0.0],
             col: [1.0; 4],
             tex: [0.0, 0.0],
         },
-        winapis::direct3d::model::Vertex {
+        model::Vertex {
             pos: [0.5, 0.5, 0.0],
             col: [1.0; 4],
             tex: [1.0, 0.0],
         },
-        winapis::direct3d::model::Vertex {
+        model::Vertex {
             pos: [0.5, -0.5, 0.0],
             col: [1.0; 4],
             tex: [1.0, 1.0],
@@ -164,8 +133,8 @@ fn create_idea(
     d3dapp.create_modelbuffer(4, &data_vtx, 6, &data_idx)
 }
 /// Create default constant buffer data.
-fn create_default_cdata() -> winapis::direct3d::cbuffer::CData {
-    winapis::direct3d::cbuffer::CData {
+fn create_default_cdata() -> cbuffer::CData {
+    cbuffer::CData {
         mat_scl: winapis::math::Matrix4x4::new_identity(),
         mat_rtx: winapis::math::Matrix4x4::new_identity(),
         mat_rty: winapis::math::Matrix4x4::new_identity(),
@@ -185,27 +154,29 @@ fn create_default_cdata() -> winapis::direct3d::cbuffer::CData {
     }
 }
 /// Apply constant buffer difference request to cdata.
-fn apply_cdata_diff(
-    cdata: winapis::direct3d::cbuffer::CData,
-    cdata_diff: gameapis::request::cdata::CDataDiff,
-) -> winapis::direct3d::cbuffer::CData {
-    winapis::direct3d::cbuffer::CData {
+fn apply_cdata_diff(cdata: cbuffer::CData, sprite: &gameapis::component::Sprite) -> cbuffer::CData {
+    cbuffer::CData {
         mat_scl: winapis::math::Matrix4x4::new_scaling(
-            cdata_diff.scl_xy[0],
-            cdata_diff.scl_xy[1],
-            1.0,
+            sprite.scaling.x,
+            sprite.scaling.y,
+            sprite.scaling.z,
         ),
-        mat_rtx: winapis::math::Matrix4x4::new_rotation_x(cdata_diff.rot_xyz[0]),
-        mat_rty: winapis::math::Matrix4x4::new_rotation_y(cdata_diff.rot_xyz[1]),
-        mat_rtz: winapis::math::Matrix4x4::new_rotation_z(cdata_diff.rot_xyz[2]),
+        mat_rtx: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.x),
+        mat_rty: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.y),
+        mat_rtz: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.z),
         mat_trs: winapis::math::Matrix4x4::new_translation(
-            cdata_diff.trs_xyz[0],
-            cdata_diff.trs_xyz[1],
-            cdata_diff.trs_xyz[2],
+            sprite.translation.x,
+            sprite.translation.y,
+            sprite.translation.z,
         ),
         mat_view: cdata.mat_view,
         mat_proj: cdata.mat_proj,
-        vec_col: cdata_diff.col_rgba,
+        vec_col: [
+            sprite.color.x,
+            sprite.color.y,
+            sprite.color.z,
+            sprite.color.w,
+        ],
         vec_prm: cdata.vec_prm,
     }
 }

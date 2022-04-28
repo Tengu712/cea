@@ -76,15 +76,3 @@ pub fn load_font_collection(
     );
     Ok(map)
 }
-
-pub fn load_images(
-    d3dapp: &D3DApplication,
-    cur_dir: String,
-) -> Result<HashMap<&str, D3DImage>, windows::core::Error> {
-    let mut map = HashMap::new();
-    let res_dir = cur_dir + r"img\";
-    for i in IMGID_ARRAY {
-        map.insert(i.0, d3dapp.create_image_from_file(res_dir.clone() + i.0)?);
-    }
-    Ok(map)
-}

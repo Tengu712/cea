@@ -33,11 +33,12 @@ impl Player {
         }
     }
     pub(super) fn update(self, input: &Input) -> Self {
-        let vel = Velocity::from_input(input);
-        let spd = P_SPD * if input.s > 0 { 0.5 } else { 1.0 };
-        let pos = self.pos.update_with_velocity(&vel, spd);
-        let pos = pos.restrict(&RECT);
-        Self { pos }
+        //let vel = Velocity::from_input(input);
+        //let spd = P_SPD * if input.s > 0 { 0.5 } else { 1.0 };
+        //let pos = self.pos.update_with_velocity(&vel, spd);
+        //let pos = pos.restrict(&RECT);
+        //Self { pos }
+        self
     }
     pub(super) fn die(self) -> Self {
         Player::new()
