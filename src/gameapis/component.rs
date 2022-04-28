@@ -1,17 +1,26 @@
 use std::collections::HashMap;
 
+pub trait SystemImpl<T, U> {
+    fn process(update: &mut T, refer: &U);
+}
+pub struct System;
+
 #[derive(Default)]
 pub struct Components {
     pub next_entity_id: usize,
     pub input: Input,
+    pub playerinputs: HashMap<usize, PlayerInput>,
     pub velocities: HashMap<usize, Velocity>,
     pub positions: HashMap<usize, Position>,
     pub sprites: HashMap<usize, Sprite>,
 }
-pub trait ComponentUpdaterImpl<T, U> {
-    fn process(update: &mut HashMap<usize, T>, refer: &HashMap<usize, U>);
+impl Components {
+    pub fn update(&mut self) {
+        System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
+        System::process(&mut self.positions, &self.velocities);
+        System::process(&mut self.sprites, &self.positions);
+    }
 }
-pub struct ComponentUpdater;
 
 #[derive(Default)]
 pub struct Input {
@@ -56,7 +65,7 @@ pub struct Velocity {
     pub speed: f32,
 }
 
-/// A component to change Sprite.translation.
+/// A component to change translation of Sprite.
 pub type Position = Vector;
 
 /// A component to draw sprite on screen.
@@ -70,7 +79,10 @@ pub struct Sprite {
     pub color: Vector4D,
 }
 
-impl ComponentUpdaterImpl<Position, Velocity> for ComponentUpdater {
+/// A component to change velocity based on input especially for player.
+pub struct PlayerInput;
+
+impl SystemImpl<HashMap<usize, Position>, HashMap<usize, Velocity>> for System {
     fn process(update: &mut HashMap<usize, Position>, refer: &HashMap<usize, Velocity>) {
         for (k, v) in update {
             if let Some(n) = refer.get(k) {
@@ -81,11 +93,32 @@ impl ComponentUpdaterImpl<Position, Velocity> for ComponentUpdater {
         }
     }
 }
-impl ComponentUpdaterImpl<Sprite, Position> for ComponentUpdater {
+impl SystemImpl<HashMap<usize, Sprite>, HashMap<usize, Position>> for System {
     fn process(update: &mut HashMap<usize, Sprite>, refer: &HashMap<usize, Position>) {
         for (k, v) in update {
             if let Some(n) = refer.get(k) {
                 v.translation = n.clone();
+            }
+        }
+    }
+}
+impl SystemImpl<HashMap<usize, Velocity>, (&HashMap<usize, PlayerInput>, &Input)> for System {
+    fn process(
+        update: &mut HashMap<usize, Velocity>,
+        refer: &(&HashMap<usize, PlayerInput>, &Input),
+    ) {
+        let (pi_map, input) = refer;
+        for (k, _) in pi_map.into_iter() {
+            if let Some(mut n) = update.get_mut(k) {
+                let lr = (input.right > 0) as i32 - (input.left > 0) as i32;
+                let ud = (input.up > 0) as i32 - (input.down > 0) as i32;
+                let coef = if lr.abs() + ud.abs() == 2 {
+                    1.0 / std::f32::consts::SQRT_2
+                } else {
+                    1.0
+                };
+                n.direction.x = lr as f32 * coef;
+                n.direction.y = ud as f32 * coef;
             }
         }
     }

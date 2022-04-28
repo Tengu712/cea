@@ -59,3 +59,20 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 
 `IRestrictedErrorInfo::GetErrorDetails`の引数に`*mut windows::core::bindings::BSTR`が必須で、それが大事なんだが、`bindings`モジュールがprivateという。
 どんな開発してんだ。
+
+## ECS
+
+### 各コンポーネントの影響関係
+
+* Velocity <- (PlayerInput, Input)
+* Position <- Velocity
+* Sprite <- Sprite
+
+### 各エンティティの実装
+
+Player
+
+* PlayerInput
+* Velocity
+* Position
+* Sprite

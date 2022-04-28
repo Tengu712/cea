@@ -58,6 +58,7 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!(" - Create game components");
     let mut components = Components::default();
     create_player(&mut components);
+    create_enemy(&mut components);
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
     d3dapp.set_cdata(&cdata)?;
@@ -70,8 +71,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         components.input.up = get_next_keystate(0x26, components.input.up);
         components.input.right = get_next_keystate(0x27, components.input.right);
         components.input.down = get_next_keystate(0x28, components.input.down);
-        ComponentUpdater::process(&mut components.positions, &components.velocities);
-        ComponentUpdater::process(&mut components.sprites, &components.positions);
+        components.update();
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
         let mut btmap = BTreeMap::new();
