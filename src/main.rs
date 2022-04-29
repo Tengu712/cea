@@ -58,8 +58,9 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!(" - Create game components");
     let mut components = Components::default();
     create_player(&mut components);
+    create_player_slow(&mut components);
     create_enemy(&mut components);
-    create_text(&mut components);
+    create_frame(&mut components);
     println!(" - Set up drawing objects");
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();

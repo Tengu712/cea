@@ -1,14 +1,18 @@
 pub mod enemy;
+pub mod frame;
 pub mod player;
+pub mod playerslow;
 
 pub use enemy::*;
+pub use frame::*;
 pub use player::*;
+pub use playerslow::*;
 
 use super::asset::*;
 use super::component::*;
 
-//const WIDTH: f32 = 1280.0;
-//const HEIGHT: f32 = 960.0;
+const SCREEN_WIDTH: f32 = 1280.0;
+const SCREEN_HEIGHT: f32 = 960.0;
 const GAME_LEFT: f32 = -392.0;
 const GAME_RIGHT: f32 = 392.0;
 const GAME_TOP: f32 = 480.0;
@@ -20,26 +24,6 @@ const COLOR_WHITE: Vector4D = Vector4D {
     w: 1.0,
 };
 
-
-
-
-pub fn create_text(components: &mut Components) {
-    components.texts.insert(
-        components.next_entity_id,
-        Text {
-            layer: 0,
-            text: String::from("はろーわーるど"),
-            rect: Rect {
-                l: 0.0,
-                r: 1280.0,
-                t: 0.0,
-                b: 960.0,
-            },
-            rgba: COLOR_WHITE,
-            fontname: "游明朝\0",
-            size: 64.0,
-            align: TextAlign2::Left,
-        },
-    );
-    components.next_entity_id += 1;
-}
+const LAYER_PLAYER: u32 = 2;
+const LAYER_PLAYER_SLOW: u32 = 3;
+const LAYER_FRAME: u32 = 4;

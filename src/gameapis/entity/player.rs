@@ -1,5 +1,8 @@
 use super::*;
 
+pub const PLAYER_KEY: EntityKey = "Player";
+pub const PLAYER_SPEED: f32 = 8.0;
+
 pub fn create_player(components: &mut Components) {
     components
         .playeranimations
@@ -29,7 +32,7 @@ pub fn create_player(components: &mut Components) {
     components.sprites.insert(
         components.next_entity_id,
         Sprite {
-            layer: 1,
+            layer: LAYER_PLAYER,
             imgid: Some(IMGID_FLAN_B0),
             scaling: Vector {
                 x: 100.0,
@@ -44,8 +47,11 @@ pub fn create_player(components: &mut Components) {
         components.next_entity_id,
         Velocity {
             direction: Vector::default(),
-            speed: 8.0,
+            speed: PLAYER_SPEED,
         },
     );
+    components
+        .entities
+        .insert(PLAYER_KEY, components.next_entity_id);
     components.next_entity_id += 1;
 }

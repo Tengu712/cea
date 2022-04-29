@@ -6,6 +6,8 @@ pub mod playerinput;
 pub mod position;
 /// A component to restrict position.
 pub mod restrict;
+/// A component to change position same as player's position.
+pub mod sameposition;
 /// A component to draw sprite on screen.
 pub mod sprite;
 /// A component to draw text on screen.
@@ -17,6 +19,7 @@ pub use playeranimation::*;
 pub use playerinput::*;
 pub use position::*;
 pub use restrict::*;
+pub use sameposition::*;
 pub use sprite::*;
 pub use text::*;
 pub use velocity::*;
@@ -29,16 +32,21 @@ pub trait SystemImpl<T, U> {
 }
 pub struct System;
 
-type CContainer<T> = HashMap<usize, T>;
+pub type EntityID = usize;
+pub type EntityKey = &'static str;
+pub type CContainer<T> = HashMap<EntityID, T>;
+pub type Entities = HashMap<EntityKey, EntityID>;
 
 #[derive(Default)]
 pub struct Components {
     pub next_entity_id: usize,
+    pub entities: Entities,
     pub input: Input,
     pub playeranimations: CContainer<PlayerAnimation>,
     pub playerinputs: CContainer<PlayerInput>,
     pub positions: CContainer<Position>,
     pub restricts: CContainer<RestrictRect>,
+    pub samepositions: CContainer<SamePosition>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub velocities: CContainer<Velocity>,
@@ -48,6 +56,8 @@ impl Components {
         System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
         System::process(&mut self.positions, &self.velocities);
         System::process(&mut self.positions, &self.restricts);
+        System::process(&mut self.samepositions, &(&self.positions, &self.entities));
+        System::process(&mut self.positions, &self.samepositions);
         System::process(
             &mut self.sprites,
             &(&self.playeranimations, &self.velocities),

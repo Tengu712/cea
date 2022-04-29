@@ -71,6 +71,7 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 | PlayerInput | 入力に対して自機を動かす。マーカー。 |
 | Position | 物体の位置。 |
 | RestrictRect | 物体の位置を制限する。 |
+| SamePosition | 物体の位置を特定の物体と同じにする。 |
 | Sprite | スプライト。 |
 | Text | 文章。現状は最前面に描画される。 |
 | Velocity | 物体の速度。 |
@@ -84,6 +85,8 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 * (PlayerInput, Input) -> Velocity
 * Velocity -> Position
 * RestrictRect -> Position
+* SamePosition <- (Position, *Entities*)
+* SamePosition -> Position
 * (PlayerAnimation, Velocity) -> Sprite
 * Position -> Sprite
 
