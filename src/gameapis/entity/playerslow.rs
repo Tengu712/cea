@@ -1,18 +1,14 @@
 use super::*;
 
-pub fn create_player_slow(components: &mut Components) {
-    components
-        .positions
-        .insert(components.next_entity_id, Position::default());
-    components.samepositions.insert(
-        components.next_entity_id,
-        SamePosition {
-            targetkey: PLAYER_KEY,
-            targetposition: Position::default(),
-        },
-    );
-    components.sprites.insert(
-        components.next_entity_id,
+pub fn create_player_slow(manager: &mut EntityManager) {
+    let id = manager.create_entity(None);
+    manager.components.positions.insert(id, Position::default());
+    manager
+        .components
+        .samepositions
+        .insert(id, SamePosition(PLAYER_KEY));
+    manager.components.sprites.insert(
+        id,
         Sprite {
             layer: LAYER_PLAYER_SLOW,
             imgid: Some(IMGID_SLOWCIRCLE),
@@ -25,5 +21,4 @@ pub fn create_player_slow(components: &mut Components) {
             ..Default::default()
         },
     );
-    components.next_entity_id += 1;
 }

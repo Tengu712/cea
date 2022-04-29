@@ -1,25 +1,24 @@
 use super::*;
 
 pub const PLAYER_KEY: EntityKey = "Player";
-pub const PLAYER_SPEED: f32 = 8.0;
 
-pub fn create_player(components: &mut Components) {
-    components
+pub fn create_player(manager: &mut EntityManager) {
+    let id = manager.create_entity(Some(PLAYER_KEY));
+    manager
+        .components
         .playeranimations
-        .insert(components.next_entity_id, PlayerAnimation::default());
-    components
-        .playerinputs
-        .insert(components.next_entity_id, PlayerInput);
-    components.positions.insert(
-        components.next_entity_id,
+        .insert(id, PlayerAnimation::default());
+    manager.components.playerinputs.insert(id, PlayerInput);
+    manager.components.positions.insert(
+        id,
         Position {
             x: 0.0,
             y: -280.0,
             z: 0.0,
         },
     );
-    components.restricts.insert(
-        components.next_entity_id,
+    manager.components.restricts.insert(
+        id,
         Rect3D {
             l: GAME_LEFT + 10.0,
             r: GAME_RIGHT - 10.0,
@@ -29,9 +28,10 @@ pub fn create_player(components: &mut Components) {
             f: 0.0,
         },
     );
-    components.sprites.insert(
-        components.next_entity_id,
+    manager.components.sprites.insert(
+        id,
         Sprite {
+            visible: true,
             layer: LAYER_PLAYER,
             imgid: Some(IMGID_FLAN_B0),
             scaling: Vector {
@@ -43,15 +43,11 @@ pub fn create_player(components: &mut Components) {
             ..Default::default()
         },
     );
-    components.velocities.insert(
-        components.next_entity_id,
+    manager.components.velocities.insert(
+        id,
         Velocity {
             direction: Vector::default(),
-            speed: PLAYER_SPEED,
+            speed: 8.0,
         },
     );
-    components
-        .entities
-        .insert(PLAYER_KEY, components.next_entity_id);
-    components.next_entity_id += 1;
 }

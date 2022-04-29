@@ -6,6 +6,7 @@ pub enum TextAlign2 {
     Right,
 }
 pub struct Text {
+    pub visible: bool,
     pub layer: u32,
     pub text: String,
     pub rect: Rect,

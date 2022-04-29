@@ -2,6 +2,8 @@
 pub mod fpsmeasure;
 /// A component to change player's image.
 pub mod playeranimation;
+/// A component to cange player slow's image.
+pub mod playerslowanimation;
 /// A component to change velocity based on input especially for player.
 pub mod playerinput;
 /// A component to change translation of Sprite.
@@ -19,6 +21,7 @@ pub mod velocity;
 
 pub use fpsmeasure::*;
 pub use playeranimation::*;
+pub use playerslowanimation::*;
 pub use playerinput::*;
 pub use position::*;
 pub use restrict::*;
@@ -27,25 +30,11 @@ pub use sprite::*;
 pub use text::*;
 pub use velocity::*;
 
-use super::asset::*;
-use std::collections::HashMap;
-
-pub trait SystemImpl<T, U> {
-    fn process(update: &mut T, refer: &U);
-}
-pub struct System;
-
-pub type EntityID = usize;
-pub type EntityKey = &'static str;
-pub type CContainer<T> = HashMap<EntityID, T>;
-pub type Entities = HashMap<EntityKey, EntityID>;
+use super::*;
 
 #[derive(Default)]
 pub struct Components {
-    pub next_entity_id: usize,
-    pub entities: Entities,
-    pub input: Input,
-    pub fpsmeasure: (FpsMeasure, EntityID),
+    pub fpsmeasures: CContainer<FpsMeasure>,
     pub playeranimations: CContainer<PlayerAnimation>,
     pub playerinputs: CContainer<PlayerInput>,
     pub positions: CContainer<Position>,
@@ -54,40 +43,6 @@ pub struct Components {
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub velocities: CContainer<Velocity>,
-}
-impl Components {
-    pub fn new() -> Self {
-        let mut res = Components::default();
-        res.next_entity_id = 1;
-        res
-    }
-}
-impl Components {
-    pub fn update(&mut self) {
-        System::process(&mut self.fpsmeasure, &());
-        System::process(&mut self.texts, &self.fpsmeasure);
-        System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
-        System::process(&mut self.positions, &self.velocities);
-        System::process(&mut self.positions, &self.restricts);
-        System::process(&mut self.samepositions, &(&self.positions, &self.entities));
-        System::process(&mut self.positions, &self.samepositions);
-        System::process(
-            &mut self.sprites,
-            &(&self.playeranimations, &self.velocities),
-        );
-        System::process(&mut self.sprites, &self.positions);
-    }
-}
-
-#[derive(Default)]
-pub struct Input {
-    pub z: i16,
-    pub x: i16,
-    pub s: i16,
-    pub left: i16,
-    pub up: i16,
-    pub right: i16,
-    pub down: i16,
 }
 
 #[derive(Default, Clone)]

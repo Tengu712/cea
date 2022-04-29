@@ -3,7 +3,7 @@ mod gameapis;
 /// This provides apis to call WindowsAPI.
 mod winapis;
 
-use gameapis::{asset::*, component::*, entity::*};
+use gameapis::{asset::*, component::*, entity::*, system::*, *};
 use std::collections::{BTreeMap, HashMap};
 use winapis::{direct3d::*, directwrite::*, winapi::*};
 
@@ -54,37 +54,45 @@ fn start_app() -> Result<(), windows::core::Error> {
         map
     };
     println!(" - Create game components");
-    let mut components = Components::new();
-    create_fps(&mut components);
-    create_player(&mut components);
-    create_player_slow(&mut components);
-    create_enemy(&mut components);
-    create_frame(&mut components);
+    let mut world = World::default();
+    create_player(&mut world.manager);
+    create_player_slow(&mut world.manager);
+    create_enemy(&mut world.manager);
+    create_frame(&mut world.manager);
+    create_fps(&mut world.manager);
+    world.systems.push(system_fpsmeasure_text);
+    world.systems.push(system_input_velocity_player);
+    world.systems.push(system_velocity_position);
+    world.systems.push(system_restrict_position);
+    world.systems.push(system_sameposition);
+    world.systems.push(system_position_sprite);
+    world.systems.push(system_playeranimation_sprite);
     println!(" - Set up drawing objects");
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
+    let mut input = Input::default();
     d3dapp.set_cdata(&cdata)?;
     println!("\nAll clear. The game is starting.\n");
     while !winapp.do_event() {
-        components.input.z = get_next_keystate(0x5A, components.input.z);
-        components.input.x = get_next_keystate(0x58, components.input.x);
-        components.input.s = get_next_keystate(0xA0, components.input.s);
-        components.input.left = get_next_keystate(0x25, components.input.left);
-        components.input.up = get_next_keystate(0x26, components.input.up);
-        components.input.right = get_next_keystate(0x27, components.input.right);
-        components.input.down = get_next_keystate(0x28, components.input.down);
-        components.update();
+        input.z = get_next_keystate(0x5A, input.z);
+        input.x = get_next_keystate(0x58, input.x);
+        input.s = get_next_keystate(0xA0, input.s);
+        input.left = get_next_keystate(0x25, input.left);
+        input.up = get_next_keystate(0x26, input.up);
+        input.right = get_next_keystate(0x27, input.right);
+        input.down = get_next_keystate(0x28, input.down);
+        world.update(&input);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
         let mut btmap_sprite = BTreeMap::new();
-        for (_, v) in components.sprites.iter() {
+        for v in world.manager.components.sprites.values() {
             btmap_sprite.insert(v.layer, v);
         }
         let mut btmap_text = BTreeMap::new();
-        for (_, v) in components.texts.iter() {
+        for v in world.manager.components.texts.values() {
             btmap_text.insert(v.layer, v);
         }
-        for (_, v) in btmap_sprite.into_iter() {
+        for v in btmap_sprite.values() {
             match v.imgid {
                 Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
                 None => cdata = d3dapp.set_d3dimage(None, cdata),
@@ -93,7 +101,7 @@ fn start_app() -> Result<(), windows::core::Error> {
             d3dapp.set_cdata(&cdata)?;
             d3dapp.draw_model(&idea);
         }
-        for (_, v) in btmap_text.into_iter() {
+        for v in btmap_text.values() {
             let desc = TextDesc {
                 text: v.text.clone(),
                 rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],

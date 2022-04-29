@@ -6,6 +6,12 @@
 
 プレイヤーの左右移動によって、背景が傾いていいかも。AC4以降のカメラワークみたいな。
 
+### ECS
+
+* エンティティ：コンポーネント間を紐づけるための識別番号。
+* コンポーネント：エンティティのデータ。システムを適応するためのマーカー。
+* システム：ロジック。状態をこねこねする。
+
 ## 創作中の愚痴
 
 ### プログラミングについて
@@ -62,12 +68,13 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 
 ## ECS
 
+なんでもかんでも参照可能・変更可能というやばい実装をしている。突貫工事だから仕方ない。
+
 ### コンポーネント表
 
 | コンポーネント名 | 概要 |
 | ----- | ----- |
-| Input | 入力情報を持つ。シングルトン。 |
-| FpsMeasure | FPSを測定する。シングルトン。 |
+| FpsMeasure | FPSを測定する。 |
 | PlayerAnimation | 速度に対して画像を変える。 |
 | PlayerInput | 入力に対して自機を動かす。マーカー。 |
 | Position | 物体の位置。 |
@@ -77,20 +84,9 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 | Text | 文章。現状は最前面に描画される。 |
 | Velocity | 物体の速度。 |
 
-### 各コンポーネントの影響関係
+### システム
 
-現状はコンテナをHashMapで管理しているため、エンティティはあるコンポーネントを高々一つしか持てない。
-そのため、影響元と先とで、列挙する方を調整すると、計算負荷を抑えられるだろう。
-列挙する方を左に書き、影響の方向を矢印で表した。
-
-* (PlayerInput, Input) -> Velocity
-* FpsMesure -> Text
-* Velocity -> Position
-* RestrictRect -> Position
-* SamePosition <- (Position, *Entities*)
-* SamePosition -> Position
-* (PlayerAnimation, Velocity) -> Sprite
-* Position -> Sprite
+詳しくはRustDocを見てほしい。
 
 ### 各エンティティの実装
 

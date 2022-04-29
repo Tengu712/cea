@@ -1,10 +1,15 @@
 use super::*;
 
-pub fn create_fps(components: &mut Components) {
-    components.fpsmeasure = (FpsMeasure::default(), components.next_entity_id);
-    components.texts.insert(
-        components.next_entity_id,
+pub fn create_fps(manager: &mut EntityManager) {
+    let id = manager.create_entity(None);
+    manager
+        .components
+        .fpsmeasures
+        .insert(id, FpsMeasure::default());
+    manager.components.texts.insert(
+        id,
         Text {
+            visible: true,
             layer: LAYER_FPS,
             text: String::new(),
             rect: Rect {
@@ -19,5 +24,4 @@ pub fn create_fps(components: &mut Components) {
             align: TextAlign2::Right,
         },
     );
-    components.next_entity_id += 1;
 }
