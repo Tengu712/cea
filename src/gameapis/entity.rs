@@ -1,9 +1,11 @@
 pub mod enemy;
+pub mod fps;
 pub mod frame;
 pub mod player;
 pub mod playerslow;
 
 pub use enemy::*;
+pub use fps::*;
 pub use frame::*;
 pub use player::*;
 pub use playerslow::*;
@@ -27,3 +29,4 @@ const COLOR_WHITE: Vector4D = Vector4D {
 const LAYER_PLAYER: u32 = 2;
 const LAYER_PLAYER_SLOW: u32 = 3;
 const LAYER_FRAME: u32 = 4;
+const LAYER_FPS: u32 = 5;

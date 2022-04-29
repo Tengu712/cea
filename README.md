@@ -67,6 +67,7 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 | コンポーネント名 | 概要 |
 | ----- | ----- |
 | Input | 入力情報を持つ。シングルトン。 |
+| FpsMeasure | FPSを測定する。シングルトン。 |
 | PlayerAnimation | 速度に対して画像を変える。 |
 | PlayerInput | 入力に対して自機を動かす。マーカー。 |
 | Position | 物体の位置。 |
@@ -83,6 +84,7 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 列挙する方を左に書き、影響の方向を矢印で表した。
 
 * (PlayerInput, Input) -> Velocity
+* FpsMesure -> Text
 * Velocity -> Position
 * RestrictRect -> Position
 * SamePosition <- (Position, *Entities*)

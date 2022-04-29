@@ -1,7 +1,5 @@
 /// This is a logic of game.
 mod gameapis;
-///
-mod resource;
 /// This provides apis to call WindowsAPI.
 mod winapis;
 
@@ -56,7 +54,8 @@ fn start_app() -> Result<(), windows::core::Error> {
         map
     };
     println!(" - Create game components");
-    let mut components = Components::default();
+    let mut components = Components::new();
+    create_fps(&mut components);
     create_player(&mut components);
     create_player_slow(&mut components);
     create_enemy(&mut components);

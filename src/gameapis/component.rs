@@ -1,3 +1,5 @@
+/// A component to measure fps.
+pub mod fpsmeasure;
 /// A component to change player's image.
 pub mod playeranimation;
 /// A component to change velocity based on input especially for player.
@@ -15,6 +17,7 @@ pub mod text;
 /// A component to change Position.
 pub mod velocity;
 
+pub use fpsmeasure::*;
 pub use playeranimation::*;
 pub use playerinput::*;
 pub use position::*;
@@ -42,6 +45,7 @@ pub struct Components {
     pub next_entity_id: usize,
     pub entities: Entities,
     pub input: Input,
+    pub fpsmeasure: (FpsMeasure, EntityID),
     pub playeranimations: CContainer<PlayerAnimation>,
     pub playerinputs: CContainer<PlayerInput>,
     pub positions: CContainer<Position>,
@@ -52,7 +56,16 @@ pub struct Components {
     pub velocities: CContainer<Velocity>,
 }
 impl Components {
+    pub fn new() -> Self {
+        let mut res = Components::default();
+        res.next_entity_id = 1;
+        res
+    }
+}
+impl Components {
     pub fn update(&mut self) {
+        System::process(&mut self.fpsmeasure, &());
+        System::process(&mut self.texts, &self.fpsmeasure);
         System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
         System::process(&mut self.positions, &self.velocities);
         System::process(&mut self.positions, &self.restricts);
