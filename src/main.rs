@@ -85,8 +85,9 @@ fn start_app() -> Result<(), windows::core::Error> {
             btmap_text.insert(v.layer, v);
         }
         for (_, v) in btmap_sprite.into_iter() {
-            if let Some(imgid) = v.imgid {
-                cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata);
+            match v.imgid {
+                Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
+                None => cdata = d3dapp.set_d3dimage(None, cdata),
             }
             cdata = apply_cdata_diff(cdata, v);
             d3dapp.set_cdata(&cdata)?;

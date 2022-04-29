@@ -1,3 +1,27 @@
+/// A component to change player's image.
+pub mod playeranimation;
+/// A component to change velocity based on input especially for player.
+pub mod playerinput;
+/// A component to change translation of Sprite.
+pub mod position;
+/// A component to restrict position.
+pub mod restrict;
+/// A component to draw sprite on screen.
+pub mod sprite;
+/// A component to draw text on screen.
+pub mod text;
+/// A component to change Position.
+pub mod velocity;
+
+pub use playeranimation::*;
+pub use playerinput::*;
+pub use position::*;
+pub use restrict::*;
+pub use sprite::*;
+pub use text::*;
+pub use velocity::*;
+
+use super::asset::*;
 use std::collections::HashMap;
 
 pub trait SystemImpl<T, U> {
@@ -5,22 +29,29 @@ pub trait SystemImpl<T, U> {
 }
 pub struct System;
 
+type CContainer<T> = HashMap<usize, T>;
+
 #[derive(Default)]
 pub struct Components {
     pub next_entity_id: usize,
     pub input: Input,
-    pub playerinputs: HashMap<usize, PlayerInput>,
-    pub velocities: HashMap<usize, Velocity>,
-    pub positions: HashMap<usize, Position>,
-    pub restricts: HashMap<usize, RestrictRect>,
-    pub texts: HashMap<usize, Text>,
-    pub sprites: HashMap<usize, Sprite>,
+    pub playeranimations: CContainer<PlayerAnimation>,
+    pub playerinputs: CContainer<PlayerInput>,
+    pub positions: CContainer<Position>,
+    pub restricts: CContainer<RestrictRect>,
+    pub sprites: CContainer<Sprite>,
+    pub texts: CContainer<Text>,
+    pub velocities: CContainer<Velocity>,
 }
 impl Components {
     pub fn update(&mut self) {
         System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
         System::process(&mut self.positions, &self.velocities);
         System::process(&mut self.positions, &self.restricts);
+        System::process(
+            &mut self.sprites,
+            &(&self.playeranimations, &self.velocities),
+        );
         System::process(&mut self.sprites, &self.positions);
     }
 }
@@ -67,100 +98,4 @@ pub struct Rect3D {
     pub t: f32,
     pub n: f32,
     pub f: f32,
-}
-
-/// A component to change Position.
-#[derive(Default)]
-pub struct Velocity {
-    pub direction: Vector,
-    pub speed: f32,
-}
-
-/// A component to change translation of Sprite.
-pub type Position = Vector;
-
-/// A component to restrict position.
-pub type RestrictRect = Rect3D;
-
-/// A component to draw sprite on screen.
-#[derive(Default)]
-pub struct Sprite {
-    pub layer: u32,
-    pub imgid: Option<&'static str>,
-    pub translation: Vector,
-    pub rotation: Vector,
-    pub scaling: Vector,
-    pub color: Vector4D,
-}
-
-pub enum TextAlign2 {
-    Left,
-    Center,
-    Right,
-}
-/// A component to draw text on screen.
-pub struct Text {
-    pub layer: u32,
-    pub text: String,
-    pub rect: Rect,
-    pub rgba: Vector4D,
-    pub fontname: &'static str,
-    pub size: f32,
-    pub align: TextAlign2,
-}
-
-/// A component to change velocity based on input especially for player.
-pub struct PlayerInput;
-
-impl SystemImpl<HashMap<usize, Position>, HashMap<usize, Velocity>> for System {
-    fn process(update: &mut HashMap<usize, Position>, refer: &HashMap<usize, Velocity>) {
-        for (k, v) in update {
-            if let Some(n) = refer.get(k) {
-                v.x += n.direction.x * n.speed;
-                v.y += n.direction.y * n.speed;
-                v.z += n.direction.z * n.speed;
-            }
-        }
-    }
-}
-impl SystemImpl<HashMap<usize, Position>, HashMap<usize, RestrictRect>> for System {
-    fn process(update: &mut HashMap<usize, Position>, refer: &HashMap<usize, RestrictRect>) {
-        for (k, v) in update {
-            if let Some(n) = refer.get(k) {
-                v.x = v.x.max(n.l).min(n.r);
-                v.y = v.y.max(n.b).min(n.t);
-                v.z = v.z.max(n.n).min(n.f);
-            }
-        }
-    }
-}
-impl SystemImpl<HashMap<usize, Sprite>, HashMap<usize, Position>> for System {
-    fn process(update: &mut HashMap<usize, Sprite>, refer: &HashMap<usize, Position>) {
-        for (k, v) in update {
-            if let Some(n) = refer.get(k) {
-                v.translation = n.clone();
-            }
-        }
-    }
-}
-impl SystemImpl<HashMap<usize, Velocity>, (&HashMap<usize, PlayerInput>, &Input)> for System {
-    fn process(
-        update: &mut HashMap<usize, Velocity>,
-        refer: &(&HashMap<usize, PlayerInput>, &Input),
-    ) {
-        let (pi_map, input) = refer;
-        for (k, _) in pi_map.into_iter() {
-            if let Some(mut n) = update.get_mut(k) {
-                let lr = (input.right > 0) as i32 - (input.left > 0) as i32;
-                let ud = (input.up > 0) as i32 - (input.down > 0) as i32;
-                let coef = if lr.abs() + ud.abs() == 2 {
-                    1.0 / std::f32::consts::SQRT_2
-                } else {
-                    1.0
-                };
-                n.direction.x = lr as f32 * coef;
-                n.direction.y = ud as f32 * coef;
-            }
-        }
-    }
 }

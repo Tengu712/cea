@@ -67,12 +67,13 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 | コンポーネント名 | 概要 |
 | ----- | ----- |
 | Input | 入力情報を持つ。シングルトン。 |
+| PlayerAnimation | 速度に対して画像を変える。 |
 | PlayerInput | 入力に対して自機を動かす。マーカー。 |
-| Velocity | 物体の速度。 |
 | Position | 物体の位置。 |
 | RestrictRect | 物体の位置を制限する。 |
-| Text | 文章。現状は最前面に描画される。 |
 | Sprite | スプライト。 |
+| Text | 文章。現状は最前面に描画される。 |
+| Velocity | 物体の速度。 |
 
 ### 各コンポーネントの影響関係
 
@@ -81,9 +82,10 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 列挙する方を左に書き、影響の方向を矢印で表した。
 
 * (PlayerInput, Input) -> Velocity
-* Position <- Velocity
-* Position <- RestrictRect
-* Sprite <- Sprite
+* Velocity -> Position
+* RestrictRect -> Position
+* (PlayerAnimation, Velocity) -> Sprite
+* Position -> Sprite
 
 ### 各エンティティの実装
 
