@@ -7,7 +7,7 @@ mod winapis;
 
 use gameapis::{asset::*, component::*, entity::*};
 use std::collections::{BTreeMap, HashMap};
-use winapis::{direct3d::*, winapi::*};
+use winapis::{direct3d::*, directwrite::*, winapi::*};
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 960;
@@ -44,8 +44,8 @@ fn start_app() -> Result<(), windows::core::Error> {
     )?;
     println!(" - Create Direct3D Components");
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
-    //println!(" - Create DirectWrite Components");
-    //let dwapp = d3dapp.create_text_module(&winapp)?;
+    println!(" - Create DirectWrite Components");
+    let dwapp = d3dapp.create_text_module(&winapp)?;
     println!(" - Load resources");
     let map_image = {
         let mut map = HashMap::new();
@@ -59,6 +59,8 @@ fn start_app() -> Result<(), windows::core::Error> {
     let mut components = Components::default();
     create_player(&mut components);
     create_enemy(&mut components);
+    create_text(&mut components);
+    println!(" - Set up drawing objects");
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
     d3dapp.set_cdata(&cdata)?;
@@ -74,17 +76,38 @@ fn start_app() -> Result<(), windows::core::Error> {
         components.update();
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let mut btmap = BTreeMap::new();
+        let mut btmap_sprite = BTreeMap::new();
         for (_, v) in components.sprites.iter() {
-            btmap.insert(v.layer, v);
+            btmap_sprite.insert(v.layer, v);
         }
-        for (_, v) in btmap.into_iter() {
+        let mut btmap_text = BTreeMap::new();
+        for (_, v) in components.texts.iter() {
+            btmap_text.insert(v.layer, v);
+        }
+        for (_, v) in btmap_sprite.into_iter() {
             if let Some(imgid) = v.imgid {
                 cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata);
             }
             cdata = apply_cdata_diff(cdata, v);
             d3dapp.set_cdata(&cdata)?;
             d3dapp.draw_model(&idea);
+        }
+        for (_, v) in btmap_text.into_iter() {
+            let desc = TextDesc {
+                text: v.text.clone(),
+                rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],
+                rgba: [v.rgba.x, v.rgba.y, v.rgba.z, v.rgba.w],
+            };
+            let formatdesc = TextFormatDesc {
+                fontname: v.fontname,
+                size: v.size,
+                align: match v.align {
+                    TextAlign2::Left => 0,
+                    TextAlign2::Center => 1,
+                    TextAlign2::Right => 2,
+                },
+            };
+            dwapp.draw_text(&desc, &formatdesc, None)?;
         }
         d3dapp.swap()?;
     }

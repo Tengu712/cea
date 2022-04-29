@@ -2,7 +2,7 @@ use super::*;
 
 use super::bullet::*;
 
-const RECT: Rect = Rect {
+const RECT: Rect3D = Rect3D {
     l: GAME_LEFT + 10.0,
     r: GAME_RIGHT - 10.0,
     t: GAME_TOP - 150.0,

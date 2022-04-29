@@ -1,14 +1,7 @@
-use super::gameapis::request::{imgid::*, text::TextFormat};
-use super::winapis::{
-    direct3d::{image::D3DImage, D3DApplication},
-    directwrite::DWriteApp,
-};
 use std::{
-    collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
 };
-use windows::Win32::Graphics::DirectWrite::IDWriteTextFormat;
 
 pub struct Config {
     numbers_font: String,
@@ -47,32 +40,4 @@ pub fn load_config(cur_dir: String) -> Config {
         }
     }
     config
-}
-
-pub fn load_font_collection(
-    dwapp: &DWriteApp,
-    config: &Config,
-) -> Result<HashMap<TextFormat, IDWriteTextFormat>, windows::core::Error> {
-    let mut map = HashMap::new();
-    map.insert(
-        TextFormat::Normal,
-        dwapp.create_text_format(config.dialogue_font.as_str(), None, 42.0)?,
-    );
-    map.insert(
-        TextFormat::Fps,
-        dwapp.create_text_format(config.numbers_font.as_str(), None, 32.0)?,
-    );
-    map.insert(
-        TextFormat::Score,
-        dwapp.create_text_format(config.numbers_font.as_str(), None, 60.0)?,
-    );
-    map.insert(
-        TextFormat::Graze,
-        dwapp.create_text_format(config.numbers_font.as_str(), None, 56.0)?,
-    );
-    map.insert(
-        TextFormat::GameOver,
-        dwapp.create_text_format(config.dialogue_font.as_str(), None, 56.0)?,
-    );
-    Ok(map)
 }

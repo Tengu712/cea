@@ -12,40 +12,14 @@ use windows::{
 
 /// Use it when drawing text.
 pub struct TextDesc {
-    text: String,
-    rect: [f32; 4],
-    rgba: [f32; 4],
-    align: u32,
+    pub text: String,
+    pub rect: [f32; 4],
+    pub rgba: [f32; 4],
 }
-impl TextDesc {
-    pub fn new() -> Self {
-        Self {
-            text: String::new(),
-            rect: [0.0, 1280.0, 0.0, 720.0],
-            rgba: [1.0; 4],
-            align: 0,
-        }
-    }
-    pub fn set_text<T: std::string::ToString>(self, text: T) -> Self {
-        let mut self_mut = self;
-        self_mut.text = text.to_string();
-        self_mut
-    }
-    pub fn set_rect(self, rect: [f32; 4]) -> Self {
-        let mut self_mut = self;
-        self_mut.rect = rect;
-        self_mut
-    }
-    pub fn set_rgba(self, rgba: [f32; 4]) -> Self {
-        let mut self_mut = self;
-        self_mut.rgba = rgba;
-        self_mut
-    }
-    pub fn set_align(self, align: u32) -> Self {
-        let mut self_mut = self;
-        self_mut.align = align;
-        self_mut
-    }
+pub struct TextFormatDesc {
+    pub fontname: &'static str,
+    pub size: f32,
+    pub align: u32,
 }
 
 pub struct DWriteApp {
@@ -66,10 +40,35 @@ impl DWriteApp {
         }
     }
     /// Draw text. To call it, user give it DrawTextDesc struct.
-    pub fn draw_text(&self, desc: &TextDesc, format: &IDWriteTextFormat) -> Result<()> {
-        let alignment = if desc.align == 1 {
+    pub fn draw_text<'a, T>(
+        &self,
+        desc: &TextDesc,
+        formatdesc: &TextFormatDesc,
+        fontcollection: T,
+    ) -> Result<()>
+    where
+        T: windows::core::IntoParam<'a, IDWriteFontCollection>,
+    {
+        let format = unsafe {
+            self.dwfactory.CreateTextFormat(
+                PCWSTR(
+                    formatdesc
+                        .fontname
+                        .encode_utf16()
+                        .collect::<Vec<u16>>()
+                        .as_ptr(),
+                ),
+                fontcollection,
+                DWRITE_FONT_WEIGHT_NORMAL,
+                DWRITE_FONT_STYLE_NORMAL,
+                DWRITE_FONT_STRETCH_NORMAL,
+                formatdesc.size * 72.0 / 96.0,
+                PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
+            )?
+        };
+        let alignment = if formatdesc.align == 1 {
             DWRITE_TEXT_ALIGNMENT_CENTER
-        } else if desc.align == 2 {
+        } else if formatdesc.align == 2 {
             DWRITE_TEXT_ALIGNMENT_TRAILING
         } else {
             DWRITE_TEXT_ALIGNMENT_LEADING
@@ -112,27 +111,5 @@ impl DWriteApp {
                 .EndDraw(std::ptr::null_mut(), std::ptr::null_mut())?
         };
         Ok(())
-    }
-    /// Create text format. If no custom font, fontcollection must be None.
-    pub fn create_text_format<'a, T>(
-        &self,
-        font: &str,
-        fontcollection: T,
-        size: f32,
-    ) -> Result<IDWriteTextFormat>
-    where
-        T: ::windows::core::IntoParam<'a, IDWriteFontCollection>,
-    {
-        unsafe {
-            self.dwfactory.CreateTextFormat(
-                PCWSTR(font.encode_utf16().collect::<Vec<u16>>().as_ptr()),
-                fontcollection,
-                DWRITE_FONT_WEIGHT_NORMAL,
-                DWRITE_FONT_STYLE_NORMAL,
-                DWRITE_FONT_STRETCH_NORMAL,
-                size * 72.0 / 96.0,
-                PCWSTR("ja-JP\0".encode_utf16().collect::<Vec<u16>>().as_ptr()),
-            )
-        }
     }
 }

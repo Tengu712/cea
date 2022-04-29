@@ -12,12 +12,15 @@ pub struct Components {
     pub playerinputs: HashMap<usize, PlayerInput>,
     pub velocities: HashMap<usize, Velocity>,
     pub positions: HashMap<usize, Position>,
+    pub restricts: HashMap<usize, RestrictRect>,
+    pub texts: HashMap<usize, Text>,
     pub sprites: HashMap<usize, Sprite>,
 }
 impl Components {
     pub fn update(&mut self) {
         System::process(&mut self.velocities, &(&self.playerinputs, &self.input));
         System::process(&mut self.positions, &self.velocities);
+        System::process(&mut self.positions, &self.restricts);
         System::process(&mut self.sprites, &self.positions);
     }
 }
@@ -54,6 +57,14 @@ pub struct Rect {
     pub r: f32,
     pub t: f32,
     pub b: f32,
+}
+
+#[derive(Default)]
+pub struct Rect3D {
+    pub l: f32,
+    pub r: f32,
+    pub b: f32,
+    pub t: f32,
     pub n: f32,
     pub f: f32,
 }
@@ -68,15 +79,34 @@ pub struct Velocity {
 /// A component to change translation of Sprite.
 pub type Position = Vector;
 
+/// A component to restrict position.
+pub type RestrictRect = Rect3D;
+
 /// A component to draw sprite on screen.
 #[derive(Default)]
 pub struct Sprite {
-    pub imgid: Option<&'static str>,
     pub layer: u32,
+    pub imgid: Option<&'static str>,
     pub translation: Vector,
     pub rotation: Vector,
     pub scaling: Vector,
     pub color: Vector4D,
+}
+
+pub enum TextAlign2 {
+    Left,
+    Center,
+    Right,
+}
+/// A component to draw text on screen.
+pub struct Text {
+    pub layer: u32,
+    pub text: String,
+    pub rect: Rect,
+    pub rgba: Vector4D,
+    pub fontname: &'static str,
+    pub size: f32,
+    pub align: TextAlign2,
 }
 
 /// A component to change velocity based on input especially for player.
@@ -89,6 +119,17 @@ impl SystemImpl<HashMap<usize, Position>, HashMap<usize, Velocity>> for System {
                 v.x += n.direction.x * n.speed;
                 v.y += n.direction.y * n.speed;
                 v.z += n.direction.z * n.speed;
+            }
+        }
+    }
+}
+impl SystemImpl<HashMap<usize, Position>, HashMap<usize, RestrictRect>> for System {
+    fn process(update: &mut HashMap<usize, Position>, refer: &HashMap<usize, RestrictRect>) {
+        for (k, v) in update {
+            if let Some(n) = refer.get(k) {
+                v.x = v.x.max(n.l).min(n.r);
+                v.y = v.y.max(n.b).min(n.t);
+                v.z = v.z.max(n.n).min(n.f);
             }
         }
     }

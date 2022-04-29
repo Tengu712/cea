@@ -62,10 +62,27 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 
 ## ECS
 
+### コンポーネント表
+
+| コンポーネント名 | 概要 |
+| ----- | ----- |
+| Input | 入力情報を持つ。シングルトン。 |
+| PlayerInput | 入力に対して自機を動かす。マーカー。 |
+| Velocity | 物体の速度。 |
+| Position | 物体の位置。 |
+| RestrictRect | 物体の位置を制限する。 |
+| Text | 文章。現状は最前面に描画される。 |
+| Sprite | スプライト。 |
+
 ### 各コンポーネントの影響関係
 
-* Velocity <- (PlayerInput, Input)
+現状はコンテナをHashMapで管理しているため、エンティティはあるコンポーネントを高々一つしか持てない。
+そのため、影響元と先とで、列挙する方を調整すると、計算負荷を抑えられるだろう。
+列挙する方を左に書き、影響の方向を矢印で表した。
+
+* (PlayerInput, Input) -> Velocity
 * Position <- Velocity
+* Position <- RestrictRect
 * Sprite <- Sprite
 
 ### 各エンティティの実装
