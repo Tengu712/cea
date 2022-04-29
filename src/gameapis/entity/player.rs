@@ -14,7 +14,7 @@ pub fn create_player(manager: &mut EntityManager) {
         Position {
             x: 0.0,
             y: -280.0,
-            z: 0.0,
+            z: -2.0,
         },
     );
     manager.components.restricts.insert(
@@ -24,8 +24,8 @@ pub fn create_player(manager: &mut EntityManager) {
             r: GAME_RIGHT - 10.0,
             t: GAME_TOP - 150.0,
             b: GAME_BOTTOM + 20.0,
-            n: 0.0,
-            f: 0.0,
+            n: -1000.0,
+            f: 1000.0,
         },
     );
     manager.components.sprites.insert(
@@ -48,6 +48,36 @@ pub fn create_player(manager: &mut EntityManager) {
         Velocity {
             direction: Vector::default(),
             speed: 8.0,
+        },
+    );
+}
+
+pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
+    let id = manager.create_entity(None);
+    manager
+        .components
+        .playerslowanimations
+        .insert(id, PlayerSlowAnimation(flg));
+    manager.components.positions.insert(
+        id,
+        Position {
+            x: 0.0,
+            y: 0.0,
+            z: 100.0,
+        },
+    );
+    manager
+        .components
+        .samepositions
+        .insert(id, SamePosition(PLAYER_KEY));
+    manager.components.sprites.insert(
+        id,
+        Sprite {
+            visible: true,
+            layer: LAYER_PLAYER_SLOW,
+            imgid: Some(IMGID_SLOWCIRCLE),
+            color: COLOR_WHITE,
+            ..Default::default()
         },
     );
 }

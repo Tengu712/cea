@@ -37,6 +37,7 @@ PSInput vs_main(VSInput input)
 {
     PSInput result;
 
+    result.col = input.col * vec_col;
     result.pos = mul(input.pos, mat_scl);
     result.pos = mul(result.pos, mat_rtx);
     result.pos = mul(result.pos, mat_rty);
@@ -44,7 +45,6 @@ PSInput vs_main(VSInput input)
     result.pos = mul(result.pos, mat_trs);
     result.pos = mul(result.pos, mat_view);
     result.pos = mul(result.pos, mat_proj);
-    result.col = input.col * vec_col;
     result.tex = input.tex;
     result.prm = vec_prm;
 

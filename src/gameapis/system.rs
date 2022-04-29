@@ -1,3 +1,7 @@
+pub mod player;
+
+pub use player::*;
+
 use super::*;
 
 pub fn system_fpsmeasure_text(manager: &mut EntityManager) {
@@ -16,25 +20,9 @@ pub fn system_fpsmeasure_text(manager: &mut EntityManager) {
     }
 }
 
-pub fn system_input_velocity_player(manager: &mut EntityManager) {
-    for k in manager.components.playerinputs.keys() {
-        if let Some(mut n) = manager.components.velocities.get_mut(k) {
-            let lr = (manager.input.right > 0) as i32 - (manager.input.left > 0) as i32;
-            let ud = (manager.input.up > 0) as i32 - (manager.input.down > 0) as i32;
-            let coef = if lr.abs() + ud.abs() == 2 {
-                1.0 / std::f32::consts::SQRT_2
-            } else {
-                1.0
-            };
-            n.direction.x = lr as f32 * coef;
-            n.direction.y = ud as f32 * coef;
-        }
-    }
-}
-
 pub fn system_velocity_position(manager: &mut EntityManager) {
     for (k, v) in &manager.components.velocities {
-        if let Some(mut n) = manager.components.positions.get_mut(&k) {
+        if let Some(n) = manager.components.positions.get_mut(&k) {
             n.x += v.direction.x * v.speed;
             n.y += v.direction.y * v.speed;
             n.z += v.direction.z * v.speed;
@@ -44,7 +32,7 @@ pub fn system_velocity_position(manager: &mut EntityManager) {
 
 pub fn system_restrict_position(manager: &mut EntityManager) {
     for (k, v) in &manager.components.restricts {
-        if let Some(mut n) = manager.components.positions.get_mut(&k) {
+        if let Some(n) = manager.components.positions.get_mut(&k) {
             n.x = n.x.max(v.l).min(v.r);
             n.y = n.y.max(v.b).min(v.t);
             n.z = n.z.max(v.n).min(v.f);
@@ -60,7 +48,8 @@ pub fn system_sameposition(manager: &mut EntityManager) {
                 src_pos = pos.clone();
             }
             if let Some(dst_pos) = manager.components.positions.get_mut(&k) {
-                *dst_pos = src_pos.clone();
+                dst_pos.x = src_pos.x;
+                dst_pos.y = src_pos.y;
             }
         }
     }
@@ -68,24 +57,8 @@ pub fn system_sameposition(manager: &mut EntityManager) {
 
 pub fn system_position_sprite(manager: &mut EntityManager) {
     for (k, v) in &manager.components.positions {
-        if let Some(mut n) = manager.components.sprites.get_mut(&k) {
+        if let Some(n) = manager.components.sprites.get_mut(&k) {
             n.translation = v.clone();
-        }
-    }
-}
-
-pub fn system_playeranimation_sprite(manager: &mut EntityManager) {
-    for k in manager.components.playeranimations.keys() {
-        if let Some(velocity) = manager.components.velocities.get(k) {
-            if let Some(mut n) = manager.components.sprites.get_mut(k) {
-                if velocity.direction.x > 0.0 {
-                    n.imgid = Some(IMGID_FLAN_R0);
-                } else if velocity.direction.x < 0.0 {
-                    n.imgid = Some(IMGID_FLAN_L0);
-                } else {
-                    n.imgid = Some(IMGID_FLAN_B0);
-                }
-            }
         }
     }
 }

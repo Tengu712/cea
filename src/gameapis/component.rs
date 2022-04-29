@@ -1,28 +1,14 @@
-/// A component to measure fps.
 pub mod fpsmeasure;
-/// A component to change player's image.
-pub mod playeranimation;
-/// A component to cange player slow's image.
-pub mod playerslowanimation;
-/// A component to change velocity based on input especially for player.
-pub mod playerinput;
-/// A component to change translation of Sprite.
+pub mod player;
 pub mod position;
-/// A component to restrict position.
 pub mod restrict;
-/// A component to change position same as player's position.
 pub mod sameposition;
-/// A component to draw sprite on screen.
 pub mod sprite;
-/// A component to draw text on screen.
 pub mod text;
-/// A component to change Position.
 pub mod velocity;
 
 pub use fpsmeasure::*;
-pub use playeranimation::*;
-pub use playerslowanimation::*;
-pub use playerinput::*;
+pub use player::*;
 pub use position::*;
 pub use restrict::*;
 pub use sameposition::*;
@@ -36,6 +22,7 @@ use super::*;
 pub struct Components {
     pub fpsmeasures: CContainer<FpsMeasure>,
     pub playeranimations: CContainer<PlayerAnimation>,
+    pub playerslowanimations: CContainer<PlayerSlowAnimation>,
     pub playerinputs: CContainer<PlayerInput>,
     pub positions: CContainer<Position>,
     pub restricts: CContainer<RestrictRect>,

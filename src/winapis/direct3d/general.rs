@@ -83,6 +83,47 @@ impl D3DApplication {
             let bbuf = swapchain.GetBuffer::<ID3D11Texture2D>(0)?;
             device.CreateRenderTargetView(bbuf, std::ptr::null())?
         };
+        // Create Depth stencil buffer
+        let dsview = unsafe {
+            let dstex = {
+                let desc = D3D11_TEXTURE2D_DESC {
+                    Width: width,
+                    Height: height,
+                    MipLevels: 1,
+                    ArraySize: 1,
+                    Format: DXGI_FORMAT_R24G8_TYPELESS,
+                    SampleDesc: DXGI_SAMPLE_DESC {
+                        Count: 1,
+                        Quality: 0,
+                    },
+                    Usage: D3D11_USAGE_DEFAULT,
+                    BindFlags: D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE,
+                    CPUAccessFlags: D3D11_CPU_ACCESS_FLAG(0),
+                    MiscFlags: D3D11_RESOURCE_MISC_FLAG(0),
+                };
+                device.CreateTexture2D(&desc, std::ptr::null())?
+            };
+            let desc = D3D11_DEPTH_STENCIL_VIEW_DESC {
+                Format: DXGI_FORMAT_D24_UNORM_S8_UINT,
+                ViewDimension: D3D11_DSV_DIMENSION_TEXTURE2D,
+                Flags: 0,
+                Anonymous: D3D11_DEPTH_STENCIL_VIEW_DESC_0 {
+                    Texture2D: D3D11_TEX2D_DSV { MipSlice: 0 },
+                },
+            };
+            device.CreateDepthStencilView(&dstex, &desc)?
+        };
+        let dsstate = unsafe {
+            let desc = D3D11_DEPTH_STENCIL_DESC {
+                DepthEnable: BOOL(1),
+                DepthWriteMask: D3D11_DEPTH_WRITE_MASK_ALL,
+                DepthFunc: D3D11_COMPARISON_LESS_EQUAL,
+                StencilEnable: BOOL(0),
+                ..Default::default()
+            };
+            device.CreateDepthStencilState(&desc)?
+        };
+        unsafe { context.OMSetDepthStencilState(&dsstate, 0) };
         // Create shaders
         let shader_coms = ShaderComs::new(&device, &shader_dir.to_string())?;
         // Set render configure
@@ -125,18 +166,23 @@ impl D3DApplication {
             context,
             swapchain,
             rtv_bbuf: Some(rtv_bbuf),
+            dsview,
             cbuffer: Some(shader_coms.cbuffer),
         })
     }
     /// Set render target view.
     pub fn set_rtv(&self) {
-        unsafe { self.context.OMSetRenderTargets(1, &self.rtv_bbuf, None) };
+        unsafe {
+            self.context
+                .OMSetRenderTargets(1, &self.rtv_bbuf, &self.dsview)
+        };
     }
     /// Clear render target view.
     pub fn clear_rtv(&self) {
         unsafe {
             self.context
-                .ClearRenderTargetView(&self.rtv_bbuf, [0.0, 0.0, 0.0, 1.0].as_ptr())
+                .ClearRenderTargetView(&self.rtv_bbuf, [0.0, 0.0, 0.0, 1.0].as_ptr());
+            self.context.ClearDepthStencilView(&self.dsview, 1 | 2, 1.0, 0);
         };
     }
     /// Swap and wait vsync.

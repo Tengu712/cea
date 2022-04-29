@@ -1,4 +1,4 @@
-pub struct Matrix4x4([f32; 16]);
+pub struct Matrix4x4(pub [f32; 16]);
 impl Matrix4x4 {
     fn from(arr: [f32; 16]) -> Self {
         Self(arr)

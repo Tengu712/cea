@@ -23,5 +23,6 @@ pub struct D3DApplication {
     context: windows::Win32::Graphics::Direct3D11::ID3D11DeviceContext,
     swapchain: windows::Win32::Graphics::Dxgi::IDXGISwapChain,
     rtv_bbuf: Option<windows::Win32::Graphics::Direct3D11::ID3D11RenderTargetView>,
+    dsview: windows::Win32::Graphics::Direct3D11::ID3D11DepthStencilView,
     cbuffer: Option<windows::Win32::Graphics::Direct3D11::ID3D11Buffer>,
 }

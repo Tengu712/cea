@@ -55,18 +55,22 @@ fn start_app() -> Result<(), windows::core::Error> {
     };
     println!(" - Create game components");
     let mut world = World::default();
-    create_player(&mut world.manager);
-    create_player_slow(&mut world.manager);
-    create_enemy(&mut world.manager);
-    create_frame(&mut world.manager);
-    create_fps(&mut world.manager);
+    create_green(&mut world.manager);
+    create_red(&mut world.manager);
+    //create_player(&mut world.manager);
+    //create_player_slow(&mut world.manager, false);
+    //create_player_slow(&mut world.manager, true);
+    //create_enemy(&mut world.manager);
+    //create_frame(&mut world.manager);
+    //create_fps(&mut world.manager);
     world.systems.push(system_fpsmeasure_text);
-    world.systems.push(system_input_velocity_player);
+    world.systems.push(system_playerinput);
     world.systems.push(system_velocity_position);
     world.systems.push(system_restrict_position);
     world.systems.push(system_sameposition);
     world.systems.push(system_position_sprite);
-    world.systems.push(system_playeranimation_sprite);
+    world.systems.push(system_playeranimation);
+    world.systems.push(system_playerslowanimation);
     println!(" - Set up drawing objects");
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
@@ -84,15 +88,10 @@ fn start_app() -> Result<(), windows::core::Error> {
         world.update(&input);
         d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        let mut btmap_sprite = BTreeMap::new();
         for v in world.manager.components.sprites.values() {
-            btmap_sprite.insert(v.layer, v);
-        }
-        let mut btmap_text = BTreeMap::new();
-        for v in world.manager.components.texts.values() {
-            btmap_text.insert(v.layer, v);
-        }
-        for v in btmap_sprite.values() {
+            if !v.visible {
+                continue;
+            }
             match v.imgid {
                 Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
                 None => cdata = d3dapp.set_d3dimage(None, cdata),
@@ -101,7 +100,10 @@ fn start_app() -> Result<(), windows::core::Error> {
             d3dapp.set_cdata(&cdata)?;
             d3dapp.draw_model(&idea);
         }
-        for v in btmap_text.values() {
+        for v in world.manager.components.texts.values() {
+            if !v.visible {
+                continue;
+            }
             let desc = TextDesc {
                 text: v.text.clone(),
                 rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],
@@ -179,7 +181,7 @@ fn create_default_cdata() -> cbuffer::CData {
             HEIGHT as f32,
             0.0,
             0.0,
-            1.0,
+            1000.0,
         ),
         vec_col: [1.0; 4],
         vec_prm: [0.0; 4],
@@ -194,8 +196,8 @@ fn apply_cdata_diff(cdata: cbuffer::CData, sprite: &gameapis::component::Sprite)
             sprite.scaling.z,
         ),
         mat_rtx: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.x),
-        mat_rty: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.y),
-        mat_rtz: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.z),
+        mat_rty: winapis::math::Matrix4x4::new_rotation_y(sprite.rotation.y),
+        mat_rtz: winapis::math::Matrix4x4::new_rotation_z(sprite.rotation.z),
         mat_trs: winapis::math::Matrix4x4::new_translation(
             sprite.translation.x,
             sprite.translation.y,
