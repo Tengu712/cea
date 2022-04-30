@@ -74,17 +74,15 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 
 ### Components
 
-* counter
-  * Counter - カウンター。毎フレームインクリメントされる。
-* fpsmeasure
-  * FpsMeasure - FPS、それを算出するためのデータ。
-* movement
-  * Position - 三次元座標。
-  * RestrictRect - 三次元範囲。
-  * Velocity - 速度。
-* graphic
-  * Sprite - スプライト。描画用データ。
-  * Text - テキスト。描画用データ。
+| Genre | Components Name | Outline |
+| ----- | ----- | ----- |
+| counter | Counter | カウンター。毎フレームインクリメントされる。 |
+| fpsmeasure | FpsMeasure | FPS、それを算出するためのデータ。 |
+| movement| Position | 三次元座標。 |
+| | RestrictRect | 三次元範囲。 |
+| | Velocity | 速度。 |
+| graphic | Sprite | スプライト。描画用データ。 |
+| | Text | テキスト。描画用データ。 |
 
 ### System
 
@@ -104,7 +102,7 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
   * *()* -> FpsMeasure -> Text
   * Counter(TitleText) -> Text(TitleText)
 
-### 各エンティティの実装
+### Entity Implementation
 
 Fps
 
