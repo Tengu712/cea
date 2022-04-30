@@ -1,12 +1,12 @@
 pub mod enemy;
-pub mod fps;
 pub mod frame;
 pub mod player;
+pub mod text;
 
 pub use enemy::*;
-pub use fps::*;
 pub use frame::*;
 pub use player::*;
+pub use text::*;
 
 use super::asset::*;
 use super::component::*;

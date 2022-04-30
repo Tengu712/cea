@@ -3,8 +3,8 @@ mod gameapis;
 /// This provides apis to call WindowsAPI.
 mod winapis;
 
-use gameapis::{asset::*, component::*, entity::*, system::*, *};
-use std::collections::{BTreeMap, HashMap};
+use gameapis::{asset::*, component::*, scene::*, system::*, *};
+use std::collections::HashMap;
 use winapis::{direct3d::*, directwrite::*, winapi::*};
 
 const WIDTH: u32 = 1280;
@@ -55,14 +55,6 @@ fn start_app() -> Result<(), windows::core::Error> {
     };
     println!(" - Create game components");
     let mut world = World::default();
-    //create_green(&mut world.manager);
-    //create_red(&mut world.manager);
-    create_player_slow(&mut world.manager, false);
-    create_player(&mut world.manager);
-    create_player_slow(&mut world.manager, true);
-    create_enemy(&mut world.manager);
-    create_frame(&mut world.manager);
-    create_fps(&mut world.manager);
     world.systems.push(system_fpsmeasure_text);
     world.systems.push(system_playerinput);
     world.systems.push(system_velocity_position);
@@ -71,6 +63,7 @@ fn start_app() -> Result<(), windows::core::Error> {
     world.systems.push(system_position_sprite);
     world.systems.push(system_playeranimation);
     world.systems.push(system_playerslowanimation);
+    initialize_title_scene(&mut world.manager);
     println!(" - Set up drawing objects");
     let idea = create_idea(&d3dapp)?;
     let mut cdata = create_default_cdata();
@@ -120,9 +113,9 @@ fn start_app() -> Result<(), windows::core::Error> {
                 fontname: v.fontname,
                 size: v.size,
                 align: match v.align {
-                    TextAlign2::Left => 0,
-                    TextAlign2::Center => 1,
-                    TextAlign2::Right => 2,
+                    TextAlign::Left => 0,
+                    TextAlign::Center => 1,
+                    TextAlign::Right => 2,
                 },
             };
             dwapp.draw_text(&desc, &formatdesc, None)?;

@@ -1,6 +1,6 @@
 use super::*;
 
-pub enum TextAlign2 {
+pub enum TextAlign {
     Left,
     Center,
     Right,
@@ -12,5 +12,5 @@ pub struct Text {
     pub rgba: Vector4D,
     pub fontname: &'static str,
     pub size: f32,
-    pub align: TextAlign2,
+    pub align: TextAlign,
 }

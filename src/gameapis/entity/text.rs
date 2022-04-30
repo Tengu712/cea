@@ -20,7 +20,28 @@ pub fn create_fps(manager: &mut EntityManager) {
             rgba: COLOR_WHITE,
             fontname: "Consolas\0",
             size: 32.0,
-            align: TextAlign2::Right,
+            align: TextAlign::Right,
+        },
+    );
+}
+
+pub fn create_title_text(manager: &mut EntityManager) {
+    let id = manager.create_entity(None);
+    manager.components.texts.insert(
+        id,
+        Text {
+            visible: true,
+            text: String::from("PRESS ANY KEY TO START"),
+            rect: Rect {
+                l: 0.0,
+                r: SCREEN_WIDTH,
+                t: 720.0,
+                b: SCREEN_HEIGHT,
+            },
+            rgba: COLOR_WHITE,
+            fontname: "游明朝\0",
+            size: 56.0,
+            align: TextAlign::Center,
         },
     );
 }

@@ -2,6 +2,7 @@ pub mod asset;
 pub mod component;
 pub mod entity;
 pub mod system;
+pub mod scene;
 
 use asset::*;
 use component::*;
