@@ -1,3 +1,4 @@
+pub mod animator;
 pub mod fpsmeasure;
 pub mod player;
 pub mod position;
@@ -7,6 +8,7 @@ pub mod sprite;
 pub mod text;
 pub mod velocity;
 
+pub use animator::*;
 pub use fpsmeasure::*;
 pub use player::*;
 pub use position::*;
@@ -27,7 +29,9 @@ pub struct Components {
     pub positions: CContainer<Position>,
     pub restricts: CContainer<RestrictRect>,
     pub sameposition2ds: CContainer<SamePosition2D>,
+    pub spriteanimators: CContainer<SpriteAnimator>,
     pub sprites: CContainer<Sprite>,
+    pub textanimators: CContainer<TextAnimator>,
     pub texts: CContainer<Text>,
     pub velocities: CContainer<Velocity>,
 }

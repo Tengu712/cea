@@ -61,7 +61,8 @@ fn start_app() -> Result<(), windows::core::Error> {
     world.systems.push(system_restrict_position);
     world.systems.push(system_sameposition2d);
     world.systems.push(system_position_sprite);
-    world.systems.push(system_playeranimation);
+    world.systems.push(system_update_sprite_animator);
+    world.systems.push(system_update_text_animator);
     world.systems.push(system_playerslowanimation);
     initialize_title_scene(&mut world.manager);
     println!(" - Set up drawing objects");
