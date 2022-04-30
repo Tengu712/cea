@@ -1,4 +1,4 @@
-use super::*;
+use super::entity::*;
 
 pub fn initialize_title_scene(manager: &mut EntityManager) {
     create_title_text(manager);

@@ -4,11 +4,12 @@ pub mod entity;
 pub mod system;
 pub mod scene;
 
-use asset::*;
-use component::*;
-use entity::*;
-
 use std::collections::HashMap;
+
+pub type EntityID = usize;
+pub type EntityKey = &'static str;
+pub type CContainer<T> = HashMap<EntityID, T>;
+pub type Entities = HashMap<EntityKey, EntityID>;
 
 #[derive(Default, Clone)]
 pub struct Input {
@@ -21,15 +22,10 @@ pub struct Input {
     pub down: i16,
 }
 
-pub type EntityID = usize;
-pub type EntityKey = &'static str;
-pub type CContainer<T> = HashMap<EntityID, T>;
-pub type Entities = HashMap<EntityKey, EntityID>;
-
 #[derive(Default)]
 pub struct World {
-    pub manager: EntityManager,
-    pub systems: Vec<fn(&mut EntityManager)>,
+    pub manager: entity::EntityManager,
+    pub systems: Vec<fn(&mut entity::EntityManager)>,
 }
 impl World {
     pub fn update(&mut self, input: &Input) {

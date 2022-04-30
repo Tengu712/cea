@@ -26,15 +26,8 @@ pub fn create_fps(manager: &mut EntityManager) {
 }
 
 pub fn create_title_text(manager: &mut EntityManager) {
-    let id = manager.create_entity(None);
-    manager.components.textanimators.insert(
-        id,
-        TextAnimator {
-            is_active: true,
-            count: 0,
-            f: title_text_animation,
-        },
-    );
+    let id = manager.create_entity(Some(TITLE_TEXT_KEY));
+    manager.components.counters.insert(id, Counter::default());
     manager.components.texts.insert(
         id,
         Text {

@@ -10,6 +10,7 @@ pub use text::*;
 
 use super::asset::*;
 use super::component::*;
+use super::system::*;
 use super::*;
 
 const SCREEN_WIDTH: f32 = 1280.0;

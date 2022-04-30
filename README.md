@@ -72,29 +72,53 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 
 なんでもかんでも参照可能・変更可能というやばい実装をしている。突貫工事だから仕方ない。
 
-### コンポーネント表
+### Components
 
-| コンポーネント名 | 概要 |
-| ----- | ----- |
-| FpsMeasure | FPSを測定する。 |
-| PlayerAnimation | 速度に対して画像を変える。 |
-| PlayerInput | 入力に対して自機を動かす。マーカー。 |
-| Position | 物体の位置。 |
-| RestrictRect | 物体の位置を制限する。 |
-| SamePosition | 物体の位置を特定の物体と同じにする。 |
-| Sprite | スプライト。 |
-| Text | 文章。現状は最前面に描画される。 |
-| Velocity | 物体の速度。 |
+* counter
+  * Counter - カウンター。毎フレームインクリメントされる。
+* fpsmeasure
+  * FpsMeasure - FPS、それを算出するためのデータ。
+* movement
+  * Position - 三次元座標。
+  * RestrictRect - 三次元範囲。
+  * Velocity - 速度。
+* graphic
+  * Sprite - スプライト。描画用データ。
+  * Text - テキスト。描画用データ。
 
-### システム
+### System
 
 詳しくはRustDocを見てほしい。
 
+* counter
+  * *()* -> Counter
+* movement
+  * Velocity -> Position
+  * RestrictRect -> Position
+  * Position -> Sprite
+* player
+  * *Input* -> Velocity(Player)
+  * *Input* -> Sprite(Player)
+  * *Input* -> Sprite(PlayerSlow)
+* text
+  * *()* -> FpsMeasure -> Text
+  * Counter(TitleText) -> Text(TitleText)
+
 ### 各エンティティの実装
+
+Fps
+
+* FpsMeasure
+* Text
+
+Title text
+
+* Counter
+* Text
 
 Player
 
-* PlayerInput
-* Velocity
 * Position
+* RestrictRect
 * Sprite
+* Velocity

@@ -1,14 +1,7 @@
 use super::*;
 
-pub const PLAYER_KEY: EntityKey = "Player";
-
 pub fn create_player(manager: &mut EntityManager) {
     let id = manager.create_entity(Some(PLAYER_KEY));
-    manager
-        .components
-        .playeranimations
-        .insert(id, PlayerAnimation::default());
-    manager.components.playerinputs.insert(id, PlayerInput);
     manager.components.positions.insert(
         id,
         Position {
@@ -52,11 +45,7 @@ pub fn create_player(manager: &mut EntityManager) {
 }
 
 pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
-    let id = manager.create_entity(None);
-    manager
-        .components
-        .playerslowanimations
-        .insert(id, PlayerSlowAnimation(flg));
+    let id = manager.create_entity(Some(PLAYER_SLOW_KEY));
     manager.components.positions.insert(
         id,
         Position {
@@ -65,10 +54,6 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
             z: Z_PLAYER_SLOW,
         },
     );
-    manager
-        .components
-        .sameposition2ds
-        .insert(id, SamePosition2D(PLAYER_KEY));
     manager.components.sprites.insert(
         id,
         Sprite {
