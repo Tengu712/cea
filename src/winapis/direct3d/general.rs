@@ -91,13 +91,13 @@ impl D3DApplication {
                     Height: height,
                     MipLevels: 1,
                     ArraySize: 1,
-                    Format: DXGI_FORMAT_R24G8_TYPELESS,
+                    Format: DXGI_FORMAT_D24_UNORM_S8_UINT,
                     SampleDesc: DXGI_SAMPLE_DESC {
                         Count: 1,
                         Quality: 0,
                     },
                     Usage: D3D11_USAGE_DEFAULT,
-                    BindFlags: D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE,
+                    BindFlags: D3D11_BIND_DEPTH_STENCIL,
                     CPUAccessFlags: D3D11_CPU_ACCESS_FLAG(0),
                     MiscFlags: D3D11_RESOURCE_MISC_FLAG(0),
                 };
@@ -171,10 +171,15 @@ impl D3DApplication {
         })
     }
     /// Set render target view.
-    pub fn set_rtv(&self) {
+    pub fn set_rtv(&self, is_enable_depth: bool) {
         unsafe {
-            self.context
-                .OMSetRenderTargets(1, &self.rtv_bbuf, &self.dsview)
+            if is_enable_depth {
+                self.context
+                    .OMSetRenderTargets(1, &self.rtv_bbuf, &self.dsview);
+                } else {
+                self.context
+                    .OMSetRenderTargets(1, &self.rtv_bbuf, None);
+            }
         };
     }
     /// Clear render target view.

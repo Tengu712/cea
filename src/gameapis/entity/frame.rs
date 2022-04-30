@@ -6,8 +6,12 @@ pub fn create_frame(manager: &mut EntityManager) {
         id,
         Sprite {
             visible: true,
-            layer: LAYER_FRAME,
             imgid: Some(IMGID_FRAME),
+            translation: Vector {
+                x: 0.0,
+                y: 0.0,
+                z: Z_FRAME,
+            },
             scaling: Vector {
                 x: SCREEN_WIDTH,
                 y: SCREEN_HEIGHT,

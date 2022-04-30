@@ -7,7 +7,6 @@ pub enum TextAlign2 {
 }
 pub struct Text {
     pub visible: bool,
-    pub layer: u32,
     pub text: String,
     pub rect: Rect,
     pub rgba: Vector4D,

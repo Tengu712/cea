@@ -25,11 +25,10 @@ const COLOR_WHITE: Vector4D = Vector4D {
     w: 1.0,
 };
 
-const LAYER_ENEMY: u32 = 1;
-const LAYER_PLAYER: u32 = 2;
-const LAYER_PLAYER_SLOW: u32 = 3;
-const LAYER_FRAME: u32 = 4;
-const LAYER_FPS: u32 = 5;
+const Z_ENEMY: f32 = -4.0;
+const Z_PLAYER: f32 = -3.0;
+const Z_PLAYER_SLOW: f32 = -2.0;
+const Z_FRAME: f32 = -1.0;
 
 #[derive(Default)]
 pub struct EntityManager {
@@ -47,68 +46,4 @@ impl EntityManager {
         }
         res
     }
-}
-
-pub fn create_green(manager: &mut EntityManager) {
-    let id = manager.create_entity(None);
-    manager.components.sprites.insert(
-        id,
-        Sprite {
-            visible: true,
-            rotation: Vector {
-                x: 0.001f32.to_radians(),
-                y: 0.0,
-                z: 0.0,
-            },
-            scaling: Vector {
-                x: 200.0,
-                y: 200.0,
-                z: 1.0,
-            },
-            color: Vector4D {
-                x: 0.0,
-                y: 1.0,
-                z: 0.0,
-                w: 1.0,
-            },
-            translation: Vector {
-                x: 50.0,
-                y: 0.0,
-                z: -200.0,
-            },
-            ..Default::default()
-        },
-    );
-}
-
-pub fn create_red(manager: &mut EntityManager) {
-    let id = manager.create_entity(None);
-    manager.components.sprites.insert(
-        id,
-        Sprite {
-            visible: true,
-            rotation: Vector {
-                x: -0.001f32.to_radians(),
-                y: 0.0,
-                z: 0.0,
-            },
-            scaling: Vector {
-                x: 200.0,
-                y: 200.0,
-                z: 1.0,
-            },
-            color: Vector4D {
-                x: 1.0,
-                y: 0.0,
-                z: 0.0,
-                w: 1.0,
-            },
-            translation: Vector {
-                x: -50.0,
-                y: 0.0,
-                z: -200.0,
-            },
-            ..Default::default()
-        },
-    );
 }

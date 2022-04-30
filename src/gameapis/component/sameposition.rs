@@ -1,3 +1,3 @@
 use super::*;
 
-pub struct SamePosition(pub EntityKey);
+pub struct SamePosition2D(pub EntityKey);

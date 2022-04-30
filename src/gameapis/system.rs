@@ -40,8 +40,8 @@ pub fn system_restrict_position(manager: &mut EntityManager) {
     }
 }
 
-pub fn system_sameposition(manager: &mut EntityManager) {
-    for (k, v) in &manager.components.samepositions {
+pub fn system_sameposition2d(manager: &mut EntityManager) {
+    for (k, v) in &manager.components.sameposition2ds {
         if let Some(id) = manager.entities.get(v.0) {
             let mut src_pos = Position::default();
             if let Some(pos) = manager.components.positions.get(id) {

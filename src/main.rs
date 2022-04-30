@@ -55,19 +55,19 @@ fn start_app() -> Result<(), windows::core::Error> {
     };
     println!(" - Create game components");
     let mut world = World::default();
-    create_green(&mut world.manager);
-    create_red(&mut world.manager);
-    //create_player(&mut world.manager);
-    //create_player_slow(&mut world.manager, false);
-    //create_player_slow(&mut world.manager, true);
-    //create_enemy(&mut world.manager);
-    //create_frame(&mut world.manager);
-    //create_fps(&mut world.manager);
+    //create_green(&mut world.manager);
+    //create_red(&mut world.manager);
+    create_player_slow(&mut world.manager, false);
+    create_player(&mut world.manager);
+    create_player_slow(&mut world.manager, true);
+    create_enemy(&mut world.manager);
+    create_frame(&mut world.manager);
+    create_fps(&mut world.manager);
     world.systems.push(system_fpsmeasure_text);
     world.systems.push(system_playerinput);
     world.systems.push(system_velocity_position);
     world.systems.push(system_restrict_position);
-    world.systems.push(system_sameposition);
+    world.systems.push(system_sameposition2d);
     world.systems.push(system_position_sprite);
     world.systems.push(system_playeranimation);
     world.systems.push(system_playerslowanimation);
@@ -86,19 +86,26 @@ fn start_app() -> Result<(), windows::core::Error> {
         input.right = get_next_keystate(0x27, input.right);
         input.down = get_next_keystate(0x28, input.down);
         world.update(&input);
-        d3dapp.set_rtv();
         d3dapp.clear_rtv();
-        for v in world.manager.components.sprites.values() {
+        d3dapp.set_rtv(false);
+        let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
+        for (k, v) in &world.manager.components.sprites {
             if !v.visible {
                 continue;
             }
-            match v.imgid {
-                Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
-                None => cdata = d3dapp.set_d3dimage(None, cdata),
+            sprites_t.push((v.translation.z, k));
+        }
+        sprites_t.sort_by(|(z1, _), (z2, _)| z1.partial_cmp(z2).unwrap());
+        for (_, k) in sprites_t {
+            if let Some(v) = world.manager.components.sprites.get(k) {
+                match v.imgid {
+                    Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
+                    None => cdata = d3dapp.set_d3dimage(None, cdata),
+                }
+                cdata = apply_cdata_diff(cdata, v);
+                d3dapp.set_cdata(&cdata)?;
+                d3dapp.draw_model(&idea);
             }
-            cdata = apply_cdata_diff(cdata, v);
-            d3dapp.set_cdata(&cdata)?;
-            d3dapp.draw_model(&idea);
         }
         for v in world.manager.components.texts.values() {
             if !v.visible {

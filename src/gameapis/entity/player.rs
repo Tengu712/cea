@@ -14,7 +14,7 @@ pub fn create_player(manager: &mut EntityManager) {
         Position {
             x: 0.0,
             y: -280.0,
-            z: -2.0,
+            z: Z_PLAYER,
         },
     );
     manager.components.restricts.insert(
@@ -32,7 +32,6 @@ pub fn create_player(manager: &mut EntityManager) {
         id,
         Sprite {
             visible: true,
-            layer: LAYER_PLAYER,
             imgid: Some(IMGID_FLAN_B0),
             scaling: Vector {
                 x: 100.0,
@@ -63,18 +62,17 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
         Position {
             x: 0.0,
             y: 0.0,
-            z: 100.0,
+            z: Z_PLAYER_SLOW,
         },
     );
     manager
         .components
-        .samepositions
-        .insert(id, SamePosition(PLAYER_KEY));
+        .sameposition2ds
+        .insert(id, SamePosition2D(PLAYER_KEY));
     manager.components.sprites.insert(
         id,
         Sprite {
             visible: true,
-            layer: LAYER_PLAYER_SLOW,
             imgid: Some(IMGID_SLOWCIRCLE),
             color: COLOR_WHITE,
             ..Default::default()

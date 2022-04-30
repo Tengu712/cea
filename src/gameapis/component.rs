@@ -26,7 +26,7 @@ pub struct Components {
     pub playerinputs: CContainer<PlayerInput>,
     pub positions: CContainer<Position>,
     pub restricts: CContainer<RestrictRect>,
-    pub samepositions: CContainer<SamePosition>,
+    pub sameposition2ds: CContainer<SamePosition2D>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub velocities: CContainer<Velocity>,

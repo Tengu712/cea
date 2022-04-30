@@ -10,7 +10,6 @@ pub fn create_fps(manager: &mut EntityManager) {
         id,
         Text {
             visible: true,
-            layer: LAYER_FPS,
             text: String::new(),
             rect: Rect {
                 l: 0.0,
