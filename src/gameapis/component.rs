@@ -43,7 +43,10 @@ pub struct Rect3D {
 
 // counter
 #[derive(Default)]
-pub struct Counter(pub u32);
+pub struct Counter {
+    pub count: u32,
+    pub count_max: u32,
+}
 pub struct FpsMeasure {
     pub fps: f32,
     pub count: u32,

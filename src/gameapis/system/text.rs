@@ -23,7 +23,7 @@ pub fn system_title_text_animation(manager: &mut EntityManager) {
     if let Some(id) = manager.entities.get(TITLE_TEXT_KEY) {
         if let Some(counter) = manager.components.counters.get(id) {
             if let Some(n) = manager.components.texts.get_mut(id) {
-                n.rgba.w = (counter.0 as f32).to_radians().cos().abs();
+                n.rgba.w = (counter.count as f32).to_radians().cos().abs();
             }
         }
     }
