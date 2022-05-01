@@ -1,12 +1,12 @@
 pub mod asset;
 pub mod component;
 pub mod entity;
-pub mod system;
 pub mod scene;
+pub mod system;
 
+use std::any::type_name;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::any::type_name;
 
 pub type EntityID = usize;
 pub type ScriptKey = &'static str;
@@ -33,5 +33,9 @@ impl World {
         for system in &self.systems {
             system(&mut self.manager);
         }
+    }
+    pub fn clear(&mut self) {
+        self.manager = Default::default();
+        self.systems = Default::default();
     }
 }

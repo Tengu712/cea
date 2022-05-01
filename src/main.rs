@@ -55,20 +55,6 @@ fn start_app() -> Result<(), windows::core::Error> {
         }
         map
     };
-    println!(" - Create game components");
-    let mut world = World::default();
-    println!("    * system");
-    world.systems.push(system_update_counter);
-    world.systems.push(system_fpsmeasure);
-    world.systems.push(system_velocity_position);
-    world.systems.push(system_restrict_position);
-    world.systems.push(system_position_sprite);
-    println!("    * script");
-    world.systems.push(script_player);
-    world.systems.push(script_player_slow);
-    world.systems.push(script_title_text);
-    println!("    * title scene");
-    initialize_title_scene(&mut world.manager);
     println!(" - Set up runtime objects");
     println!("    * square polygon");
     let idea = create_idea(&d3dapp)?;
@@ -77,6 +63,9 @@ fn start_app() -> Result<(), windows::core::Error> {
     d3dapp.set_cdata(&cdata)?;
     println!("    * input data");
     let mut input = Input::default();
+    println!("    * game components");
+    let mut world = World::default();
+    let mut scene = Title::new(&mut world);
     println!("\nAll clear. The game is starting.\n");
     while !winapp.do_event() {
         input.z = get_next_keystate(0x5A, input.z);
@@ -87,6 +76,9 @@ fn start_app() -> Result<(), windows::core::Error> {
         input.right = get_next_keystate(0x27, input.right);
         input.down = get_next_keystate(0x28, input.down);
         world.update(&input);
+        if let Some(next) = scene.as_mut().update(&mut world) {
+            scene = next;
+        }
         d3dapp.clear_rtv();
         d3dapp.set_rtv(false);
         let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
