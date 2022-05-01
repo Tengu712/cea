@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn create_player(manager: &mut EntityManager) {
+pub fn create_player(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
     manager.insert_scripted_id(id, type_name::<MarkerPlayer>());
     manager.components.positions.insert(
@@ -47,9 +47,10 @@ pub fn create_player(manager: &mut EntityManager) {
             speed: 8.0,
         },
     );
+    id
 }
 
-pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
+pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg: bool) -> EntityID {
     let id = manager.create_entity();
     manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
     manager.components.positions.insert(
@@ -61,6 +62,10 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
             z: Z_PLAYER_SLOW,
         },
     );
+    manager
+        .components
+        .sameposition2ds
+        .insert(id, true, SamePosition2D(player_id));
     manager.components.sprites.insert(
         id,
         true,
@@ -68,7 +73,13 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
             visible: true,
             imgid: Some(IMGID_SLOWCIRCLE),
             color: COLOR_WHITE,
+            rotation: Vector {
+                x: 0.0,
+                y: 0.0,
+                z: if flg { 360.0 } else { -360.0 },
+            },
             ..Default::default()
         },
     );
+    id
 }

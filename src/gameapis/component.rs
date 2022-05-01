@@ -104,6 +104,7 @@ pub struct Components {
     pub fpsmeasures: CContainer<FpsMeasure>,
     pub positions: CContainer<Position>,
     pub restricts: CContainer<RestrictRect>,
+    pub sameposition2ds: CContainer<SamePosition2D>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub velocities: CContainer<Velocity>,
@@ -163,6 +164,8 @@ impl Default for FpsMeasure {
 // movement
 pub type Position = Vector;
 pub type RestrictRect = Rect3D;
+#[derive(Default)]
+pub struct SamePosition2D(pub EntityID);
 #[derive(Default)]
 pub struct Velocity {
     pub direction: Vector,

@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn create_frame(manager: &mut EntityManager) {
+pub fn create_frame(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
     manager.components.sprites.insert(
         id,
@@ -22,4 +22,5 @@ pub fn create_frame(manager: &mut EntityManager) {
             ..Default::default()
         },
     );
+    id
 }

@@ -75,10 +75,10 @@ fn start_app() -> Result<(), windows::core::Error> {
         input.up = get_next_keystate(0x26, input.up);
         input.right = get_next_keystate(0x27, input.right);
         input.down = get_next_keystate(0x28, input.down);
-        world.update(&input);
         if let Some(next) = scene.as_mut().update(&mut world) {
             scene = next;
         }
+        world.update(&input);
         d3dapp.clear_rtv();
         d3dapp.set_rtv(false);
         let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());

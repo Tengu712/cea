@@ -22,7 +22,11 @@ impl Title {
 }
 impl Scene for Title {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        Some(Stage::new(world))
+        if world.manager.input.z == 1 {
+            Some(Stage::new(world))
+        } else {
+            None
+        }
     }
 }
 
@@ -31,8 +35,18 @@ pub struct Stage {}
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
         world.clear();
-        create_fps(&mut world.manager);
+        let _ = create_fps(&mut world.manager);
+        let player = create_player(&mut world.manager);
+        let _ = create_player_slow(&mut world.manager, player, true);
+        let _ = create_player_slow(&mut world.manager, player, false);
+        let _ = create_frame(&mut world.manager);
         world.systems.push(system_fpsmeasure);
+        world.systems.push(system_velocity_position);
+        world.systems.push(system_restrict_position);
+        world.systems.push(system_same_position_2d);
+        world.systems.push(system_position_sprite);
+        world.systems.push(script_player);
+        world.systems.push(script_player_slow);
         Box::new(Stage {})
     }
 }
