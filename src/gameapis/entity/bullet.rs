@@ -21,12 +21,6 @@ pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> Enti
             z: Z_BULLET,
         },
     );
-    const BULLET_RECT: [f32; 4] = [
-        GAME_LEFT - 80.0,
-        GAME_RIGHT + 80.0,
-        GAME_TOP + 80.0,
-        GAME_BOTTOM - 80.0,
-    ];
     manager.components.removerects.insert(
         id,
         RemoveRect {
