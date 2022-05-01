@@ -1,5 +1,5 @@
-pub mod bullet;
 pub mod bullet_enemy;
+pub mod bullet_player;
 pub mod constant;
 pub mod enemy;
 pub mod floor;
@@ -12,8 +12,8 @@ pub mod text_graze;
 pub mod text_score;
 pub mod text_title;
 
-pub use bullet::*;
 pub use bullet_enemy::*;
+pub use bullet_player::*;
 pub use constant::*;
 pub use enemy::*;
 pub use floor::*;
@@ -34,6 +34,7 @@ use super::*;
 pub struct EntityManager {
     next_entity_id: EntityID,
     pub components: Components,
+    pub unique_ids: HashMap<EntityKey, EntityID>,
     pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
     pub camera: Camera,
@@ -47,6 +48,7 @@ impl EntityManager {
         for (_, v) in self.scripted_ids.iter_mut() {
             v.remove(id);
         }
+        self.unique_ids.retain(|_, v| v != id);
         self.components.remove(id);
     }
     pub fn insert_scripted_id(&mut self, id: EntityID, key: ScriptKey) {
