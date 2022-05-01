@@ -1,41 +1,28 @@
 pub mod bg;
 pub mod bullet;
+pub mod bullet_enemy;
+pub mod constant;
 pub mod enemy;
 pub mod frame;
 pub mod player;
 pub mod player_slow;
+pub mod script_1_1;
 pub mod text;
 
 pub use bg::*;
 pub use bullet::*;
+pub use bullet_enemy::*;
+pub use constant::*;
 pub use enemy::*;
 pub use frame::*;
 pub use player::*;
 pub use player_slow::*;
+pub use script_1_1::*;
 pub use text::*;
 
 use super::asset::*;
 use super::component::*;
 use super::*;
-
-const SCREEN_WIDTH: f32 = 1280.0;
-const SCREEN_HEIGHT: f32 = 960.0;
-const GAME_LEFT: f32 = -392.0;
-const GAME_RIGHT: f32 = 392.0;
-const GAME_TOP: f32 = 480.0;
-const GAME_BOTTOM: f32 = -480.0;
-const COLOR_WHITE: Vector4D = Vector4D {
-    x: 1.0,
-    y: 1.0,
-    z: 1.0,
-    w: 1.0,
-};
-
-const Z_ENEMY: f32 = -5.0;
-const Z_PLAYER: f32 = -4.0;
-const Z_BULLET: f32 = -3.0;
-const Z_PLAYER_SLOW: f32 = -2.0;
-const Z_FRAME: f32 = -1.0;
 
 #[derive(Default)]
 pub struct EntityManager {

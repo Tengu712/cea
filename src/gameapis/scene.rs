@@ -35,6 +35,7 @@ pub struct Stage {
     pub player: EntityID,
     pub score: EntityID,
     pub graze: EntityID,
+    pub phase: EntityID,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
@@ -52,7 +53,9 @@ impl Stage {
         let _ = create_frame(&mut world.manager);
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
+        let phase = create_script_1_1(&mut world.manager);
         // script
+        world.systems.push(script_1_1);
         world.systems.push(script_player);
         world.systems.push(script_player_slow);
         world.systems.push(script_player_shot);
@@ -69,6 +72,7 @@ impl Stage {
             player,
             score,
             graze,
+            phase,
         })
     }
 }

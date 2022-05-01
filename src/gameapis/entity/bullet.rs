@@ -13,25 +13,14 @@ pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> Enti
             speed: 40.0,
         },
     );
-    manager.components.positions.insert(
-        id,
-        Vector {
-            x: x,
-            y: y,
-            z: Z_BULLET,
-        },
-    );
-    manager.components.removerects.insert(
-        id,
-        RemoveRect {
-            l: GAME_LEFT - 80.0,
-            r: GAME_RIGHT,
-            b: GAME_BOTTOM - 80.0,
-            t: GAME_TOP + 80.0,
-            n: -1000.0,
-            f: 1000.0,
-        },
-    );
+    manager
+        .components
+        .positions
+        .insert(id, Vector { x, y, z: Z_BULLET });
+    manager
+        .components
+        .removerects
+        .insert(id, BULLET_REMOVE_RECT);
     manager.components.sprites.insert(
         id,
         Sprite {
