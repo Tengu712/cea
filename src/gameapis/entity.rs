@@ -2,12 +2,14 @@ pub mod bullet;
 pub mod enemy;
 pub mod frame;
 pub mod player;
+pub mod player_slow;
 pub mod text;
 
 pub use bullet::*;
 pub use enemy::*;
 pub use frame::*;
 pub use player::*;
+pub use player_slow::*;
 pub use text::*;
 
 use super::asset::*;

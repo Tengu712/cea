@@ -6,7 +6,7 @@ pub fn create_enemy(manager: &mut EntityManager) -> EntityID {
         id,
         Sprite {
             visible: true,
-            imgid: None,
+            imgid: Some(IMGID_REMILIA_F0),
             translation: Vector {
                 x: 0.0,
                 y: 0.0,

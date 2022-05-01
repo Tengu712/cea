@@ -41,6 +41,7 @@ impl Stage {
         world.clear();
         // entity
         let _ = create_fps(&mut world.manager);
+        let _ = create_enemy(&mut world.manager);
         let player = create_player(&mut world.manager);
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
