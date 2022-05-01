@@ -6,7 +6,7 @@ pub fn script_camera_lean(manager: &mut EntityManager) {
     if let Some(ids) = manager.scripted_ids.get(type_name::<MarkerCameraLean>()) {
         for id in ids {
             if let Some(n) = manager.components.counters.get_mut(id) {
-                if manager.input.s > 0 {
+                if manager.input.s > 0 || (manager.input.left > 0 && manager.input.right > 0) {
                 } else if manager.input.left > 0 {
                     n.count_max = (n.count_max - 5).max(5).min(125);
                 } else if manager.input.right > 0 {
