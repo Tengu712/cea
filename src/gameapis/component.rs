@@ -107,6 +107,7 @@ pub struct Components {
     pub sameposition2ds: CContainer<SamePosition2D>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
+    pub valuetexts: CContainer<ValueText>,
     pub velocities: CContainer<Velocity>,
 }
 
@@ -143,8 +144,13 @@ pub struct Rect3D {
 // counter
 #[derive(Default)]
 pub struct Counter {
-    pub count: u32,
-    pub count_max: u32,
+    pub speed: u64,
+    pub count: u64,
+    pub count_max: u64,
+}
+#[derive(Default)]
+pub struct ValueText {
+    pub format: Option<fn(u64) -> String>,
 }
 pub struct FpsMeasure {
     pub fps: f32,

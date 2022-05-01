@@ -5,7 +5,23 @@ pub fn system_update_counter(manager: &mut EntityManager) {
         if !s.is_active() {
             continue;
         }
-        v.count = (v.count + 1).min(v.count_max);
+        v.count = (v.count + v.speed).min(v.count_max);
+    }
+}
+/// Reflect counter value to text.
+pub fn system_value_text(manager: &mut EntityManager) {
+    for (k, s, v) in manager.components.valuetexts.iter() {
+        if !s.is_active() {
+            continue;
+        }
+        if let Some(counter) = manager.components.counters.get(k) {
+            if let Some(n) = manager.components.texts.get_mut(k) {
+                match v.format {
+                    Some(f) => n.text = f(counter.count),
+                    None => n.text = counter.count.to_string(),
+                }
+            }
+        }
     }
 }
 /// Update fps measure and change text.

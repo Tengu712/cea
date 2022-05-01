@@ -40,11 +40,13 @@ impl Stage {
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
+        let _ = create_score(&mut world.manager);
         world.systems.push(system_fpsmeasure);
         world.systems.push(system_velocity_position);
         world.systems.push(system_restrict_position);
         world.systems.push(system_same_position_2d);
         world.systems.push(system_position_sprite);
+        world.systems.push(system_value_text);
         world.systems.push(script_player);
         world.systems.push(script_player_slow);
         Box::new(Stage {})
