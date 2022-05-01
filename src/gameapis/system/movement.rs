@@ -26,7 +26,7 @@ pub fn system_remove_rect(manager: &mut EntityManager) {
         }
     }
     for i in deads {
-        manager.components.remove(&i);
+        manager.remove_entity(&i);
     }
 }
 

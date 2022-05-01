@@ -5,7 +5,6 @@ pub fn create_enemy(manager: &mut EntityManager) -> EntityID {
     manager.components.sprites.insert(
         id,
         Sprite {
-            visible: true,
             imgid: Some(IMGID_REMILIA_F0),
             translation: Vector {
                 x: 0.0,

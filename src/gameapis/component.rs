@@ -101,6 +101,7 @@ pub struct Components {
     pub removerects: CContainer<RemoveRect>,
     pub restricts: CContainer<RestrictRect>,
     pub sameposition2ds: CContainer<SamePosition2D>,
+    pub sprite3ds: CContainer<Sprite>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub valuetexts: CContainer<ValueText>,
@@ -114,6 +115,7 @@ impl Components {
         self.removerects.remove(id);
         self.restricts.remove(id);
         self.sameposition2ds.remove(id);
+        self.sprite3ds.remove(id);
         self.sprites.remove(id);
         self.texts.remove(id);
         self.valuetexts.remove(id);
@@ -191,7 +193,6 @@ pub struct Velocity {
 // graphic
 #[derive(Default)]
 pub struct Sprite {
-    pub visible: bool,
     pub imgid: Option<&'static str>,
     pub translation: Vector,
     pub rotation: Vector,

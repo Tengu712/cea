@@ -5,7 +5,7 @@ mod winapis;
 
 use gameapis::{asset::*, component::*, scene::*, *};
 use std::collections::HashMap;
-use winapis::{direct3d::*, directwrite::*, winapi::*};
+use winapis::{direct3d::*, directwrite::*, math::*, winapi::*};
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 960;
@@ -61,6 +61,16 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!("    * constant buffer data");
     let mut cdata = create_default_cdata();
     d3dapp.set_cdata(&cdata)?;
+    println!("    * camera matrixes");
+    let mat_view = Matrix4x4::new_view([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
+    let mat_proj = Matrix4x4::new_ortho(0.0, WIDTH as f32, HEIGHT as f32, 0.0, 0.0, 1000.0);
+    let mat_proj_3d = Matrix4x4::new_perse(
+        WIDTH as f32,
+        HEIGHT as f32,
+        45.0f32.to_radians(),
+        1.0,
+        1000.0,
+    );
     println!("    * input data");
     let mut input = Input::default();
     println!("    * game components");
@@ -80,13 +90,40 @@ fn start_app() -> Result<(), windows::core::Error> {
         }
         world.update(&input);
         d3dapp.clear_rtv();
-        d3dapp.set_rtv(false);
-        let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
-        for (k, s, v) in world.manager.components.sprites.iter() {
+        // Draw 3d sprite
+        d3dapp.set_rtv(true);
+        cdata.mat_view = Matrix4x4::new_view(
+            [
+                world.manager.camera.pos.x,
+                world.manager.camera.pos.y,
+                world.manager.camera.pos.z,
+            ],
+            [
+                world.manager.camera.rot.x,
+                world.manager.camera.rot.y,
+                world.manager.camera.rot.z,
+            ],
+        );
+        cdata.mat_proj = mat_proj_3d.clone();
+        for (_, s, v) in world.manager.components.sprite3ds.iter() {
             if !s.is_active() {
                 continue;
             }
-            if !v.visible {
+            match v.imgid {
+                Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
+                None => cdata = d3dapp.set_d3dimage(None, cdata),
+            }
+            cdata = apply_cdata_diff(cdata, v);
+            d3dapp.set_cdata(&cdata)?;
+            d3dapp.draw_model(&idea);
+        }
+        // Draw 2d sprite
+        d3dapp.set_rtv(false);
+        cdata.mat_view = mat_view.clone();
+        cdata.mat_proj = mat_proj.clone();
+        let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
+        for (k, s, v) in world.manager.components.sprites.iter() {
+            if !s.is_active() {
                 continue;
             }
             sprites_t.push((v.translation.z, k));
@@ -103,6 +140,7 @@ fn start_app() -> Result<(), windows::core::Error> {
                 d3dapp.draw_model(&idea);
             }
         }
+        // Draw 2d text
         for (_, s, v) in world.manager.components.texts.iter() {
             if !s.is_active() {
                 continue;
@@ -175,20 +213,13 @@ fn create_idea(d3dapp: &D3DApplication) -> Result<model::ModelBuffer, windows::c
 /// Create default constant buffer data.
 fn create_default_cdata() -> cbuffer::CData {
     cbuffer::CData {
-        mat_scl: winapis::math::Matrix4x4::new_identity(),
-        mat_rtx: winapis::math::Matrix4x4::new_identity(),
-        mat_rty: winapis::math::Matrix4x4::new_identity(),
-        mat_rtz: winapis::math::Matrix4x4::new_identity(),
-        mat_trs: winapis::math::Matrix4x4::new_identity(),
-        mat_view: winapis::math::Matrix4x4::new_identity(),
-        mat_proj: winapis::math::Matrix4x4::new_ortho(
-            0.0,
-            WIDTH as f32,
-            HEIGHT as f32,
-            0.0,
-            0.0,
-            1000.0,
-        ),
+        mat_scl: Matrix4x4::new_identity(),
+        mat_rtx: Matrix4x4::new_identity(),
+        mat_rty: Matrix4x4::new_identity(),
+        mat_rtz: Matrix4x4::new_identity(),
+        mat_trs: Matrix4x4::new_identity(),
+        mat_view: Matrix4x4::new_identity(),
+        mat_proj: Matrix4x4::new_ortho(0.0, WIDTH as f32, HEIGHT as f32, 0.0, 0.0, 1000.0),
         vec_col: [1.0; 4],
         vec_prm: [0.0; 4],
     }
@@ -196,15 +227,11 @@ fn create_default_cdata() -> cbuffer::CData {
 /// Apply constant buffer difference request to cdata.
 fn apply_cdata_diff(cdata: cbuffer::CData, sprite: &gameapis::component::Sprite) -> cbuffer::CData {
     cbuffer::CData {
-        mat_scl: winapis::math::Matrix4x4::new_scaling(
-            sprite.scaling.x,
-            sprite.scaling.y,
-            sprite.scaling.z,
-        ),
-        mat_rtx: winapis::math::Matrix4x4::new_rotation_x(sprite.rotation.x),
-        mat_rty: winapis::math::Matrix4x4::new_rotation_y(sprite.rotation.y),
-        mat_rtz: winapis::math::Matrix4x4::new_rotation_z(sprite.rotation.z),
-        mat_trs: winapis::math::Matrix4x4::new_translation(
+        mat_scl: Matrix4x4::new_scaling(sprite.scaling.x, sprite.scaling.y, sprite.scaling.z),
+        mat_rtx: Matrix4x4::new_rotation_x(sprite.rotation.x),
+        mat_rty: Matrix4x4::new_rotation_y(sprite.rotation.y),
+        mat_rtz: Matrix4x4::new_rotation_z(sprite.rotation.z),
+        mat_trs: Matrix4x4::new_translation(
             sprite.translation.x,
             sprite.translation.y,
             sprite.translation.z,

@@ -34,7 +34,6 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
     manager.components.sprites.insert(
         id,
         Sprite {
-            visible: true,
             imgid: Some(IMGID_FLAN_B0),
             scaling: Vector {
                 x: 100.0,

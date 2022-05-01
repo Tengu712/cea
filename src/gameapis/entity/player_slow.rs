@@ -18,7 +18,6 @@ pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg:
     manager.components.sprites.insert(
         id,
         Sprite {
-            visible: true,
             imgid: Some(IMGID_SLOWCIRCLE),
             color: COLOR_WHITE,
             rotation: Vector {

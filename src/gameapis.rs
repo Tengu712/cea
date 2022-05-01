@@ -23,6 +23,12 @@ pub struct Input {
 }
 
 #[derive(Default)]
+pub struct Camera {
+    pub pos: component::Vector,
+    pub rot: component::Vector,
+}
+
+#[derive(Default)]
 pub struct World {
     pub manager: entity::EntityManager,
     pub systems: Vec<fn(&mut entity::EntityManager)>,

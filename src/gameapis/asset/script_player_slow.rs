@@ -1,15 +1,21 @@
 use super::*;
 
+const SLOWCIRCLE_SIZE: f32 = 140.0;
+
 pub struct MarkerPlayerSlow;
 
 /// Change player slow circle's animation with input.
 pub fn script_player_slow(manager: &mut EntityManager) {
     if let Some(ids) = manager.scripted_ids.get(type_name::<MarkerPlayerSlow>()) {
         for id in ids {
-            const SLOWCIRCLE_SIZE: f32 = 140.0;
+            let cnt = manager.input.s;
+            if cnt > 0 {
+                manager.components.sprites.active(id);
+            } else {
+                manager.components.sprites.disactive(id);
+                continue;
+            }
             if let Some(n) = manager.components.sprites.get_mut(id) {
-                let cnt = manager.input.s;
-                n.visible = cnt > 0;
                 let abs = n.rotation.z.abs();
                 let sign = if abs == 0.0 {
                     1.0

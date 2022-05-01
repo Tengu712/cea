@@ -35,7 +35,6 @@ pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> Enti
     manager.components.sprites.insert(
         id,
         Sprite {
-            visible: true,
             imgid: Some(IMGID_BUL_FLAN),
             scaling: Vector {
                 x: 90.0,

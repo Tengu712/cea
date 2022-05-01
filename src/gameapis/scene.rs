@@ -39,8 +39,12 @@ pub struct Stage {
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
         world.clear();
+        world.manager.camera.rot.x = -30.0f32.to_radians();
         // entity
         let _ = create_fps(&mut world.manager);
+        let _ = create_floor(&mut world.manager, 0);
+        let _ = create_floor(&mut world.manager, 1);
+        let _ = create_floor(&mut world.manager, 2);
         let _ = create_enemy(&mut world.manager);
         let player = create_player(&mut world.manager);
         let _ = create_player_slow(&mut world.manager, player, true);
