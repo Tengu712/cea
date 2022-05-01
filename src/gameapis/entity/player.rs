@@ -3,9 +3,17 @@ use super::*;
 pub fn create_player(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
     manager.insert_scripted_id(id, type_name::<MarkerPlayer>());
+    manager.insert_scripted_id(id, type_name::<MarkerPlayerShot>());
+    manager.components.counters.insert(
+        id,
+        Counter {
+            speed: 1,
+            count: 0,
+            count_max: std::u64::MAX,
+        },
+    );
     manager.components.positions.insert(
         id,
-        true,
         Position {
             x: 0.0,
             y: -280.0,
@@ -14,7 +22,6 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
     );
     manager.components.restricts.insert(
         id,
-        true,
         Rect3D {
             l: GAME_LEFT + 10.0,
             r: GAME_RIGHT - 10.0,
@@ -26,7 +33,6 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
     );
     manager.components.sprites.insert(
         id,
-        true,
         Sprite {
             visible: true,
             imgid: Some(IMGID_FLAN_B0),
@@ -41,7 +47,6 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
     );
     manager.components.velocities.insert(
         id,
-        true,
         Velocity {
             direction: Vector::default(),
             speed: 8.0,
@@ -55,7 +60,6 @@ pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg:
     manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
     manager.components.positions.insert(
         id,
-        true,
         Position {
             x: 0.0,
             y: 0.0,
@@ -65,10 +69,9 @@ pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg:
     manager
         .components
         .sameposition2ds
-        .insert(id, true, SamePosition2D(player_id));
+        .insert(id, SamePosition2D(player_id));
     manager.components.sprites.insert(
         id,
-        true,
         Sprite {
             visible: true,
             imgid: Some(IMGID_SLOWCIRCLE),

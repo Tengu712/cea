@@ -3,7 +3,7 @@ mod gameapis;
 /// This provides apis to call WindowsAPI.
 mod winapis;
 
-use gameapis::{asset::*, component::*, scene::*, system::*, *};
+use gameapis::{asset::*, component::*, scene::*, *};
 use std::collections::HashMap;
 use winapis::{direct3d::*, directwrite::*, winapi::*};
 

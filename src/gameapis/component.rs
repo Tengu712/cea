@@ -26,21 +26,16 @@ pub struct CContainer<T> {
     v: Vec<(EntityID, ComponentState, T)>,
 }
 impl<T> CContainer<T> {
-    /// Insert component to vector empty slot. Then, user can decide whether active or not.
-    pub fn insert(&mut self, id: EntityID, is_active: bool, component: T) {
-        let state = if is_active {
-            ComponentState::Active
-        } else {
-            ComponentState::Disactive
-        };
+    /// Insert component to vector empty slot.
+    pub fn insert(&mut self, id: EntityID, component: T) {
         match self.empty_idx.pop() {
             Some(idx) => {
                 self.id_idx.insert(id, idx);
-                self.v[idx] = (id, state, component);
+                self.v[idx] = (id, ComponentState::Active, component);
             }
             None => {
                 self.id_idx.insert(id, self.v.len());
-                self.v.push((id, state, component));
+                self.v.push((id, ComponentState::Active, component));
             }
         }
     }

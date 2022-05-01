@@ -5,10 +5,9 @@ pub fn create_fps(manager: &mut EntityManager) {
     manager
         .components
         .fpsmeasures
-        .insert(id, true, FpsMeasure::default());
+        .insert(id, FpsMeasure::default());
     manager.components.texts.insert(
         id,
-        true,
         Text {
             visible: true,
             text: String::new(),
@@ -31,7 +30,6 @@ pub fn create_title_text(manager: &mut EntityManager) {
     manager.insert_scripted_id(id, type_name::<MarkerTitleText>());
     manager.components.counters.insert(
         id,
-        true,
         Counter {
             speed: 1,
             count: 0,
@@ -40,7 +38,6 @@ pub fn create_title_text(manager: &mut EntityManager) {
     );
     manager.components.texts.insert(
         id,
-        true,
         Text {
             visible: true,
             text: String::from("PRESS ANY KEY TO START"),
@@ -62,7 +59,6 @@ pub fn create_score(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
     manager.components.counters.insert(
         id,
-        true,
         Counter {
             speed: 0,
             count: 0,
@@ -71,7 +67,6 @@ pub fn create_score(manager: &mut EntityManager) -> EntityID {
     );
     manager.components.texts.insert(
         id,
-        true,
         Text {
             visible: true,
             text: String::default(),
@@ -90,6 +85,6 @@ pub fn create_score(manager: &mut EntityManager) -> EntityID {
     manager
         .components
         .valuetexts
-        .insert(id, true, ValueText::default());
+        .insert(id, ValueText::default());
     id
 }

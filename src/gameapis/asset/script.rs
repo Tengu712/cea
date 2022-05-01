@@ -2,6 +2,7 @@ use super::*;
 
 pub struct MarkerPlayer;
 pub struct MarkerPlayerSlow;
+pub struct MarkerPlayerShot;
 pub struct MarkerTitleText;
 
 /// Change player's velocity with input. Then, it does player's animation with input.
@@ -31,6 +32,18 @@ pub fn script_player(manager: &mut EntityManager) {
         }
     }
 }
+/// Launch player's bullet with counter and input.
+pub fn script_player_shot(manager: &mut EntityManager) {
+    if let Some(ids) = manager.scripted_ids.get(type_name::<MarkerPlayerShot>()) {
+        for id in ids {
+            if let Some(counter) = manager.components.counters.get(id) {
+                if counter.count % 60 == 1 && manager.input.z > 0 {
+                    println!("shoot!");
+                }
+            }
+        }
+    }
+}
 /// Change player slow circle's animation with input.
 pub fn script_player_slow(manager: &mut EntityManager) {
     if let Some(ids) = manager.scripted_ids.get(type_name::<MarkerPlayerSlow>()) {
@@ -51,7 +64,7 @@ pub fn script_player_slow(manager: &mut EntityManager) {
                     n.scaling.x = size;
                     n.scaling.y = size;
                     n.scaling.z = 1.0;
-                } else if cnt > 10{
+                } else if cnt > 10 {
                     n.rotation.z = sign * (cnt as f32 * 4.0).to_radians();
                     n.scaling.x = SLOWCIRCLE_SIZE;
                     n.scaling.y = SLOWCIRCLE_SIZE;

@@ -4,7 +4,6 @@ pub fn create_enemy(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
     manager.components.sprites.insert(
         id,
-        true,
         Sprite {
             visible: true,
             imgid: None,
