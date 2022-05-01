@@ -56,7 +56,7 @@ impl<T> CContainer<T> {
             self.v[*idx].1 = ComponentState::Active;
         }
     }
-    /// Get (is_active, component). If the component is disactive, return None. 
+    /// Get (is_active, component). If the component is disactive, return None.
     pub fn get(&self, id: &EntityID) -> Option<&T> {
         match self.id_idx.get(id) {
             Some(idx) => match self.v.get(*idx) {
@@ -98,12 +98,27 @@ pub struct Components {
     pub counters: CContainer<Counter>,
     pub fpsmeasures: CContainer<FpsMeasure>,
     pub positions: CContainer<Position>,
+    pub removerects: CContainer<RemoveRect>,
     pub restricts: CContainer<RestrictRect>,
     pub sameposition2ds: CContainer<SamePosition2D>,
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub valuetexts: CContainer<ValueText>,
     pub velocities: CContainer<Velocity>,
+}
+impl Components {
+    pub fn remove(&mut self, id: &EntityID) {
+        self.counters.remove(id);
+        self.fpsmeasures.remove(id);
+        self.positions.remove(id);
+        self.removerects.remove(id);
+        self.restricts.remove(id);
+        self.sameposition2ds.remove(id);
+        self.sprites.remove(id);
+        self.texts.remove(id);
+        self.valuetexts.remove(id);
+        self.velocities.remove(id);
+    }
 }
 
 #[derive(Default, Clone)]
@@ -165,6 +180,7 @@ impl Default for FpsMeasure {
 // movement
 pub type Position = Vector;
 pub type RestrictRect = Rect3D;
+pub type RemoveRect = Rect3D;
 #[derive(Default)]
 pub struct SamePosition2D(pub EntityID);
 #[derive(Default)]

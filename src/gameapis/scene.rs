@@ -38,22 +38,26 @@ pub struct Stage {
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
         world.clear();
+        // entity
         let _ = create_fps(&mut world.manager);
         let player = create_player(&mut world.manager);
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
         let score = create_score(&mut world.manager);
+        // script
+        world.systems.push(script_player);
+        world.systems.push(script_player_slow);
+        world.systems.push(script_player_shot);
+        // system
         world.systems.push(system_fpsmeasure);
         world.systems.push(system_update_counter);
         world.systems.push(system_velocity_position);
+        world.systems.push(system_remove_rect);
         world.systems.push(system_restrict_position);
         world.systems.push(system_same_position_2d);
         world.systems.push(system_position_sprite);
         world.systems.push(system_value_text);
-        world.systems.push(script_player);
-        world.systems.push(script_player_slow);
-        world.systems.push(script_player_shot);
         Box::new(Stage { player, score })
     }
 }

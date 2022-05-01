@@ -4,5 +4,5 @@ pub mod script;
 pub use image::*;
 pub use script::*;
 
-use super::entity::EntityManager;
+use super::entity::*;
 use super::*;

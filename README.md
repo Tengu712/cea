@@ -92,28 +92,28 @@ swapchain.GetBuffer::<ID3D11Texture2D>(0)
 | counter | Counter | カウンター。毎フレームインクリメントされる。 |
 | fpsmeasure | FpsMeasure | FPS、それを算出するためのデータ。 |
 | movement| Position | 三次元座標。 |
-| | RestrictRect | 三次元範囲。 |
+| | RemoveRect | 存在可能な三次元範囲。 |
+| | RestrictRect | 三次元範囲制限。 |
+| | SamePosition2D | 特定の物体の座標と同じ座標にする。 |
 | | Velocity | 速度。 |
 | graphic | Sprite | スプライト。描画用データ。 |
 | | Text | テキスト。描画用データ。 |
+| | ValueText | カウンターの値を特定の書式でテキストに反映する。 |
 
 ### System
 
 詳しくはRustDocを見てほしい。
 
 * counter
-  * *()* -> Counter
+  * () -> Counter
+  * ValueText, Counter -> Text
+  * () -> FpsMeasure, Text
 * movement
   * Velocity -> Position
+  * RemoveRect, Position -> *remove entity*
   * RestrictRect -> Position
+  * SamePosition2D, Position -> Position
   * Position -> Sprite
-* player
-  * *Input* -> Velocity(Player)
-  * *Input* -> Sprite(Player)
-  * *Input* -> Sprite(PlayerSlow)
-* text
-  * *()* -> FpsMeasure -> Text
-  * Counter(TitleText) -> Text(TitleText)
 
 ### Entity Implementation
 
