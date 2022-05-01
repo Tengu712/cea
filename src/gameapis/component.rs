@@ -1,5 +1,103 @@
 use super::*;
 
+pub enum ComponentState {
+    Active,
+    Disactive,
+    Empty,
+}
+impl Default for ComponentState {
+    fn default() -> Self {
+        ComponentState::Empty
+    }
+}
+impl ComponentState {
+    pub fn is_active(&self) -> bool {
+        match self {
+            ComponentState::Active => true,
+            _ => false,
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct CContainer<T> {
+    empty_idx: Vec<usize>,
+    id_idx: HashMap<EntityID, usize>,
+    v: Vec<(EntityID, ComponentState, T)>,
+}
+impl<T> CContainer<T> {
+    /// Insert component to vector empty slot. Then, user can decide whether active or not.
+    pub fn insert(&mut self, id: EntityID, is_active: bool, component: T) {
+        let state = if is_active {
+            ComponentState::Active
+        } else {
+            ComponentState::Disactive
+        };
+        match self.empty_idx.pop() {
+            Some(idx) => {
+                self.id_idx.insert(id, idx);
+                self.v[idx] = (id, state, component);
+            }
+            None => {
+                self.id_idx.insert(id, self.v.len());
+                self.v.push((id, state, component));
+            }
+        }
+    }
+    /// Change component state to empty and push empty_idx stack the index.
+    pub fn remove(&mut self, id: &EntityID) {
+        if let Some(idx) = self.id_idx.remove(id) {
+            self.v[idx].1 = ComponentState::Empty;
+            self.empty_idx.push(idx);
+        }
+    }
+    pub fn disactive(&mut self, id: &EntityID) {
+        if let Some(idx) = self.id_idx.get(id) {
+            self.v[*idx].1 = ComponentState::Disactive;
+        }
+    }
+    pub fn active(&mut self, id: &EntityID) {
+        if let Some(idx) = self.id_idx.get(id) {
+            self.v[*idx].1 = ComponentState::Active;
+        }
+    }
+    /// Get (is_active, component). If the component is disactive, return None. 
+    pub fn get(&self, id: &EntityID) -> Option<&T> {
+        match self.id_idx.get(id) {
+            Some(idx) => match self.v.get(*idx) {
+                Some((_, s, c)) => match s {
+                    ComponentState::Active => Some(c),
+                    _ => None,
+                },
+                None => None,
+            },
+            None => None,
+        }
+    }
+    /// Get (is_active, component).
+    pub fn get_mut(&mut self, id: &EntityID) -> Option<&mut T> {
+        match self.id_idx.get(id) {
+            Some(idx) => match self.v.get_mut(*idx) {
+                Some((_, s, c)) => match s {
+                    ComponentState::Active => Some(c),
+                    _ => None,
+                },
+                None => None,
+            },
+            None => None,
+        }
+    }
+    pub fn iter(&self) -> std::slice::Iter<(EntityID, ComponentState, T)> {
+        self.v.iter()
+    }
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<(EntityID, ComponentState, T)> {
+        self.v.iter_mut()
+    }
+    pub fn len(&self) -> usize {
+        self.v.len()
+    }
+}
+
 #[derive(Default)]
 pub struct Components {
     pub counters: CContainer<Counter>,
@@ -85,6 +183,12 @@ pub enum TextAlign {
     Center,
     Right,
 }
+impl Default for TextAlign {
+    fn default() -> Self {
+        TextAlign::Left
+    }
+}
+#[derive(Default)]
 pub struct Text {
     pub visible: bool,
     pub text: String,

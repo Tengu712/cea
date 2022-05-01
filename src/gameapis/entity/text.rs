@@ -5,9 +5,10 @@ pub fn create_fps(manager: &mut EntityManager) {
     manager
         .components
         .fpsmeasures
-        .insert(id, FpsMeasure::default());
+        .insert(id, true, FpsMeasure::default());
     manager.components.texts.insert(
         id,
+        true,
         Text {
             visible: true,
             text: String::new(),
@@ -30,6 +31,7 @@ pub fn create_title_text(manager: &mut EntityManager) {
     manager.insert_scripted_id(id, type_name::<MarkerTitleText>());
     manager.components.counters.insert(
         id,
+        true,
         Counter {
             count: 0,
             count_max: 0xffffffff,
@@ -37,6 +39,7 @@ pub fn create_title_text(manager: &mut EntityManager) {
     );
     manager.components.texts.insert(
         id,
+        true,
         Text {
             visible: true,
             text: String::from("PRESS ANY KEY TO START"),

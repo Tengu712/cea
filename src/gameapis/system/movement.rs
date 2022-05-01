@@ -1,7 +1,10 @@
 use super::*;
 
 pub fn system_velocity_position(manager: &mut EntityManager) {
-    for (k, v) in &manager.components.velocities {
+    for (k, s, v) in manager.components.velocities.iter() {
+        if !s.is_active() {
+            continue;
+        }
         if let Some(n) = manager.components.positions.get_mut(&k) {
             n.x += v.direction.x * v.speed;
             n.y += v.direction.y * v.speed;
@@ -11,7 +14,10 @@ pub fn system_velocity_position(manager: &mut EntityManager) {
 }
 
 pub fn system_restrict_position(manager: &mut EntityManager) {
-    for (k, v) in &manager.components.restricts {
+    for (k, s, v) in manager.components.restricts.iter() {
+        if !s.is_active() {
+            continue;
+        }
         if let Some(n) = manager.components.positions.get_mut(&k) {
             n.x = n.x.max(v.l).min(v.r);
             n.y = n.y.max(v.b).min(v.t);
@@ -21,7 +27,10 @@ pub fn system_restrict_position(manager: &mut EntityManager) {
 }
 
 pub fn system_position_sprite(manager: &mut EntityManager) {
-    for (k, v) in &manager.components.positions {
+    for (k, s, v) in manager.components.positions.iter() {
+        if !s.is_active() {
+            continue;
+        }
         if let Some(n) = manager.components.sprites.get_mut(&k) {
             n.translation = v.clone();
         }

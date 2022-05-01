@@ -90,7 +90,10 @@ fn start_app() -> Result<(), windows::core::Error> {
         d3dapp.clear_rtv();
         d3dapp.set_rtv(false);
         let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
-        for (k, v) in &world.manager.components.sprites {
+        for (k, s, v) in world.manager.components.sprites.iter() {
+            if !s.is_active() {
+                continue;
+            }
             if !v.visible {
                 continue;
             }
@@ -108,7 +111,10 @@ fn start_app() -> Result<(), windows::core::Error> {
                 d3dapp.draw_model(&idea);
             }
         }
-        for v in world.manager.components.texts.values() {
+        for (_, s, v) in world.manager.components.texts.iter() {
+            if !s.is_active() {
+                continue;
+            }
             if !v.visible {
                 continue;
             }

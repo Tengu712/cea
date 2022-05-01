@@ -9,7 +9,6 @@ use std::collections::HashSet;
 use std::any::type_name;
 
 pub type EntityID = usize;
-pub type CContainer<T> = HashMap<EntityID, T>;
 pub type ScriptKey = &'static str;
 
 #[derive(Default, Clone)]

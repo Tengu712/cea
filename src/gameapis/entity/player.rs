@@ -5,6 +5,7 @@ pub fn create_player(manager: &mut EntityManager) {
     manager.insert_scripted_id(id, type_name::<MarkerPlayer>());
     manager.components.positions.insert(
         id,
+        true,
         Position {
             x: 0.0,
             y: -280.0,
@@ -13,6 +14,7 @@ pub fn create_player(manager: &mut EntityManager) {
     );
     manager.components.restricts.insert(
         id,
+        true,
         Rect3D {
             l: GAME_LEFT + 10.0,
             r: GAME_RIGHT - 10.0,
@@ -24,6 +26,7 @@ pub fn create_player(manager: &mut EntityManager) {
     );
     manager.components.sprites.insert(
         id,
+        true,
         Sprite {
             visible: true,
             imgid: Some(IMGID_FLAN_B0),
@@ -38,6 +41,7 @@ pub fn create_player(manager: &mut EntityManager) {
     );
     manager.components.velocities.insert(
         id,
+        true,
         Velocity {
             direction: Vector::default(),
             speed: 8.0,
@@ -50,6 +54,7 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
     manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
     manager.components.positions.insert(
         id,
+        true,
         Position {
             x: 0.0,
             y: 0.0,
@@ -58,6 +63,7 @@ pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
     );
     manager.components.sprites.insert(
         id,
+        true,
         Sprite {
             visible: true,
             imgid: Some(IMGID_SLOWCIRCLE),
