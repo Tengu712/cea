@@ -16,10 +16,11 @@ fn main() {
         Ok(_) => (),
         Err(e) => {
             let message = format!(
-                "Error code : 0x{:X}\n{}",
+                "code : 0x{:X}\n{}",
                 e.code().0,
                 e.message().to_string_lossy()
             );
+            println!("\nError! The game will not start.");
             println!("{}", message);
             show_messagebox(message, "Error")
         }
@@ -30,7 +31,7 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!("\n==================================================");
     println!("            \"TITLE\"");
     println!("      SkyDog Assoc of WordSpiritism, Tengu712");
-    println!("==================================================");
+    println!("==================================================\n");
     println!("Starts up ...");
     let cur_dir = get_curdir_for_winapp().unwrap_or(String::from(r"\"));
     println!(" - Create a window");
@@ -49,28 +50,33 @@ fn start_app() -> Result<(), windows::core::Error> {
         let mut map = HashMap::new();
         let res_dir = cur_dir + r"img\";
         for i in IMGID_ARRAY {
+            println!("    * {}", i);
             map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
         }
         map
     };
     println!(" - Create game components");
     let mut world = World::default();
+    println!("    * system");
     world.systems.push(system_update_counter);
     world.systems.push(system_fpsmeasure);
-    world.systems.push(system_playerinput);
     world.systems.push(system_velocity_position);
     world.systems.push(system_restrict_position);
     world.systems.push(system_position_sprite);
-    world.systems.push(system_title_text_animation);
-    world.systems.push(system_playerinput);
-    world.systems.push(system_playeranimation);
-    world.systems.push(system_playerslowanimation);
+    println!("    * script");
+    world.systems.push(script_player);
+    world.systems.push(script_player_slow);
+    world.systems.push(script_title_text);
+    println!("    * title scene");
     initialize_title_scene(&mut world.manager);
-    println!(" - Set up drawing objects");
+    println!(" - Set up runtime objects");
+    println!("    * square polygon");
     let idea = create_idea(&d3dapp)?;
+    println!("    * constant buffer data");
     let mut cdata = create_default_cdata();
-    let mut input = Input::default();
     d3dapp.set_cdata(&cdata)?;
+    println!("    * input data");
+    let mut input = Input::default();
     println!("\nAll clear. The game is starting.\n");
     while !winapp.do_event() {
         input.z = get_next_keystate(0x5A, input.z);

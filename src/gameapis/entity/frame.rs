@@ -1,7 +1,7 @@
 use super::*;
 
 pub fn create_frame(manager: &mut EntityManager) {
-    let id = manager.create_entity(None);
+    let id = manager.create_entity();
     manager.components.sprites.insert(
         id,
         Sprite {

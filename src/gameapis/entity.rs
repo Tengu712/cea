@@ -10,7 +10,6 @@ pub use text::*;
 
 use super::asset::*;
 use super::component::*;
-use super::system::*;
 use super::*;
 
 const SCREEN_WIDTH: f32 = 1280.0;
@@ -34,17 +33,22 @@ const Z_FRAME: f32 = -1.0;
 #[derive(Default)]
 pub struct EntityManager {
     pub next_entity_id: EntityID,
-    pub entities: Entities,
     pub components: Components,
+    pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
 }
 impl EntityManager {
-    pub fn create_entity(&mut self, key: Option<EntityKey>) -> EntityID {
-        let res = self.next_entity_id;
+    pub fn create_entity(&mut self) -> EntityID {
         self.next_entity_id += 1;
-        if let Some(n) = key {
-            self.entities.insert(n, res);
+        self.next_entity_id - 1
+    }
+    pub fn insert_scripted_id(&mut self, id: EntityID, key: ScriptKey) {
+        if let Some(ids) = self.scripted_ids.get_mut(key) {
+            ids.insert(id);
+        } else {
+            let mut ids = HashSet::new();
+            ids.insert(id);
+            self.scripted_ids.insert(key, ids);
         }
-        res
     }
 }

@@ -1,7 +1,7 @@
 use super::*;
 
 pub fn create_fps(manager: &mut EntityManager) {
-    let id = manager.create_entity(None);
+    let id = manager.create_entity();
     manager
         .components
         .fpsmeasures
@@ -26,7 +26,8 @@ pub fn create_fps(manager: &mut EntityManager) {
 }
 
 pub fn create_title_text(manager: &mut EntityManager) {
-    let id = manager.create_entity(Some(TITLE_TEXT_KEY));
+    let id = manager.create_entity();
+    manager.insert_scripted_id(id, type_name::<MarkerTitleText>());
     manager.components.counters.insert(
         id,
         Counter {

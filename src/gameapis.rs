@@ -5,11 +5,12 @@ pub mod system;
 pub mod scene;
 
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::any::type_name;
 
 pub type EntityID = usize;
-pub type EntityKey = &'static str;
 pub type CContainer<T> = HashMap<EntityID, T>;
-pub type Entities = HashMap<EntityKey, EntityID>;
+pub type ScriptKey = &'static str;
 
 #[derive(Default, Clone)]
 pub struct Input {

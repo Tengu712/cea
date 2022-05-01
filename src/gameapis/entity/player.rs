@@ -1,7 +1,8 @@
 use super::*;
 
 pub fn create_player(manager: &mut EntityManager) {
-    let id = manager.create_entity(Some(PLAYER_KEY));
+    let id = manager.create_entity();
+    manager.insert_scripted_id(id, type_name::<MarkerPlayer>());
     manager.components.positions.insert(
         id,
         Position {
@@ -45,7 +46,8 @@ pub fn create_player(manager: &mut EntityManager) {
 }
 
 pub fn create_player_slow(manager: &mut EntityManager, flg: bool) {
-    let id = manager.create_entity(Some(PLAYER_SLOW_KEY));
+    let id = manager.create_entity();
+    manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
     manager.components.positions.insert(
         id,
         Position {
