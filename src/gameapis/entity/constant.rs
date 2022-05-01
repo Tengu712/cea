@@ -15,7 +15,7 @@ pub const COLOR_WHITE: Vector4D = Vector4D {
 
 pub const BULLET_REMOVE_RECT: RemoveRect = RemoveRect {
     l: GAME_LEFT - 80.0,
-    r: GAME_RIGHT,
+    r: GAME_RIGHT + 80.0,
     b: GAME_BOTTOM - 80.0,
     t: GAME_TOP + 80.0,
     n: -1000.0,

@@ -1,24 +1,30 @@
-pub mod bg;
 pub mod bullet;
 pub mod bullet_enemy;
 pub mod constant;
 pub mod enemy;
+pub mod floor;
+pub mod fps;
 pub mod frame;
 pub mod player;
 pub mod player_slow;
 pub mod script_1_1;
-pub mod text;
+pub mod text_graze;
+pub mod text_score;
+pub mod text_title;
 
-pub use bg::*;
 pub use bullet::*;
 pub use bullet_enemy::*;
 pub use constant::*;
 pub use enemy::*;
+pub use floor::*;
+pub use fps::*;
 pub use frame::*;
 pub use player::*;
 pub use player_slow::*;
 pub use script_1_1::*;
-pub use text::*;
+pub use text_graze::*;
+pub use text_score::*;
+pub use text_title::*;
 
 use super::asset::*;
 use super::component::*;
