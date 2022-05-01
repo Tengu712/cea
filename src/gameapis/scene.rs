@@ -54,8 +54,10 @@ impl Stage {
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
         let phase = create_script_1_1(&mut world.manager);
+        let _ = create_script_camera_1(&mut world.manager);
         // script
         world.systems.push(script_1_1);
+        world.systems.push(script_camera_1);
         world.systems.push(script_player);
         world.systems.push(script_player_slow);
         world.systems.push(script_player_shot);
