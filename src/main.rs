@@ -244,6 +244,11 @@ fn apply_cdata_diff(cdata: cbuffer::CData, sprite: &gameapis::component::Sprite)
             sprite.color.z,
             sprite.color.w,
         ],
-        vec_prm: cdata.vec_prm,
+        vec_prm: [
+            cdata.vec_prm[0],
+            sprite.mode,
+            cdata.vec_prm[2],
+            cdata.vec_prm[3],
+        ],
     }
 }

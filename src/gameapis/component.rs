@@ -198,6 +198,7 @@ pub struct Sprite {
     pub rotation: Vector,
     pub scaling: Vector,
     pub color: Vector4D,
+    pub mode: f32,
 }
 pub enum TextAlign {
     Left,

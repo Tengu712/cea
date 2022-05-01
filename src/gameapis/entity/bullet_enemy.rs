@@ -60,6 +60,7 @@ pub fn create_bullet(
                 z: 1.0,
             },
             color,
+            mode: 1.0,
             ..Default::default()
         },
     );
