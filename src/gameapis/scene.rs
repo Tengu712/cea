@@ -33,11 +33,14 @@ impl Scene for Title {
 #[derive(Default)]
 pub struct Stage {
     pub player: EntityID,
+    pub player_slow1: EntityID,
+    pub player_slow2: EntityID,
     pub score: EntityID,
     pub graze: EntityID,
     pub stage: EntityID,
     pub e_hp: EntityID,
     pub rate: EntityID,
+    pub delay_count: Option<EntityID>,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
@@ -48,13 +51,13 @@ impl Stage {
         let _ = create_floor(&mut world.manager, 0);
         let _ = create_floor(&mut world.manager, 1);
         let _ = create_floor(&mut world.manager, 2);
-        let enemy = create_enemy(&mut world.manager);
-        let player = create_player(&mut world.manager);
-        let rate = create_player_rate(&mut world.manager, player);
-        let _ = create_player_slow(&mut world.manager, player, true);
-        let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
+        let enemy = create_enemy(&mut world.manager);
         let e_hp = create_enemy_hp(&mut world.manager, 2000, enemy);
+        let player = create_player(&mut world.manager);
+        let player_slow1 = create_player_slow(&mut world.manager, player, true);
+        let player_slow2 = create_player_slow(&mut world.manager, player, false);
+        let rate = create_player_rate(&mut world.manager, player);
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
         let stage = create_stage1(&mut world.manager);
@@ -90,23 +93,26 @@ impl Stage {
         world.systems.push(system_value_text);
         Box::new(Stage {
             player,
+            player_slow1,
+            player_slow2,
             score,
             graze,
             stage,
             e_hp,
             rate,
+            delay_count: None,
         })
     }
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
         // Reserve message
-        let _ = world
+        let msg_hit = world
             .manager
             .messages
             .remove(MESSAGE_PLAYER_HIT)
             .unwrap_or(0);
-        let _ = world
+        let msg_hit_fragile = world
             .manager
             .messages
             .remove(MESSAGE_PLAYER_HIT_FRAGILE)
@@ -121,10 +127,52 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_ENEMY_HIT)
             .unwrap_or(0);
+        // Delay
+        let is_dead = if let Some(n) = self.delay_count {
+            if let Some(counter) = world.manager.components.counters.get(&n) {
+                counter.count == counter.count_max
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+        // Hit
+        let mut is_snap = 0;
+        if msg_hit > 0 || is_dead {
+            world.manager.remove_entity(&self.player);
+            world.manager.remove_entity(&self.player_slow1);
+            world.manager.remove_entity(&self.player_slow2);
+            world.manager.remove_entity(&self.rate);
+            if let Some(n) = self.delay_count {
+                world.manager.remove_entity(&n);
+                self.delay_count = None;
+            }
+            self.player = create_player(&mut world.manager);
+            self.player_slow1 = create_player_slow(&mut world.manager, self.player, true);
+            self.player_slow2 = create_player_slow(&mut world.manager, self.player, false);
+            self.rate = create_player_rate(&mut world.manager, self.player);
+            world.manager.unique_ids.insert(UNIQUE_PLAYER, self.player);
+        } else if let Some(n) = self.delay_count {
+            // If down Z key during delay, player regain moving and shooting.
+            if world.manager.input.z == 1 {
+                world.manager.components.counters.active(&self.player);
+                world.manager.components.velocities.active(&self.player);
+                world.manager.remove_entity(&n);
+                self.delay_count = None;
+                is_snap = 1;
+            }
+        } else if msg_hit_fragile > 0 {
+            // If hit by fragile bullet, player cannot move and shoot.
+            world.manager.components.counters.disactive(&self.player);
+            world.manager.components.velocities.disactive(&self.player);
+            // And delay is starting.
+            self.delay_count = Some(create_delay_count(&mut world.manager));
+        }
         // Add rate
         let rate = if let Some(rate_counter) = world.manager.components.counters.get_mut(&self.rate)
         {
-            let add = msg_graze * 10;
+            let add = msg_graze * 10 + is_snap * 200;
             rate_counter.count = (rate_counter.count + add).min(rate_counter.count_max);
             (rate_counter.count as f32) / (rate_counter.count_max as f32) * 100.0
         } else {
