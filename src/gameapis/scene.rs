@@ -169,6 +169,10 @@ impl Scene for Stage {
                 add_rate -= (n.count == n.count_max) as i64 + (world.emngr.input.z > 0) as i64;
             }
         }
+        if is_snap != 1 && world.emngr.input.z == 1 {
+            // If down Z key when not snapping, rate will decrease.
+            add_rate -= 100;
+        }
         if let Some(rate_counter) = world.emngr.coms.counters.get_mut(&self.rate) {
             rate_counter.count = (rate_counter.count + add_rate).min(rate_counter.count_max);
         }
