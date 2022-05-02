@@ -20,7 +20,7 @@ impl BulletKind {
 }
 
 pub fn create_bullet(
-    manager: &mut EntityManager,
+    emngr: &mut EntityManager,
     knd: BulletKind,
     x: f32,
     y: f32,
@@ -29,13 +29,13 @@ pub fn create_bullet(
     color: Vector4D,
     is_fragile: bool,
 ) {
-    if manager.bullet_ids.len() >= BULLET_MAX_NUM {
+    if emngr.bullet_ids.len() >= BULLET_MAX_NUM {
         return;
     }
     let (size, r, imgid) = knd.analyze(is_fragile);
     // Normal
-    let id = manager.create_entity();
-    manager.components.velocities.insert(
+    let id = emngr.create_entity();
+    emngr.coms.velocities.insert(
         id,
         Velocity {
             direction: Vector {
@@ -46,15 +46,15 @@ pub fn create_bullet(
             speed,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .positions
         .insert(id, Vector { x, y, z: Z_BULLET });
-    manager
-        .components
+    emngr
+        .coms
         .removerects
         .insert(id, BULLET_REMOVE_RECT);
-    manager.components.collisions.insert(
+    emngr.coms.collisions.insert(
         id,
         Collision {
             r,
@@ -65,7 +65,7 @@ pub fn create_bullet(
             },
         },
     );
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(imgid),
@@ -79,18 +79,18 @@ pub fn create_bullet(
             ..Default::default()
         },
     );
-    manager.bullet_ids.insert(id);
+    emngr.bullet_ids.insert(id);
     // Graze
-    let id_graze = manager.create_entity();
-    manager
-        .components
+    let id_graze = emngr.create_entity();
+    emngr
+        .coms
         .positions
         .insert(id_graze, Vector { x, y, z: Z_BULLET });
-    manager
-        .components
+    emngr
+        .coms
         .sameposition2ds
         .insert(id_graze, SamePosition2D(id));
-    manager.components.collisions.insert(
+    emngr.coms.collisions.insert(
         id_graze,
         Collision {
             r: r * 4.0,

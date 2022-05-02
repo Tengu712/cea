@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_graze(manager: &mut EntityManager, graze: i64) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_graze(emngr: &mut EntityManager, graze: i64) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 0,
@@ -10,7 +10,7 @@ pub fn create_graze(manager: &mut EntityManager, graze: i64) -> EntityID {
             count_max: graze,
         },
     );
-    manager.components.texts.insert(
+    emngr.coms.texts.insert(
         id,
         Text {
             text: String::default(),
@@ -26,8 +26,8 @@ pub fn create_graze(manager: &mut EntityManager, graze: i64) -> EntityID {
             align: TextAlign::Left,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .valuetexts
         .insert(id, ValueText::default());
     id

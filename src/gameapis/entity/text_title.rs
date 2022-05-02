@@ -1,9 +1,9 @@
 use super::*;
 
-pub fn create_title_text(manager: &mut EntityManager) {
-    let id = manager.create_entity();
-    manager.insert_scripted_id(id, type_name::<MarkerTitleText>());
-    manager.components.counters.insert(
+pub fn create_title_text(emngr: &mut EntityManager) {
+    let id = emngr.create_entity();
+    emngr.insert_scripted_id(id, type_name::<MarkerTitleText>());
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 1,
@@ -11,7 +11,7 @@ pub fn create_title_text(manager: &mut EntityManager) {
             count_max: std::i64::MAX,
         },
     );
-    manager.components.texts.insert(
+    emngr.coms.texts.insert(
         id,
         Text {
             text: String::from("PRESS ANY KEY TO START"),

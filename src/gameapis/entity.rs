@@ -43,7 +43,7 @@ use super::*;
 #[derive(Default)]
 pub struct EntityManager {
     next_entity_id: EntityID,
-    pub components: Components,
+    pub coms: Components,
     pub unique_ids: HashMap<EntityKey, EntityID>,
     pub bullet_ids: HashSet<EntityID>,
     pub messages: HashMap<MessageKey, i64>,
@@ -62,7 +62,7 @@ impl EntityManager {
         }
         self.unique_ids.retain(|_, v| v != id);
         self.bullet_ids.remove(id);
-        self.components.remove(id);
+        self.coms.remove(id);
     }
     pub fn insert_scripted_id(&mut self, id: EntityID, key: ScriptKey) {
         if let Some(ids) = self.scripted_ids.get_mut(key) {

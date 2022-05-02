@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_camera_lean(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_camera_lean(emngr: &mut EntityManager) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 0,

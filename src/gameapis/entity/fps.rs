@@ -1,12 +1,12 @@
 use super::*;
 
-pub fn create_fps(manager: &mut EntityManager) {
-    let id = manager.create_entity();
-    manager
-        .components
+pub fn create_fps(emngr: &mut EntityManager) {
+    let id = emngr.create_entity();
+    emngr
+        .coms
         .fpsmeasures
         .insert(id, FpsMeasure::default());
-    manager.components.texts.insert(
+    emngr.coms.texts.insert(
         id,
         Text {
             text: String::new(),

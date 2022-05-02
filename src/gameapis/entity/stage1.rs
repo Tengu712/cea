@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_stage1(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 1,
@@ -10,7 +10,7 @@ pub fn create_stage1(manager: &mut EntityManager) -> EntityID {
             count_max: 3600,
         },
     );
-    manager.components.texts.insert(
+    emngr.coms.texts.insert(
         id,
         Text {
             text: String::from("0"),
@@ -26,7 +26,7 @@ pub fn create_stage1(manager: &mut EntityManager) -> EntityID {
             align: TextAlign::Right,
         },
     );
-    manager.components.valuetexts.insert(
+    emngr.coms.valuetexts.insert(
         id,
         ValueText {
             format: Some(|n| format!("{}", (n.count_max - n.count) / 60)),

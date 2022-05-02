@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn unique_stage1_1(manager: &mut EntityManager) {
-    let counter = match manager.unique_ids.get(UNIQUE_STAGE1) {
-        Some(id) => match manager.components.counters.get(id) {
+pub fn unique_stage1_1(emngr: &mut EntityManager) {
+    let counter = match emngr.unique_ids.get(UNIQUE_STAGE1) {
+        Some(id) => match emngr.coms.counters.get(id) {
             Some(n) => n.clone(),
             None => return,
         },
@@ -11,8 +11,8 @@ pub fn unique_stage1_1(manager: &mut EntityManager) {
     if counter.count % 10 != 0 {
         return;
     }
-    let e_pos = match manager.unique_ids.get(UNIQUE_ENEMY) {
-        Some(id) => match manager.components.positions.get(id) {
+    let e_pos = match emngr.unique_ids.get(UNIQUE_ENEMY) {
+        Some(id) => match emngr.coms.positions.get(id) {
             Some(e_pos) => e_pos.clone(),
             None => return,
         },
@@ -26,7 +26,7 @@ pub fn unique_stage1_1(manager: &mut EntityManager) {
             i % 2 == 0
         };
         let _ = create_bullet(
-            manager,
+            emngr,
             BulletKind::BigCircle,
             e_pos.x,
             e_pos.y,

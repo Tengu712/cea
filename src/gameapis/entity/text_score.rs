@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_score(manager: &mut EntityManager, score: i64) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 0,
@@ -10,7 +10,7 @@ pub fn create_score(manager: &mut EntityManager, score: i64) -> EntityID {
             count_max: score,
         },
     );
-    manager.components.texts.insert(
+    emngr.coms.texts.insert(
         id,
         Text {
             text: String::default(),
@@ -26,7 +26,7 @@ pub fn create_score(manager: &mut EntityManager, score: i64) -> EntityID {
             align: TextAlign::Left,
         },
     );
-    manager.components.valuetexts.insert(
+    emngr.coms.valuetexts.insert(
         id,
         ValueText {
             format: Some(|n| format!("{:>012}", n.count)),

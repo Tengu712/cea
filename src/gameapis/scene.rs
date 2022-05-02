@@ -12,8 +12,8 @@ pub struct Title {}
 impl Title {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
         world.clear();
-        create_fps(&mut world.manager);
-        create_title_text(&mut world.manager);
+        create_fps(&mut world.emngr);
+        create_title_text(&mut world.emngr);
         world.systems.push(system_update_counter);
         world.systems.push(system_fpsmeasure);
         world.systems.push(script_title_text);
@@ -22,7 +22,7 @@ impl Title {
 }
 impl Scene for Title {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        if world.manager.input.z == 1 {
+        if world.emngr.input.z == 1 {
             Some(Stage::new(world))
         } else {
             None
@@ -40,38 +40,41 @@ pub struct Stage {
     pub stage: EntityID,
     pub e_hp: EntityID,
     pub rate: EntityID,
-    pub delay_count: Option<EntityID>,
+    pub rate_delay: EntityID,
+    pub snap_delay: EntityID,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
         world.clear();
-        world.manager.camera.rot.x = -30.0f32.to_radians();
+        world.emngr.camera.rot.x = -30.0f32.to_radians();
         // entity
-        let _ = create_fps(&mut world.manager);
-        let _ = create_floor(&mut world.manager, 0);
-        let _ = create_floor(&mut world.manager, 1);
-        let _ = create_floor(&mut world.manager, 2);
-        let _ = create_frame(&mut world.manager);
-        let enemy = create_enemy(&mut world.manager);
-        let e_hp = create_enemy_hp(&mut world.manager, 2000, enemy);
-        let player = create_player(&mut world.manager);
-        let player_slow1 = create_player_slow(&mut world.manager, player, true);
-        let player_slow2 = create_player_slow(&mut world.manager, player, false);
-        let rate = create_player_rate(&mut world.manager, player);
-        let score = create_score(&mut world.manager, 0);
-        let graze = create_graze(&mut world.manager, 0);
-        let stage = create_stage1(&mut world.manager);
-        let camera = create_camera(&mut world.manager);
-        let camera_lean = create_camera_lean(&mut world.manager);
+        let _ = create_fps(&mut world.emngr);
+        let _ = create_floor(&mut world.emngr, 0);
+        let _ = create_floor(&mut world.emngr, 1);
+        let _ = create_floor(&mut world.emngr, 2);
+        let _ = create_frame(&mut world.emngr);
+        let enemy = create_enemy(&mut world.emngr);
+        let e_hp = create_enemy_hp(&mut world.emngr, 2000, enemy);
+        let player = create_player(&mut world.emngr);
+        let player_slow1 = create_player_slow(&mut world.emngr, player, true);
+        let player_slow2 = create_player_slow(&mut world.emngr, player, false);
+        let rate = create_player_rate(&mut world.emngr, player);
+        let rate_delay = create_delay_count(&mut world.emngr, 60);
+        let snap_delay = create_delay_count(&mut world.emngr, 10);
+        let score = create_score(&mut world.emngr, 0);
+        let graze = create_graze(&mut world.emngr, 0);
+        let stage = create_stage1(&mut world.emngr);
+        let camera = create_camera(&mut world.emngr);
+        let camera_lean = create_camera_lean(&mut world.emngr);
         // Unique
-        world.manager.unique_ids.insert(UNIQUE_CAMERA, camera);
+        world.emngr.unique_ids.insert(UNIQUE_CAMERA, camera);
         world
-            .manager
+            .emngr
             .unique_ids
             .insert(UNIQUE_CAMERA_LEAN, camera_lean);
-        world.manager.unique_ids.insert(UNIQUE_ENEMY, enemy);
-        world.manager.unique_ids.insert(UNIQUE_PLAYER, player);
-        world.manager.unique_ids.insert(UNIQUE_STAGE1, stage);
+        world.emngr.unique_ids.insert(UNIQUE_ENEMY, enemy);
+        world.emngr.unique_ids.insert(UNIQUE_PLAYER, player);
+        world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage);
         // script
         world.systems.push(unique_stage1_1);
         world.systems.push(unique_camera);
@@ -100,119 +103,132 @@ impl Stage {
             stage,
             e_hp,
             rate,
-            delay_count: None,
+            rate_delay,
+            snap_delay,
         })
     }
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
         // Reserve message
-        let msg_hit = world
-            .manager
-            .messages
-            .remove(MESSAGE_PLAYER_HIT)
-            .unwrap_or(0);
+        let msg_hit = world.emngr.messages.remove(MESSAGE_PLAYER_HIT).unwrap_or(0);
         let msg_hit_fragile = world
-            .manager
+            .emngr
             .messages
             .remove(MESSAGE_PLAYER_HIT_FRAGILE)
             .unwrap_or(0);
         let msg_graze = world
-            .manager
+            .emngr
             .messages
             .remove(MESSAGE_PLAYER_GRAZE)
             .unwrap_or(0);
-        let msg_enemy_hit = world
-            .manager
-            .messages
-            .remove(MESSAGE_ENEMY_HIT)
-            .unwrap_or(0);
-        // Delay
-        let is_dead = if let Some(n) = self.delay_count {
-            if let Some(counter) = world.manager.components.counters.get(&n) {
-                counter.count == counter.count_max
-            } else {
-                false
-            }
+        let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Check snap delay is end
+        let is_dead = if let Some(counter) = world.emngr.coms.counters.get(&self.snap_delay) {
+            counter.count == counter.count_max
         } else {
             false
         };
         // Hit
         let mut is_snap = 0;
         if msg_hit > 0 || is_dead {
-            world.manager.remove_entity(&self.player);
-            world.manager.remove_entity(&self.player_slow1);
-            world.manager.remove_entity(&self.player_slow2);
-            world.manager.remove_entity(&self.rate);
-            if let Some(n) = self.delay_count {
-                world.manager.remove_entity(&n);
-                self.delay_count = None;
-            }
-            self.player = create_player(&mut world.manager);
-            self.player_slow1 = create_player_slow(&mut world.manager, self.player, true);
-            self.player_slow2 = create_player_slow(&mut world.manager, self.player, false);
-            self.rate = create_player_rate(&mut world.manager, self.player);
-            world.manager.unique_ids.insert(UNIQUE_PLAYER, self.player);
-        } else if let Some(n) = self.delay_count {
+            world.emngr.remove_entity(&self.player);
+            world.emngr.remove_entity(&self.player_slow1);
+            world.emngr.remove_entity(&self.player_slow2);
+            world.emngr.remove_entity(&self.rate);
+            world.emngr.coms.counters.disactive(&self.snap_delay);
+            self.player = create_player(&mut world.emngr);
+            self.player_slow1 = create_player_slow(&mut world.emngr, self.player, true);
+            self.player_slow2 = create_player_slow(&mut world.emngr, self.player, false);
+            self.rate = create_player_rate(&mut world.emngr, self.player);
+            world.emngr.unique_ids.insert(UNIQUE_PLAYER, self.player);
+        } else if world.emngr.coms.counters.get(&self.snap_delay).is_some() {
             // If down Z key during delay, player regain moving and shooting.
-            if world.manager.input.z == 1 {
-                world.manager.components.counters.active(&self.player);
-                world.manager.components.velocities.active(&self.player);
-                world.manager.remove_entity(&n);
-                self.delay_count = None;
+            if world.emngr.input.z == 1 {
+                world.emngr.coms.counters.active(&self.player);
+                world.emngr.coms.velocities.active(&self.player);
+                world.emngr.coms.counters.disactive(&self.snap_delay);
                 is_snap = 1;
             }
         } else if msg_hit_fragile > 0 {
             // If hit by fragile bullet, player cannot move and shoot.
-            world.manager.components.counters.disactive(&self.player);
-            world.manager.components.velocities.disactive(&self.player);
+            world.emngr.coms.counters.disactive(&self.player);
+            world.emngr.coms.velocities.disactive(&self.player);
             // And delay is starting.
-            self.delay_count = Some(create_delay_count(&mut world.manager));
+            world.emngr.coms.counters.active(&self.snap_delay);
+            if let Some(n) = world.emngr.coms.counters.get_mut(&self.snap_delay) {
+                n.count = 0;
+            }
         }
-        // Add rate
-        let rate = if let Some(rate_counter) = world.manager.components.counters.get_mut(&self.rate)
-        {
-            let add = msg_graze * 10 + is_snap * 200;
-            rate_counter.count = (rate_counter.count + add).min(rate_counter.count_max);
-            (rate_counter.count as f32) / (rate_counter.count_max as f32) * 100.0
-        } else {
-            0.0
-        };
-        // Subtract enemy hp
-        let (enemy_hp, enemy_hp_max) =
-            if let Some(enemy_hp) = world.manager.components.counters.get_mut(&self.e_hp) {
-                enemy_hp.count -= msg_enemy_hit;
-                (enemy_hp.count, enemy_hp.count_max)
+        // Addition of rate
+        let mut add_rate = msg_graze * 10 + is_snap * 200;
+        if let Some(n) = world.emngr.coms.counters.get_mut(&self.rate_delay) {
+            if add_rate > 0 {
+                n.count = 0;
             } else {
-                (0, 0)
-            };
+                add_rate -= (n.count == n.count_max) as i64 + (world.emngr.input.z > 0) as i64;
+            }
+        }
+        if let Some(rate_counter) = world.emngr.coms.counters.get_mut(&self.rate) {
+            rate_counter.count = (rate_counter.count + add_rate).min(rate_counter.count_max);
+        }
+        // Subtraction of enemy hp
+        if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
+            enemy_hp.count -= msg_enemy_hit;
+        }
         // Add graze
-        if let Some(graze_counter) = world.manager.components.counters.get_mut(&self.graze) {
+        if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
             graze_counter.count += msg_graze;
             graze_counter.count_max += msg_graze;
         }
         // Add score
-        if let Some(score_counter) = world.manager.components.counters.get_mut(&self.score) {
+        if let Some(score_counter) = world.emngr.coms.counters.get_mut(&self.score) {
             let add = msg_graze * 30 + msg_enemy_hit * 10;
             score_counter.count += add;
             score_counter.count_max += add;
         }
         // Print console
-        let (time_count, time_count_max) =
-            if let Some(n) = world.manager.components.counters.get(&self.stage) {
-                (n.count, n.count_max)
-            } else {
-                (0, 0)
-            };
-        println!("\x1b[2KTime : {} / {}", time_count, time_count_max);
-        println!("\x1b[2KRate : {:.0} %", rate);
         println!(
             "\x1b[2KBulletNumber : {} / {}",
-            world.manager.bullet_ids.len(),
+            world.emngr.bullet_ids.len(),
             BULLET_MAX_NUM
         );
-        println!("\x1b[2KEnemyHP : {} / {}", enemy_hp, enemy_hp_max);
-        println!("\x1b[5A");
+        println!(
+            "\x1b[2KRate : {:.0} %",
+            100.0
+                * world
+                    .emngr
+                    .coms
+                    .counters
+                    .get(&self.rate)
+                    .map(|n| n.count)
+                    .unwrap_or(0) as f32
+                / world
+                    .emngr
+                    .coms
+                    .counters
+                    .get(&self.rate)
+                    .map(|n| n.count_max)
+                    .unwrap_or(1) as f32
+        );
+        println!(
+            "\x1b[2KEnemyHP : {} / {}",
+            world
+                .emngr
+                .coms
+                .counters
+                .get(&self.e_hp)
+                .map(|n| n.count)
+                .unwrap_or(0),
+            world
+                .emngr
+                .coms
+                .counters
+                .get(&self.e_hp)
+                .map(|n| n.count_max)
+                .unwrap_or(0),
+        );
+        println!("\x1b[4A");
         None
     }
 }

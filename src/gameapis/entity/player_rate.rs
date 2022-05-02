@@ -1,9 +1,9 @@
 use super::*;
 
-pub fn create_player_rate(manager: &mut EntityManager, player_id: EntityID) -> EntityID {
-    let id = manager.create_entity();
-    manager.insert_scripted_id(id, type_name::<MarkerGage>());
-    manager.components.counters.insert(
+pub fn create_player_rate(emngr: &mut EntityManager, player_id: EntityID) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.insert_scripted_id(id, type_name::<MarkerGage>());
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 0,
@@ -11,7 +11,7 @@ pub fn create_player_rate(manager: &mut EntityManager, player_id: EntityID) -> E
             count_max: 1000,
         },
     );
-    manager.components.positions.insert(
+    emngr.coms.positions.insert(
         id,
         Vector {
             x: 0.0,
@@ -19,11 +19,11 @@ pub fn create_player_rate(manager: &mut EntityManager, player_id: EntityID) -> E
             z: Z_GAGE,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .sameposition2ds
         .insert(id, SamePosition2D(player_id));
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_RATE),

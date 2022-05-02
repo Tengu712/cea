@@ -2,9 +2,9 @@ use super::*;
 
 const FLOOR_SIZE: f32 = 350.0;
 
-pub fn create_floor(manager: &mut EntityManager, cnt: u32) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.sprite3ds.insert(
+pub fn create_floor(emngr: &mut EntityManager, cnt: u32) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.sprite3ds.insert(
         id,
         Sprite {
             imgid: Some(IMGID_FLOOR),

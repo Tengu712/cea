@@ -1,9 +1,9 @@
 use super::*;
 
-pub fn create_enemy_hp(manager: &mut EntityManager, hp_max: i64, enemy_id: EntityID) -> EntityID {
-    let id = manager.create_entity();
-    manager.insert_scripted_id(id, type_name::<MarkerGage>());
-    manager.components.counters.insert(
+pub fn create_enemy_hp(emngr: &mut EntityManager, hp_max: i64, enemy_id: EntityID) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.insert_scripted_id(id, type_name::<MarkerGage>());
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 0,
@@ -11,7 +11,7 @@ pub fn create_enemy_hp(manager: &mut EntityManager, hp_max: i64, enemy_id: Entit
             count_max: hp_max,
         },
     );
-    manager.components.positions.insert(
+    emngr.coms.positions.insert(
         id,
         Vector {
             x: 0.0,
@@ -19,11 +19,11 @@ pub fn create_enemy_hp(manager: &mut EntityManager, hp_max: i64, enemy_id: Entit
             z: Z_GAGE,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .sameposition2ds
         .insert(id, SamePosition2D(enemy_id));
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_HP),

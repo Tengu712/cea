@@ -73,7 +73,7 @@ fn start_app() -> Result<(), windows::core::Error> {
     );
     print!("\r\x1b[2K    * input data");
     let mut input = Input::default();
-    print!("\r\x1b[2K    * game components");
+    print!("\r\x1b[2K    * game coms");
     let mut world = World::default();
     let mut scene = Title::new(&mut world);
     println!("\r\x1b[2K\nAll clear. The game is starting.\n");
@@ -94,18 +94,18 @@ fn start_app() -> Result<(), windows::core::Error> {
         d3dapp.set_rtv(true);
         cdata.mat_view = Matrix4x4::new_view(
             [
-                world.manager.camera.pos.x,
-                world.manager.camera.pos.y,
-                world.manager.camera.pos.z,
+                world.emngr.camera.pos.x,
+                world.emngr.camera.pos.y,
+                world.emngr.camera.pos.z,
             ],
             [
-                world.manager.camera.rot.x,
-                world.manager.camera.rot.y,
-                world.manager.camera.rot.z,
+                world.emngr.camera.rot.x,
+                world.emngr.camera.rot.y,
+                world.emngr.camera.rot.z,
             ],
         );
         cdata.mat_proj = mat_proj_3d.clone();
-        for (_, s, v) in world.manager.components.sprite3ds.iter() {
+        for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
             if !s.is_active() {
                 continue;
             }
@@ -121,8 +121,8 @@ fn start_app() -> Result<(), windows::core::Error> {
         d3dapp.set_rtv(false);
         cdata.mat_view = mat_view.clone();
         cdata.mat_proj = mat_proj.clone();
-        let mut sprites_t = Vec::with_capacity(world.manager.components.sprites.len());
-        for (k, s, v) in world.manager.components.sprites.iter() {
+        let mut sprites_t = Vec::with_capacity(world.emngr.coms.sprites.len());
+        for (k, s, v) in world.emngr.coms.sprites.iter() {
             if !s.is_active() {
                 continue;
             }
@@ -130,7 +130,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         }
         sprites_t.sort_by(|(z1, _), (z2, _)| z1.partial_cmp(z2).unwrap());
         for (_, k) in sprites_t {
-            if let Some(v) = world.manager.components.sprites.get(k) {
+            if let Some(v) = world.emngr.coms.sprites.get(k) {
                 match v.imgid {
                     Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
                     None => cdata = d3dapp.set_d3dimage(None, cdata),
@@ -141,7 +141,7 @@ fn start_app() -> Result<(), windows::core::Error> {
             }
         }
         // Draw 2d text
-        for (_, s, v) in world.manager.components.texts.iter() {
+        for (_, s, v) in world.emngr.coms.texts.iter() {
             if !s.is_active() {
                 continue;
             }

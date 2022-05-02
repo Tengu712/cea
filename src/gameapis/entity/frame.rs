@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_frame(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.sprites.insert(
+pub fn create_frame(emngr: &mut EntityManager) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_FRAME),

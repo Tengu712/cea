@@ -5,17 +5,17 @@ const SLOWCIRCLE_SIZE: f32 = 140.0;
 pub struct MarkerPlayerSlow;
 
 /// Change player slow circle's animation with input.
-pub fn script_player_slow(manager: &mut EntityManager) {
-    if let Some(ids) = manager.scripted_ids.get(type_name::<MarkerPlayerSlow>()) {
+pub fn script_player_slow(emngr: &mut EntityManager) {
+    if let Some(ids) = emngr.scripted_ids.get(type_name::<MarkerPlayerSlow>()) {
         for id in ids {
-            let cnt = manager.input.s;
+            let cnt = emngr.input.s;
             if cnt > 0 {
-                manager.components.sprites.active(id);
+                emngr.coms.sprites.active(id);
             } else {
-                manager.components.sprites.disactive(id);
+                emngr.coms.sprites.disactive(id);
                 continue;
             }
-            if let Some(n) = manager.components.sprites.get_mut(id) {
+            if let Some(n) = emngr.coms.sprites.get_mut(id) {
                 let abs = n.rotation.z.abs();
                 let sign = if abs == 0.0 {
                     1.0

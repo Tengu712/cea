@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.velocities.insert(
+pub fn create_player_bullet(emngr: &mut EntityManager, x: f32, y: f32) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.velocities.insert(
         id,
         Velocity {
             direction: Vector {
@@ -13,22 +13,22 @@ pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> Enti
             speed: 40.0,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .positions
         .insert(id, Vector { x, y, z: Z_BULLET });
-    manager
-        .components
+    emngr
+        .coms
         .removerects
         .insert(id, BULLET_REMOVE_RECT);
-    manager.components.collisions.insert(
+    emngr.coms.collisions.insert(
         id,
         Collision {
             r: 100.0,
             team: TEAM_PLAYER_BULLET,
         },
     );
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_BUL_FLAN),

@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_player(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_player(emngr: &mut EntityManager) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 1,
@@ -10,7 +10,7 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
             count_max: std::i64::MAX,
         },
     );
-    manager.components.positions.insert(
+    emngr.coms.positions.insert(
         id,
         Vector {
             x: 0.0,
@@ -18,7 +18,7 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
             z: Z_PLAYER,
         },
     );
-    manager.components.restricts.insert(
+    emngr.coms.restricts.insert(
         id,
         Rect3D {
             l: GAME_LEFT + 10.0,
@@ -29,7 +29,7 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
             f: 1000.0,
         },
     );
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_FLAN_B0),
@@ -42,8 +42,8 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
             ..Default::default()
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .velocities
         .insert(id, Velocity::default());
     id

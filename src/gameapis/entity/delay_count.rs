@@ -1,13 +1,13 @@
 use super::*;
 
-pub fn create_delay_count(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.counters.insert(
+pub fn create_delay_count(emngr: &mut EntityManager, count_max: i64) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.counters.insert(
         id,
         Counter {
             speed: 1,
             count: 0,
-            count_max: 10,
+            count_max,
         },
     );
     id

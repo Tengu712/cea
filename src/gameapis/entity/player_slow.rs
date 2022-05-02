@@ -1,9 +1,9 @@
 use super::*;
 
-pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg: bool) -> EntityID {
-    let id = manager.create_entity();
-    manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
-    manager.components.positions.insert(
+pub fn create_player_slow(emngr: &mut EntityManager, player_id: EntityID, flg: bool) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
+    emngr.coms.positions.insert(
         id,
         Vector {
             x: 0.0,
@@ -11,11 +11,11 @@ pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg:
             z: Z_PLAYER_SLOW,
         },
     );
-    manager
-        .components
+    emngr
+        .coms
         .sameposition2ds
         .insert(id, SamePosition2D(player_id));
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_SLOWCIRCLE),

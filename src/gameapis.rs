@@ -32,18 +32,18 @@ pub struct Camera {
 
 #[derive(Default)]
 pub struct World {
-    pub manager: entity::EntityManager,
+    pub emngr: entity::EntityManager,
     pub systems: Vec<fn(&mut entity::EntityManager)>,
 }
 impl World {
     pub fn update(&mut self, input: &Input) {
-        self.manager.input = input.clone();
+        self.emngr.input = input.clone();
         for system in &self.systems {
-            system(&mut self.manager);
+            system(&mut self.emngr);
         }
     }
     pub fn clear(&mut self) {
-        self.manager = Default::default();
+        self.emngr = Default::default();
         self.systems = Default::default();
     }
 }

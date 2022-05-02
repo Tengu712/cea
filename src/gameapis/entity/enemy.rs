@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn create_enemy(manager: &mut EntityManager) -> EntityID {
-    let id = manager.create_entity();
-    manager.components.positions.insert(
+pub fn create_enemy(emngr: &mut EntityManager) -> EntityID {
+    let id = emngr.create_entity();
+    emngr.coms.positions.insert(
         id,
         Vector {
             x: 0.0,
@@ -10,7 +10,7 @@ pub fn create_enemy(manager: &mut EntityManager) -> EntityID {
             z: Z_ENEMY,
         },
     );
-    manager.components.sprites.insert(
+    emngr.coms.sprites.insert(
         id,
         Sprite {
             imgid: Some(IMGID_REMILIA_F0),
