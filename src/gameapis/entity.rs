@@ -1,5 +1,7 @@
 pub mod bullet_enemy;
 pub mod bullet_player;
+pub mod camera;
+pub mod camera_lean;
 pub mod constant;
 pub mod enemy;
 pub mod enemy_hp;
@@ -9,14 +11,14 @@ pub mod frame;
 pub mod player;
 pub mod player_slow;
 pub mod stage1;
-pub mod script_camera;
-pub mod script_camera_lean;
 pub mod text_graze;
 pub mod text_score;
 pub mod text_title;
 
 pub use bullet_enemy::*;
 pub use bullet_player::*;
+pub use camera::*;
+pub use camera_lean::*;
 pub use constant::*;
 pub use enemy::*;
 pub use enemy_hp::*;
@@ -26,8 +28,6 @@ pub use frame::*;
 pub use player::*;
 pub use player_slow::*;
 pub use stage1::*;
-pub use script_camera::*;
-pub use script_camera_lean::*;
 pub use text_graze::*;
 pub use text_score::*;
 pub use text_title::*;
@@ -42,7 +42,7 @@ pub struct EntityManager {
     pub components: Components,
     pub unique_ids: HashMap<EntityKey, EntityID>,
     pub bullet_ids: HashSet<EntityID>,
-    pub messages: HashMap<MessageKey, usize>,
+    pub messages: HashMap<MessageKey, i64>,
     pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
     pub camera: Camera,

@@ -52,7 +52,7 @@ impl Stage {
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
-        let e_hp = create_enemy_hp(&mut world.manager, 2000);
+        let e_hp = create_enemy_hp(&mut world.manager, 2000, enemy);
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
         let stage = create_stage1(&mut world.manager);
@@ -76,6 +76,7 @@ impl Stage {
         world.systems.push(unique_player_hit);
         world.systems.push(unique_player_shot);
         world.systems.push(script_player_slow);
+        world.systems.push(script_gage);
         // system
         world.systems.push(system_fpsmeasure);
         world.systems.push(system_update_counter);
@@ -96,6 +97,7 @@ impl Stage {
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
+        // Reserve message
         let _ = world
             .manager
             .messages
@@ -111,17 +113,26 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_ENEMY_HIT)
             .unwrap_or(0);
+        // Subtract enemy hp
         let (enemy_hp, enemy_hp_max) =
             if let Some(enemy_hp) = world.manager.components.counters.get_mut(&self.e_hp) {
-                enemy_hp.count += msg_enemy_hit as i64;
+                enemy_hp.count -= msg_enemy_hit;
                 (enemy_hp.count, enemy_hp.count_max)
             } else {
                 (0, 0)
             };
+        // Add graze
         if let Some(graze_counter) = world.manager.components.counters.get_mut(&self.graze) {
-            graze_counter.count += msg_graze as i64;
-            graze_counter.count_max += msg_graze as i64;
+            graze_counter.count += msg_graze;
+            graze_counter.count_max += msg_graze;
         }
+        // Add score
+        if let Some(score_counter) = world.manager.components.counters.get_mut(&self.score) {
+            let add = msg_graze * 30 + msg_enemy_hit * 10;
+            score_counter.count += add;
+            score_counter.count_max += add;
+        }
+        // Print console
         let (time_count, time_count_max) =
             if let Some(n) = world.manager.components.counters.get(&self.stage) {
                 (n.count, n.count_max)
@@ -134,11 +145,7 @@ impl Scene for Stage {
             world.manager.bullet_ids.len(),
             BULLET_MAX_NUM
         );
-        println!(
-            "\x1b[2KEnemyHP : {} / {}",
-            (enemy_hp_max - enemy_hp),
-            enemy_hp_max
-        );
+        println!("\x1b[2KEnemyHP : {} / {}", enemy_hp, enemy_hp_max);
         println!("\x1b[4A");
         None
     }

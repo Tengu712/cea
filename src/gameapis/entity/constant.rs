@@ -23,8 +23,9 @@ pub const BULLET_REMOVE_RECT: Rect3D = Rect3D {
 };
 pub const BULLET_MAX_NUM: usize = 640;
 
-pub const Z_ENEMY: f32 = -5.0;
-pub const Z_PLAYER: f32 = -4.0;
-pub const Z_BULLET: f32 = -3.0;
-pub const Z_PLAYER_SLOW: f32 = -2.0;
+pub const Z_ENEMY: f32 = -6.0;
+pub const Z_PLAYER: f32 = -5.0;
+pub const Z_BULLET: f32 = -4.0;
+pub const Z_PLAYER_SLOW: f32 = -3.0;
+pub const Z_GAGE: f32 = -2.0;
 pub const Z_FRAME: f32 = -1.0;
