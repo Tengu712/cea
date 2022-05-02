@@ -1,5 +1,32 @@
 use super::*;
 
+/*
+pub(super) const BUL_CIRCLE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE,
+    size: 30.0,
+    r: 10.0,
+    is_fragile: false,
+};
+pub(super) const BUL_CIRCLE_FRAGILE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE_FRAGILE,
+    size: 30.0,
+    r: 10.0,
+    is_fragile: true,
+};
+pub(super) const BUL_MID_CIRCLE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE,
+    size: 50.0,
+    r: 20.0,
+    is_fragile: false,
+};
+pub(super) const BUL_MID_CIRCLE_FRAGILE: BulletKind = BulletKind {
+    imgid: IMGID_BUL_CIRCLE_FRAGILE,
+    size: 50.0,
+    r: 20.0,
+    is_fragile: true,
+};
+*/
+
 pub enum BulletKind {
     BigCircle,
 }

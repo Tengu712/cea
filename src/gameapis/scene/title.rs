@@ -1,0 +1,24 @@
+use super::*;
+
+#[derive(Default)]
+pub struct Title;
+impl Title {
+    pub fn new(world: &mut World) -> Box<dyn Scene> {
+        world.clear();
+        create_fps(&mut world.emngr);
+        create_title_text(&mut world.emngr);
+        world.systems.push(system_update_counter);
+        world.systems.push(system_fpsmeasure);
+        world.systems.push(script_title_text);
+        Box::new(Title)
+    }
+}
+impl Scene for Title {
+    fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
+        if world.emngr.input.z == 1 {
+            Some(super::stage::Stage::new(world))
+        } else {
+            None
+        }
+    }
+}

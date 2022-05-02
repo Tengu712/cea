@@ -1,108 +1,99 @@
-mod bg;
-mod bullet;
-mod constant;
-mod enemy;
-mod entity;
-mod gameover;
-mod hp;
-mod logue;
-mod player;
-mod rate;
+mod convinient;
+pub mod new;
+
+pub use new::*;
 
 use super::*;
 
-const WIDTH: f32 = 1280.0;
-const HEIGHT: f32 = 960.0;
-const GAME_LEFT: f32 = -392.0;
-const GAME_RIGHT: f32 = 392.0;
-const GAME_TOP: f32 = 480.0;
-const GAME_BOTTOM: f32 = -480.0;
-
-enum State {
-    Start,
-    Shoot,
-    End,
-    GameOver,
+#[derive(Default)]
+pub struct Stage {
+    pub player: EntityID,
+    pub player_slow1: EntityID,
+    pub player_slow2: EntityID,
+    pub score: EntityID,
+    pub graze: EntityID,
+    pub stage: EntityID,
+    pub e_hp: EntityID,
+    pub rate: EntityID,
+    pub rate_delay: EntityID,
+    pub snap_delay: EntityID,
 }
-
-pub(in super::super) struct Stage {
-    cnt: u32,
-    stage: usize,
-    state: State,
-    logue: logue::Logue,
-    entity: entity::Entity,
-    bg: bg::Background,
-    gameover: gameover::GameOver,
-}
-impl Stage {
-    pub(super) fn new() -> Self {
-        Self {
-            cnt: 0,
-            stage: 0,
-            state: State::Start,
-            logue: logue::Logue::new(),
-            entity: entity::Entity::new(0, 0),
-            bg: bg::Background::new(),
-            gameover: gameover::GameOver::new(),
+impl Scene for Stage {
+    fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
+        // Reserve message
+        let msg_hit = world.emngr.messages.remove(MESSAGE_PLAYER_HIT).unwrap_or(0);
+        let msg_hit_fragile = world
+            .emngr
+            .messages
+            .remove(MESSAGE_PLAYER_HIT_FRAGILE)
+            .unwrap_or(0);
+        let msg_graze = world
+            .emngr
+            .messages
+            .remove(MESSAGE_PLAYER_GRAZE)
+            .unwrap_or(0);
+        let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Check hit
+        let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
+        // Add rate
+        self.add_rate(world, msg_graze, is_snap);
+        // Subtraction of enemy hp
+        if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
+            enemy_hp.count -= msg_enemy_hit;
         }
-    }
-    pub(super) fn update(self, reqs: &mut Vec<Request>, input: &Input) -> Scene {
-        let cnt = self.cnt + 1;
-        // ========== ========== //
-        let logue = match self.state {
-            State::Start | State::End => self.logue.update(input.z),
-            _ => self.logue,
-        };
-        let state = match self.state {
-            State::Start if logue.is_end_start_log(self.stage) => State::Shoot,
-            State::End if logue.is_end_log(self.stage) => return Scene::Stage(Stage::new()),
-            _ => self.state,
-        };
-        let gameover = match state {
-            State::GameOver if self.gameover.is_end() => {
-                return Scene::Title(super::title::Title::new())
-            }
-            State::GameOver => self.gameover.update(),
-            _ => self.gameover,
-        };
-        let is_shooting = match state {
-            State::Shoot => true,
-            _ => false,
-        };
-        let is_game_over = match state {
-            State::GameOver => true,
-            _ => false,
-        };
-        // 
-        let entity = self.entity.update(is_shooting, is_game_over, self.stage, input);
-        let state = if is_shooting && entity.is_game_over() {
-            State::GameOver
-        } else if is_shooting && entity.is_game_clear(self.stage) {
-            State::End
-        } else {
-            state
-        };
-        // Back ground
-        let bg = self.bg;
-        // ========== Drawing ========== //
-        bg.push_reqs(reqs, cnt);
-        entity.push_reqs(reqs, self.stage, is_shooting, is_game_over);
-        reqs.push(IMGID_FRAME.pack());
-        reqs.push(CDataDiff::new().set_scl([WIDTH, HEIGHT]).pack());
-        reqs.push(Request::DrawImage);
-        match state {
-            State::Start | State::End => logue.push_reqs(reqs, self.stage),
-            State::GameOver => gameover.push_reqs(reqs),
-            _ => (),
+        // Add graze
+        if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
+            graze_counter.count += msg_graze;
+            graze_counter.count_max += msg_graze;
         }
-        Scene::Stage(Stage {
-            cnt,
-            stage: self.stage,
-            state,
-            logue,
-            entity,
-            bg,
-            gameover,
-        })
+        // Add score
+        if let Some(score_counter) = world.emngr.coms.counters.get_mut(&self.score) {
+            let add = msg_graze * 30 + msg_enemy_hit * 10;
+            score_counter.count += add;
+            score_counter.count_max += add;
+        }
+        // Print console
+        println!(
+            "\x1b[2KBulletNumber : {} / {}",
+            world.emngr.bullet_ids.len(),
+            BULLET_MAX_NUM
+        );
+        println!(
+            "\x1b[2KRate : {:.0} %",
+            100.0
+                * world
+                    .emngr
+                    .coms
+                    .counters
+                    .get(&self.rate)
+                    .map(|n| n.count)
+                    .unwrap_or(0) as f32
+                / world
+                    .emngr
+                    .coms
+                    .counters
+                    .get(&self.rate)
+                    .map(|n| n.count_max)
+                    .unwrap_or(1) as f32
+        );
+        println!(
+            "\x1b[2KEnemyHP : {} / {}",
+            world
+                .emngr
+                .coms
+                .counters
+                .get(&self.e_hp)
+                .map(|n| n.count)
+                .unwrap_or(0),
+            world
+                .emngr
+                .coms
+                .counters
+                .get(&self.e_hp)
+                .map(|n| n.count_max)
+                .unwrap_or(0),
+        );
+        println!("\x1b[4A");
+        None
     }
 }
