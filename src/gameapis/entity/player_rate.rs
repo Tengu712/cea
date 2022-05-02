@@ -26,7 +26,7 @@ pub fn create_player_rate(manager: &mut EntityManager, player_id: EntityID) -> E
     manager.components.sprites.insert(
         id,
         Sprite {
-            imgid: Some(IMGID_HP),
+            imgid: Some(IMGID_RATE),
             scaling: Vector {
                 x: 160.0,
                 y: 160.0,
