@@ -7,7 +7,7 @@ pub fn create_graze(manager: &mut EntityManager, graze: u64) -> EntityID {
         Counter {
             speed: 0,
             count: graze,
-            count_max: std::u64::MAX,
+            count_max: graze,
         },
     );
     manager.components.texts.insert(

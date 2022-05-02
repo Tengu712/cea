@@ -7,7 +7,7 @@ pub fn create_score(manager: &mut EntityManager, score: u64) -> EntityID {
         Counter {
             speed: 0,
             count: score,
-            count_max: std::u64::MAX,
+            count_max: score,
         },
     );
     manager.components.texts.insert(

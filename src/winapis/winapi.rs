@@ -8,6 +8,24 @@ use windows::{
     },
 };
 
+/// Get std handle.
+pub fn get_std_handle() -> HANDLE {
+    unsafe {
+        windows::Win32::System::Console::GetStdHandle(
+            windows::Win32::System::Console::STD_OUTPUT_HANDLE,
+        )
+    }
+}
+/// Set console mode with enable virtual terminal processing
+pub fn set_console_mode_vtp(handle: &HANDLE) -> Result<()> {
+    let mut mode = windows::Win32::System::Console::CONSOLE_MODE(0);
+    unsafe { windows::Win32::System::Console::GetConsoleMode(handle, &mut mode).ok()? };
+    let mode = windows::Win32::System::Console::CONSOLE_MODE(
+        mode.0 | windows::Win32::System::Console::ENABLE_VIRTUAL_TERMINAL_PROCESSING.0,
+    );
+    unsafe { windows::Win32::System::Console::SetConsoleMode(handle, mode).ok()? };
+    Ok(())
+}
 /// Show a message box.
 pub fn show_messagebox<'a, T, U>(message: T, title: U)
 where

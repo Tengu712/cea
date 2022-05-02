@@ -11,6 +11,7 @@ use std::collections::HashSet;
 pub type EntityID = usize;
 pub type EntityKey = &'static str;
 pub type ScriptKey = &'static str;
+pub type MessageKey = &'static str;
 
 #[derive(Default, Clone)]
 pub struct Input {

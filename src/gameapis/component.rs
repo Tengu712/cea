@@ -1,3 +1,4 @@
+pub mod collision;
 pub mod counter;
 pub mod fpsmeasure;
 pub mod sameposition2d;
@@ -6,6 +7,7 @@ pub mod text;
 pub mod valuetext;
 pub mod velocity;
 
+pub use collision::*;
 pub use counter::*;
 pub use fpsmeasure::*;
 pub use sameposition2d::*;
@@ -111,6 +113,7 @@ impl<T> CContainer<T> {
 
 #[derive(Default)]
 pub struct Components {
+    pub collisions: CContainer<Collision>,
     pub counters: CContainer<Counter>,
     pub fpsmeasures: CContainer<FpsMeasure>,
     pub positions: CContainer<Vector>,
@@ -125,6 +128,7 @@ pub struct Components {
 }
 impl Components {
     pub fn remove(&mut self, id: &EntityID) {
+        self.collisions.remove(id);
         self.counters.remove(id);
         self.fpsmeasures.remove(id);
         self.positions.remove(id);

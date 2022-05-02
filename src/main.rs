@@ -25,6 +25,7 @@ fn main() {
 }
 /// Start application.
 fn start_app() -> Result<(), windows::core::Error> {
+    set_console_mode_vtp(&get_std_handle())?;
     println!("\n==================================================");
     println!("            \"TITLE\"");
     println!("      SkyDog Assoc of WordSpiritism, Tengu712");

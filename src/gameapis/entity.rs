@@ -40,6 +40,7 @@ pub struct EntityManager {
     pub components: Components,
     pub unique_ids: HashMap<EntityKey, EntityID>,
     pub bullet_ids: HashSet<EntityID>,
+    pub messages: HashMap<MessageKey, usize>,
     pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
     pub camera: Camera,

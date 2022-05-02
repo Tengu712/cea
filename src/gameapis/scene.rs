@@ -61,6 +61,7 @@ impl Stage {
         world.systems.push(script_camera);
         world.systems.push(script_camera_lean);
         world.systems.push(script_player);
+        world.systems.push(script_player_hit);
         world.systems.push(script_player_slow);
         world.systems.push(script_player_shot);
         // system
@@ -82,7 +83,22 @@ impl Stage {
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        print!("\r\x1b[2KBulletNumber : {}", world.manager.bullet_ids.len());
+        let msg_hit = world
+            .manager
+            .messages
+            .remove(MESSAGE_PLAYER_HIT)
+            .unwrap_or(0);
+        let msg_graze = world
+            .manager
+            .messages
+            .remove(MESSAGE_PLAYER_GRAZE)
+            .unwrap_or(0);
+        if let Some(graze_counter) = world.manager.components.counters.get_mut(&self.graze) {
+            graze_counter.count += msg_graze as u64;
+            graze_counter.count_max += msg_graze as u64;
+        }
+        println!("\x1b[2KBulletNumber : {}", world.manager.bullet_ids.len());
+        println!("\x1b[2A");
         None
     }
 }

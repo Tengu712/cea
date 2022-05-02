@@ -32,7 +32,7 @@ pub fn create_bullet(
     if manager.bullet_ids.len() >= BULLET_MAX_NUM {
         return;
     }
-    let (size, _, imgid) = knd.analyze(is_fragile);
+    let (size, r, imgid) = knd.analyze(is_fragile);
     let id = manager.create_entity();
     manager.components.velocities.insert(
         id,
@@ -53,6 +53,13 @@ pub fn create_bullet(
         .components
         .removerects
         .insert(id, BULLET_REMOVE_RECT);
+    manager.components.collisions.insert(
+        id,
+        Collision {
+            r,
+            team: TEAM_ENEMY_BULLET,
+        },
+    );
     manager.components.sprites.insert(
         id,
         Sprite {
