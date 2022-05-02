@@ -108,29 +108,14 @@ impl Stage {
         })
     }
 }
-impl Scene for Stage {
-    fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        // Reserve message
-        let msg_hit = world.emngr.messages.remove(MESSAGE_PLAYER_HIT).unwrap_or(0);
-        let msg_hit_fragile = world
-            .emngr
-            .messages
-            .remove(MESSAGE_PLAYER_HIT_FRAGILE)
-            .unwrap_or(0);
-        let msg_graze = world
-            .emngr
-            .messages
-            .remove(MESSAGE_PLAYER_GRAZE)
-            .unwrap_or(0);
-        let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+impl Stage {
+    fn check_hit(&mut self, world: &mut World, msg_hit: i64, msg_hit_fragile: i64) -> i64 {
         // Check snap delay is end
-        let is_dead = if let Some(counter) = world.emngr.coms.counters.get(&self.snap_delay) {
-            counter.count == counter.count_max
-        } else {
-            false
-        };
-        // Hit
-        let mut is_snap = 0;
+        let mut is_dead = false;
+        if let Some(counter) = world.emngr.coms.counters.get(&self.snap_delay) {
+            is_dead = counter.count == counter.count_max;
+        }
+        // Check death
         if msg_hit > 0 || is_dead {
             world.emngr.remove_entity(&self.player);
             world.emngr.remove_entity(&self.player_slow1);
@@ -148,7 +133,7 @@ impl Scene for Stage {
                 world.emngr.coms.counters.active(&self.player);
                 world.emngr.coms.velocities.active(&self.player);
                 world.emngr.coms.counters.disactive(&self.snap_delay);
-                is_snap = 1;
+                return 1;
             }
         } else if msg_hit_fragile > 0 {
             // If hit by fragile bullet, player cannot move and shoot.
@@ -160,22 +145,50 @@ impl Scene for Stage {
                 n.count = 0;
             }
         }
-        // Addition of rate
+        0
+    }
+    fn add_rate(&mut self, world: &mut World, msg_graze: i64, is_snap: i64) {
         let mut add_rate = msg_graze * 10 + is_snap * 200;
         if let Some(n) = world.emngr.coms.counters.get_mut(&self.rate_delay) {
+            // If graze or snap, natural decrease count is set 0.
             if add_rate > 0 {
                 n.count = 0;
-            } else {
+            }
+            // Or, natural decrease. Moreover, rate will decrease while shooting.
+            else {
                 add_rate -= (n.count == n.count_max) as i64 + (world.emngr.input.z > 0) as i64;
             }
         }
+        // If down Z key when not snapping, rate will decrease.
         if is_snap != 1 && world.emngr.input.z == 1 {
-            // If down Z key when not snapping, rate will decrease.
             add_rate -= 100;
         }
         if let Some(rate_counter) = world.emngr.coms.counters.get_mut(&self.rate) {
-            rate_counter.count = (rate_counter.count + add_rate).min(rate_counter.count_max);
+            rate_counter.count = (rate_counter.count + add_rate)
+                .min(rate_counter.count_max)
+                .max(0);
         }
+    }
+}
+impl Scene for Stage {
+    fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
+        // Reserve message
+        let msg_hit = world.emngr.messages.remove(MESSAGE_PLAYER_HIT).unwrap_or(0);
+        let msg_hit_fragile = world
+            .emngr
+            .messages
+            .remove(MESSAGE_PLAYER_HIT_FRAGILE)
+            .unwrap_or(0);
+        let msg_graze = world
+            .emngr
+            .messages
+            .remove(MESSAGE_PLAYER_GRAZE)
+            .unwrap_or(0);
+        let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Check hit
+        let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
+        // Add rate
+        self.add_rate(world, msg_graze, is_snap);
         // Subtraction of enemy hp
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
             enemy_hp.count -= msg_enemy_hit;
