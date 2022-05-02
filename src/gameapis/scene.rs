@@ -35,7 +35,7 @@ pub struct Stage {
     pub player: EntityID,
     pub score: EntityID,
     pub graze: EntityID,
-    pub phase: EntityID,
+    pub stage: EntityID,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
@@ -46,18 +46,22 @@ impl Stage {
         let _ = create_floor(&mut world.manager, 0);
         let _ = create_floor(&mut world.manager, 1);
         let _ = create_floor(&mut world.manager, 2);
-        let _ = create_enemy(&mut world.manager);
+        let enemy = create_enemy(&mut world.manager);
         let player = create_player(&mut world.manager);
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
-        let phase = create_script_1_1(&mut world.manager);
+        let stage = create_stage1(&mut world.manager);
         let _ = create_script_camera(&mut world.manager);
         let _ = create_script_camera_lean(&mut world.manager);
+        // Unique
+        world.manager.unique_ids.insert(UNIQUE_ENEMY, enemy);
+        world.manager.unique_ids.insert(UNIQUE_PLAYER, player);
+        world.manager.unique_ids.insert(UNIQUE_STAGE1, stage);
         // script
-        world.systems.push(script_1_1);
+        world.systems.push(script_stage1);
         world.systems.push(script_camera);
         world.systems.push(script_camera_lean);
         world.systems.push(script_player);
@@ -77,13 +81,13 @@ impl Stage {
             player,
             score,
             graze,
-            phase,
+            stage,
         })
     }
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        let msg_hit = world
+        let _ = world
             .manager
             .messages
             .remove(MESSAGE_PLAYER_HIT)

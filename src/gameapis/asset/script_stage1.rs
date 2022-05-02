@@ -1,24 +1,26 @@
 use super::*;
 
-pub struct Marker11;
-
-pub fn script_1_1(manager: &mut EntityManager) {
-    let count = match manager.scripted_ids.get(type_name::<Marker11>()) {
-        Some(ids) => match ids.iter().next() {
-            Some(id) => match manager.components.counters.get(id) {
-                Some(n) => n.count,
-                None => return,
-            },
+pub fn script_stage1(manager: &mut EntityManager) {
+    let counter = match manager.unique_ids.get(UNIQUE_STAGE1) {
+        Some(id) => match manager.components.counters.get(id) {
+            Some(n) => n.clone(),
             None => return,
         },
         None => return,
     };
-    if count % 10 != 0 {
+    if counter.count % 10 != 0 {
         return;
     }
+    let e_pos = match manager.unique_ids.get(UNIQUE_ENEMY) {
+        Some(id) => match manager.components.positions.get(id) {
+            Some(e_pos) => e_pos.clone(),
+            None => return,
+        },
+        None => return,
+    };
     // big circle
     for i in 0..6 {
-        let is_fragile = if (count / 10) % 2 == 0 {
+        let is_fragile = if (counter.count / 10) % 2 == 0 {
             i % 2 == 1
         } else {
             i % 2 == 0
@@ -26,9 +28,9 @@ pub fn script_1_1(manager: &mut EntityManager) {
         let _ = create_bullet(
             manager,
             BulletKind::BigCircle,
-            0.0,
-            0.0,
-            i as f32 * 60.0 + 45.0 - count as f32,
+            e_pos.x,
+            e_pos.y,
+            i as f32 * 60.0 + 45.0 - counter.count as f32,
             8.0,
             Vector4D {
                 x: 1.0,

@@ -1,4 +1,4 @@
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Counter {
     pub speed: u64,
     pub count: u64,
