@@ -6,8 +6,8 @@ pub fn create_camera_lean(emngr: &mut EntityManager) -> EntityID {
         id,
         Counter {
             speed: 0,
-            count: 65,
-            count_max: 65,
+            count: 0,
+            count_max: 0,
         },
     );
     id
