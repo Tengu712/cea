@@ -7,7 +7,7 @@ pub fn create_camera(manager: &mut EntityManager) -> EntityID {
         Counter {
             speed: 1,
             count: 0,
-            count_max: std::u64::MAX,
+            count_max: std::i64::MAX,
         },
     );
     id

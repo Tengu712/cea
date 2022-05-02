@@ -8,7 +8,7 @@ pub fn create_title_text(manager: &mut EntityManager) {
         Counter {
             speed: 1,
             count: 0,
-            count_max: std::u64::MAX,
+            count_max: std::i64::MAX,
         },
     );
     manager.components.texts.insert(

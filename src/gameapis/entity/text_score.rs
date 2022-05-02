@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn create_score(manager: &mut EntityManager, score: u64) -> EntityID {
+pub fn create_score(manager: &mut EntityManager, score: i64) -> EntityID {
     let id = manager.create_entity();
     manager.components.counters.insert(
         id,
@@ -29,7 +29,7 @@ pub fn create_score(manager: &mut EntityManager, score: u64) -> EntityID {
     manager.components.valuetexts.insert(
         id,
         ValueText {
-            format: Some(|n| format!("{:>012}", n)),
+            format: Some(|n| format!("{:>012}", n.count)),
         },
     );
     id

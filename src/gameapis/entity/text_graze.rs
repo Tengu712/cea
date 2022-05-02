@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn create_graze(manager: &mut EntityManager, graze: u64) -> EntityID {
+pub fn create_graze(manager: &mut EntityManager, graze: i64) -> EntityID {
     let id = manager.create_entity();
     manager.components.counters.insert(
         id,

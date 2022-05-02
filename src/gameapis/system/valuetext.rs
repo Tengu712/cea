@@ -9,7 +9,7 @@ pub fn system_value_text(manager: &mut EntityManager) {
         if let Some(counter) = manager.components.counters.get(k) {
             if let Some(n) = manager.components.texts.get_mut(k) {
                 match v.format {
-                    Some(f) => n.text = f(counter.count),
+                    Some(f) => n.text = f(counter),
                     None => n.text = counter.count.to_string(),
                 }
             }

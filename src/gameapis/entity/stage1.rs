@@ -26,5 +26,11 @@ pub fn create_stage1(manager: &mut EntityManager) -> EntityID {
             align: TextAlign::Right,
         },
     );
+    manager.components.valuetexts.insert(
+        id,
+        ValueText {
+            format: Some(|n| format!("{}", (n.count_max - n.count) / 60)),
+        },
+    );
     id
 }

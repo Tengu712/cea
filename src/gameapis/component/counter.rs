@@ -1,6 +1,6 @@
 #[derive(Default, Clone)]
 pub struct Counter {
-    pub speed: u64,
-    pub count: u64,
-    pub count_max: u64,
+    pub speed: i64,
+    pub count: i64,
+    pub count_max: i64,
 }

@@ -1,4 +1,6 @@
+use super::*;
+
 #[derive(Default)]
 pub struct ValueText {
-    pub format: Option<fn(u64) -> String>,
+    pub format: Option<fn(&Counter) -> String>,
 }

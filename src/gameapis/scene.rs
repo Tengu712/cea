@@ -103,11 +103,18 @@ impl Scene for Stage {
             .remove(MESSAGE_PLAYER_GRAZE)
             .unwrap_or(0);
         if let Some(graze_counter) = world.manager.components.counters.get_mut(&self.graze) {
-            graze_counter.count += msg_graze as u64;
-            graze_counter.count_max += msg_graze as u64;
+            graze_counter.count += msg_graze as i64;
+            graze_counter.count_max += msg_graze as i64;
         }
+        let (time_count, time_count_max) =
+            if let Some(n) = world.manager.components.counters.get(&self.stage) {
+                (n.count, n.count_max)
+            } else {
+                (0, 0)
+            };
+        println!("\x1b[2KTime : {} / {}", time_count, time_count_max);
         println!("\x1b[2KBulletNumber : {}", world.manager.bullet_ids.len());
-        println!("\x1b[2A");
+        println!("\x1b[3A");
         None
     }
 }
