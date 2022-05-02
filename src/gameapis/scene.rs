@@ -81,7 +81,8 @@ impl Stage {
     }
 }
 impl Scene for Stage {
-    fn update(&mut self, _: &mut World) -> Option<Box<dyn Scene>> {
+    fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
+        print!("\r\x1b[2KBulletNumber : {}", world.manager.bullet_ids.len());
         None
     }
 }

@@ -7,9 +7,6 @@ use gameapis::{asset::*, component::*, scene::*, *};
 use std::collections::HashMap;
 use winapis::{direct3d::*, directwrite::*, math::*, winapi::*};
 
-const WIDTH: u32 = 1280;
-const HEIGHT: u32 = 960;
-
 /// Entory point.
 fn main() {
     match start_app() {
@@ -33,6 +30,8 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!("      SkyDog Assoc of WordSpiritism, Tengu712");
     println!("==================================================\n");
     println!("Starts up ...");
+    const WIDTH: u32 = 1280;
+    const HEIGHT: u32 = 960;
     let cur_dir = get_curdir_for_winapp().unwrap_or(String::from(r"\"));
     println!(" - Create a window");
     let winapp = WindowsApplication::new(
@@ -50,18 +49,18 @@ fn start_app() -> Result<(), windows::core::Error> {
         let mut map = HashMap::new();
         let res_dir = cur_dir + r"img\";
         for i in IMGID_ARRAY {
-            println!("    * {}", i);
+            print!("\r\x1b[2K    * {}", i);
             map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
         }
         map
     };
-    println!(" - Set up runtime objects");
-    println!("    * square polygon");
+    println!("\r\x1b[2K - Set up runtime objects");
+    print!("\r\x1b[2K    * square polygon");
     let idea = create_idea(&d3dapp)?;
-    println!("    * constant buffer data");
-    let mut cdata = create_default_cdata();
+    print!("\r\x1b[2K    * constant buffer data");
+    let mut cdata = create_default_cdata(WIDTH as f32, HEIGHT as f32);
     d3dapp.set_cdata(&cdata)?;
-    println!("    * camera matrixes");
+    print!("\r\x1b[2K    * camera matrixes");
     let mat_view = Matrix4x4::new_view([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
     let mat_proj = Matrix4x4::new_ortho(0.0, WIDTH as f32, HEIGHT as f32, 0.0, 0.0, 1000.0);
     let mat_proj_3d = Matrix4x4::new_perse(
@@ -71,12 +70,12 @@ fn start_app() -> Result<(), windows::core::Error> {
         1.0,
         1000.0,
     );
-    println!("    * input data");
+    print!("\r\x1b[2K    * input data");
     let mut input = Input::default();
-    println!("    * game components");
+    print!("\r\x1b[2K    * game components");
     let mut world = World::default();
     let mut scene = Title::new(&mut world);
-    println!("\nAll clear. The game is starting.\n");
+    println!("\r\x1b[2K\nAll clear. The game is starting.\n");
     while !winapp.do_event() {
         input.z = get_next_keystate(0x5A, input.z);
         input.x = get_next_keystate(0x58, input.x);
@@ -182,47 +181,6 @@ fn get_curdir_for_winapp() -> Result<String, ()> {
         .unwrap_or(&cur_dir)
         .clone();
     Ok(dir)
-}
-/// Create idea sprite.
-fn create_idea(d3dapp: &D3DApplication) -> Result<model::ModelBuffer, windows::core::Error> {
-    let data_vtx = [
-        model::Vertex {
-            pos: [-0.5, -0.5, 0.0],
-            col: [1.0; 4],
-            tex: [0.0, 1.0],
-        },
-        model::Vertex {
-            pos: [-0.5, 0.5, 0.0],
-            col: [1.0; 4],
-            tex: [0.0, 0.0],
-        },
-        model::Vertex {
-            pos: [0.5, 0.5, 0.0],
-            col: [1.0; 4],
-            tex: [1.0, 0.0],
-        },
-        model::Vertex {
-            pos: [0.5, -0.5, 0.0],
-            col: [1.0; 4],
-            tex: [1.0, 1.0],
-        },
-    ];
-    let data_idx = [0, 1, 2, 0, 2, 3];
-    d3dapp.create_modelbuffer(4, &data_vtx, 6, &data_idx)
-}
-/// Create default constant buffer data.
-fn create_default_cdata() -> cbuffer::CData {
-    cbuffer::CData {
-        mat_scl: Matrix4x4::new_identity(),
-        mat_rtx: Matrix4x4::new_identity(),
-        mat_rty: Matrix4x4::new_identity(),
-        mat_rtz: Matrix4x4::new_identity(),
-        mat_trs: Matrix4x4::new_identity(),
-        mat_view: Matrix4x4::new_identity(),
-        mat_proj: Matrix4x4::new_ortho(0.0, WIDTH as f32, HEIGHT as f32, 0.0, 0.0, 1000.0),
-        vec_col: [1.0; 4],
-        vec_prm: [0.0; 4],
-    }
 }
 /// Apply constant buffer difference request to cdata.
 fn apply_cdata_diff(cdata: cbuffer::CData, sprite: &gameapis::component::Sprite) -> cbuffer::CData {
