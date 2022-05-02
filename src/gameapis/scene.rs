@@ -37,6 +37,7 @@ pub struct Stage {
     pub graze: EntityID,
     pub stage: EntityID,
     pub e_hp: EntityID,
+    pub rate: EntityID,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
@@ -49,6 +50,7 @@ impl Stage {
         let _ = create_floor(&mut world.manager, 2);
         let enemy = create_enemy(&mut world.manager);
         let player = create_player(&mut world.manager);
+        let rate = create_player_rate(&mut world.manager, player);
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
@@ -92,6 +94,7 @@ impl Stage {
             graze,
             stage,
             e_hp,
+            rate,
         })
     }
 }
@@ -113,6 +116,15 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_ENEMY_HIT)
             .unwrap_or(0);
+        // Add rate
+        let rate = if let Some(rate_counter) = world.manager.components.counters.get_mut(&self.rate)
+        {
+            let add = msg_graze * 10;
+            rate_counter.count = (rate_counter.count + add).min(rate_counter.count_max);
+            (rate_counter.count as f32) / (rate_counter.count_max as f32) * 100.0
+        } else {
+            0.0
+        };
         // Subtract enemy hp
         let (enemy_hp, enemy_hp_max) =
             if let Some(enemy_hp) = world.manager.components.counters.get_mut(&self.e_hp) {
@@ -145,8 +157,9 @@ impl Scene for Stage {
             world.manager.bullet_ids.len(),
             BULLET_MAX_NUM
         );
+        println!("\x1b[2KRate : {} %", rate);
         println!("\x1b[2KEnemyHP : {} / {}", enemy_hp, enemy_hp_max);
-        println!("\x1b[4A");
+        println!("\x1b[5A");
         None
     }
 }
