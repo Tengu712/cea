@@ -28,7 +28,10 @@ pub fn create_bullet(
     speed: f32,
     color: Vector4D,
     is_fragile: bool,
-) -> EntityID {
+) {
+    if manager.bullet_ids.len() >= BULLET_MAX_NUM {
+        return;
+    }
     let (size, _, imgid) = knd.analyze(is_fragile);
     let id = manager.create_entity();
     manager.components.velocities.insert(
@@ -64,5 +67,5 @@ pub fn create_bullet(
             ..Default::default()
         },
     );
-    id
+    manager.bullet_ids.insert(id);
 }

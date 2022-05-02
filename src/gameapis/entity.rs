@@ -39,6 +39,7 @@ pub struct EntityManager {
     next_entity_id: EntityID,
     pub components: Components,
     pub unique_ids: HashMap<EntityKey, EntityID>,
+    pub bullet_ids: HashSet<EntityID>,
     pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
     pub camera: Camera,
@@ -53,6 +54,7 @@ impl EntityManager {
             v.remove(id);
         }
         self.unique_ids.retain(|_, v| v != id);
+        self.bullet_ids.remove(id);
         self.components.remove(id);
     }
     pub fn insert_scripted_id(&mut self, id: EntityID, key: ScriptKey) {

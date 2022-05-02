@@ -21,6 +21,7 @@ pub const BULLET_REMOVE_RECT: RemoveRect = RemoveRect {
     n: -1000.0,
     f: 1000.0,
 };
+pub const BULLET_MAX_NUM: usize = 640;
 
 pub const Z_ENEMY: f32 = -5.0;
 pub const Z_PLAYER: f32 = -4.0;
