@@ -33,6 +33,7 @@ pub fn create_bullet(
         return;
     }
     let (size, r, imgid) = knd.analyze(is_fragile);
+    // Normal
     let id = manager.create_entity();
     manager.components.velocities.insert(
         id,
@@ -75,4 +76,21 @@ pub fn create_bullet(
         },
     );
     manager.bullet_ids.insert(id);
+    // Graze
+    let id_graze = manager.create_entity();
+    manager
+        .components
+        .positions
+        .insert(id_graze, Vector { x, y, z: Z_BULLET });
+    manager
+        .components
+        .sameposition2ds
+        .insert(id_graze, SamePosition2D(id));
+    manager.components.collisions.insert(
+        id_graze,
+        Collision {
+            r: r * 4.0,
+            team: TEAM_ENEMY_BULLET_GRAZE,
+        },
+    );
 }
