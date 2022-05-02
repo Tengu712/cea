@@ -106,6 +106,11 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_PLAYER_HIT)
             .unwrap_or(0);
+        let _ = world
+            .manager
+            .messages
+            .remove(MESSAGE_PLAYER_HIT_FRAGILE)
+            .unwrap_or(0);
         let msg_graze = world
             .manager
             .messages
@@ -152,12 +157,12 @@ impl Scene for Stage {
                 (0, 0)
             };
         println!("\x1b[2KTime : {} / {}", time_count, time_count_max);
+        println!("\x1b[2KRate : {:.0} %", rate);
         println!(
             "\x1b[2KBulletNumber : {} / {}",
             world.manager.bullet_ids.len(),
             BULLET_MAX_NUM
         );
-        println!("\x1b[2KRate : {} %", rate);
         println!("\x1b[2KEnemyHP : {} / {}", enemy_hp, enemy_hp_max);
         println!("\x1b[5A");
         None

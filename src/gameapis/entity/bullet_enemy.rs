@@ -58,7 +58,11 @@ pub fn create_bullet(
         id,
         Collision {
             r,
-            team: TEAM_ENEMY_BULLET,
+            team: if is_fragile {
+                TEAM_ENEMY_BULLET_FRAGILE
+            } else {
+                TEAM_ENEMY_BULLET
+            },
         },
     );
     manager.components.sprites.insert(
