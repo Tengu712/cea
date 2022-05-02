@@ -14,7 +14,7 @@ pub fn create_player(manager: &mut EntityManager) -> EntityID {
     );
     manager.components.positions.insert(
         id,
-        Position {
+        Vector {
             x: 0.0,
             y: -280.0,
             z: Z_PLAYER,

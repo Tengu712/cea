@@ -1,3 +1,19 @@
+pub mod counter;
+pub mod fpsmeasure;
+pub mod sameposition2d;
+pub mod sprite;
+pub mod text;
+pub mod valuetext;
+pub mod velocity;
+
+pub use counter::*;
+pub use fpsmeasure::*;
+pub use sameposition2d::*;
+pub use sprite::*;
+pub use text::*;
+pub use valuetext::*;
+pub use velocity::*;
+
 use super::*;
 
 pub enum ComponentState {
@@ -97,9 +113,9 @@ impl<T> CContainer<T> {
 pub struct Components {
     pub counters: CContainer<Counter>,
     pub fpsmeasures: CContainer<FpsMeasure>,
-    pub positions: CContainer<Position>,
-    pub removerects: CContainer<RemoveRect>,
-    pub restricts: CContainer<RestrictRect>,
+    pub positions: CContainer<Vector>,
+    pub removerects: CContainer<Rect3D>,
+    pub restricts: CContainer<Rect3D>,
     pub sameposition2ds: CContainer<SamePosition2D>,
     pub sprite3ds: CContainer<Sprite>,
     pub sprites: CContainer<Sprite>,
@@ -151,72 +167,4 @@ pub struct Rect3D {
     pub t: f32,
     pub n: f32,
     pub f: f32,
-}
-
-// counter
-#[derive(Default)]
-pub struct Counter {
-    pub speed: u64,
-    pub count: u64,
-    pub count_max: u64,
-}
-#[derive(Default)]
-pub struct ValueText {
-    pub format: Option<fn(u64) -> String>,
-}
-pub struct FpsMeasure {
-    pub fps: f32,
-    pub count: u32,
-    pub last: std::time::Instant,
-}
-// fpsmeasure
-impl Default for FpsMeasure {
-    fn default() -> Self {
-        Self {
-            fps: 0.0,
-            count: 0,
-            last: std::time::Instant::now(),
-        }
-    }
-}
-// movement
-pub type Position = Vector;
-pub type RestrictRect = Rect3D;
-pub type RemoveRect = Rect3D;
-#[derive(Default)]
-pub struct SamePosition2D(pub EntityID);
-#[derive(Default)]
-pub struct Velocity {
-    pub direction: Vector,
-    pub speed: f32,
-}
-// graphic
-#[derive(Default)]
-pub struct Sprite {
-    pub imgid: Option<&'static str>,
-    pub translation: Vector,
-    pub rotation: Vector,
-    pub scaling: Vector,
-    pub color: Vector4D,
-    pub mode: f32,
-}
-pub enum TextAlign {
-    Left,
-    Center,
-    Right,
-}
-impl Default for TextAlign {
-    fn default() -> Self {
-        TextAlign::Left
-    }
-}
-#[derive(Default)]
-pub struct Text {
-    pub visible: bool,
-    pub text: String,
-    pub rect: Rect,
-    pub rgba: Vector4D,
-    pub fontname: &'static str,
-    pub size: f32,
-    pub align: TextAlign,
 }

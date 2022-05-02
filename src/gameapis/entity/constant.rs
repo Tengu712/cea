@@ -13,7 +13,7 @@ pub const COLOR_WHITE: Vector4D = Vector4D {
     w: 1.0,
 };
 
-pub const BULLET_REMOVE_RECT: RemoveRect = RemoveRect {
+pub const BULLET_REMOVE_RECT: Rect3D = Rect3D {
     l: GAME_LEFT - 80.0,
     r: GAME_RIGHT + 80.0,
     b: GAME_BOTTOM - 80.0,

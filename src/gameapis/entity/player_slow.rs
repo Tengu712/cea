@@ -5,7 +5,7 @@ pub fn create_player_slow(manager: &mut EntityManager, player_id: EntityID, flg:
     manager.insert_scripted_id(id, type_name::<MarkerPlayerSlow>());
     manager.components.positions.insert(
         id,
-        Position {
+        Vector {
             x: 0.0,
             y: 0.0,
             z: Z_PLAYER_SLOW,
