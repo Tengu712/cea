@@ -36,6 +36,7 @@ pub struct Stage {
     pub score: EntityID,
     pub graze: EntityID,
     pub stage: EntityID,
+    pub e_hp: EntityID,
 }
 impl Stage {
     pub fn new(world: &mut World) -> Box<dyn Scene> {
@@ -51,6 +52,7 @@ impl Stage {
         let _ = create_player_slow(&mut world.manager, player, true);
         let _ = create_player_slow(&mut world.manager, player, false);
         let _ = create_frame(&mut world.manager);
+        let e_hp = create_enemy_hp(&mut world.manager, 2000);
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
         let stage = create_stage1(&mut world.manager);
@@ -70,6 +72,7 @@ impl Stage {
         world.systems.push(unique_camera);
         world.systems.push(unique_camera_lean);
         world.systems.push(unique_player);
+        world.systems.push(unique_enemy_hit);
         world.systems.push(unique_player_hit);
         world.systems.push(unique_player_shot);
         world.systems.push(script_player_slow);
@@ -87,6 +90,7 @@ impl Stage {
             score,
             graze,
             stage,
+            e_hp,
         })
     }
 }
@@ -102,6 +106,18 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_PLAYER_GRAZE)
             .unwrap_or(0);
+        let msg_enemy_hit = world
+            .manager
+            .messages
+            .remove(MESSAGE_ENEMY_HIT)
+            .unwrap_or(0);
+        let (enemy_hp, enemy_hp_max) =
+            if let Some(enemy_hp) = world.manager.components.counters.get_mut(&self.e_hp) {
+                enemy_hp.count += msg_enemy_hit as i64;
+                (enemy_hp.count, enemy_hp.count_max)
+            } else {
+                (0, 0)
+            };
         if let Some(graze_counter) = world.manager.components.counters.get_mut(&self.graze) {
             graze_counter.count += msg_graze as i64;
             graze_counter.count_max += msg_graze as i64;
@@ -113,8 +129,17 @@ impl Scene for Stage {
                 (0, 0)
             };
         println!("\x1b[2KTime : {} / {}", time_count, time_count_max);
-        println!("\x1b[2KBulletNumber : {}", world.manager.bullet_ids.len());
-        println!("\x1b[3A");
+        println!(
+            "\x1b[2KBulletNumber : {} / {}",
+            world.manager.bullet_ids.len(),
+            BULLET_MAX_NUM
+        );
+        println!(
+            "\x1b[2KEnemyHP : {} / {}",
+            (enemy_hp_max - enemy_hp),
+            enemy_hp_max
+        );
+        println!("\x1b[4A");
         None
     }
 }

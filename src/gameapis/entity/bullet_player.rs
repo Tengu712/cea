@@ -21,6 +21,13 @@ pub fn create_player_bullet(manager: &mut EntityManager, x: f32, y: f32) -> Enti
         .components
         .removerects
         .insert(id, BULLET_REMOVE_RECT);
+    manager.components.collisions.insert(
+        id,
+        Collision {
+            r: 100.0,
+            team: TEAM_PLAYER_BULLET,
+        },
+    );
     manager.components.sprites.insert(
         id,
         Sprite {
