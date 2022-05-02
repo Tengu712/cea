@@ -14,7 +14,6 @@ pub fn create_title_text(manager: &mut EntityManager) {
     manager.components.texts.insert(
         id,
         Text {
-            visible: true,
             text: String::from("PRESS ANY KEY TO START"),
             rect: Rect {
                 l: 0.0,

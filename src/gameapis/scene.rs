@@ -54,20 +54,25 @@ impl Stage {
         let score = create_score(&mut world.manager, 0);
         let graze = create_graze(&mut world.manager, 0);
         let stage = create_stage1(&mut world.manager);
-        let _ = create_script_camera(&mut world.manager);
-        let _ = create_script_camera_lean(&mut world.manager);
+        let camera = create_camera(&mut world.manager);
+        let camera_lean = create_camera_lean(&mut world.manager);
         // Unique
+        world.manager.unique_ids.insert(UNIQUE_CAMERA, camera);
+        world
+            .manager
+            .unique_ids
+            .insert(UNIQUE_CAMERA_LEAN, camera_lean);
         world.manager.unique_ids.insert(UNIQUE_ENEMY, enemy);
         world.manager.unique_ids.insert(UNIQUE_PLAYER, player);
         world.manager.unique_ids.insert(UNIQUE_STAGE1, stage);
         // script
-        world.systems.push(script_stage1);
-        world.systems.push(script_camera);
-        world.systems.push(script_camera_lean);
-        world.systems.push(script_player);
-        world.systems.push(script_player_hit);
+        world.systems.push(unique_stage1_1);
+        world.systems.push(unique_camera);
+        world.systems.push(unique_camera_lean);
+        world.systems.push(unique_player);
+        world.systems.push(unique_player_hit);
+        world.systems.push(unique_player_shot);
         world.systems.push(script_player_slow);
-        world.systems.push(script_player_shot);
         // system
         world.systems.push(system_fpsmeasure);
         world.systems.push(system_update_counter);

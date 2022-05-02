@@ -13,7 +13,6 @@ pub fn create_score(manager: &mut EntityManager, score: u64) -> EntityID {
     manager.components.texts.insert(
         id,
         Text {
-            visible: true,
             text: String::default(),
             rect: Rect {
                 l: 280.0,

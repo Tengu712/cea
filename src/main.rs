@@ -145,9 +145,6 @@ fn start_app() -> Result<(), windows::core::Error> {
             if !s.is_active() {
                 continue;
             }
-            if !v.visible {
-                continue;
-            }
             let desc = TextDesc {
                 text: v.text.clone(),
                 rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],

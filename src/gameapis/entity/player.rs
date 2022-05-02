@@ -2,9 +2,6 @@ use super::*;
 
 pub fn create_player(manager: &mut EntityManager) -> EntityID {
     let id = manager.create_entity();
-    manager.insert_scripted_id(id, type_name::<MarkerPlayer>());
-    manager.insert_scripted_id(id, type_name::<MarkerPlayerHit>());
-    manager.insert_scripted_id(id, type_name::<MarkerPlayerShot>());
     manager.components.counters.insert(
         id,
         Counter {

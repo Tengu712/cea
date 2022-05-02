@@ -22,7 +22,8 @@ pub fn create_stage1(manager: &mut EntityManager) -> EntityID {
             },
             size: 60.0,
             rgba: COLOR_WHITE,
-            ..Default::default()
+            fontname: "Consolas\0",
+            align: TextAlign::Right,
         },
     );
     id

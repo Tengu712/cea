@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn script_stage1(manager: &mut EntityManager) {
+pub fn unique_stage1_1(manager: &mut EntityManager) {
     let counter = match manager.unique_ids.get(UNIQUE_STAGE1) {
         Some(id) => match manager.components.counters.get(id) {
             Some(n) => n.clone(),

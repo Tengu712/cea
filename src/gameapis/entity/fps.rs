@@ -9,7 +9,6 @@ pub fn create_fps(manager: &mut EntityManager) {
     manager.components.texts.insert(
         id,
         Text {
-            visible: true,
             text: String::new(),
             rect: Rect {
                 l: 0.0,
