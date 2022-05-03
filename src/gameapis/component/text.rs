@@ -10,7 +10,6 @@ impl Default for TextAlign {
         TextAlign::Left
     }
 }
-#[derive(Default)]
 pub struct Text {
     pub layer: f32,
     pub text: String,
@@ -19,4 +18,17 @@ pub struct Text {
     pub fontname: &'static str,
     pub size: f32,
     pub align: TextAlign,
+}
+impl Default for Text {
+    fn default() -> Self {
+        Self {
+            layer: 0.0,
+            text: String::default(),
+            rect: Rect::default(),
+            rgba: Vector4D::default(),
+            fontname: "MS Gothic\0",
+            size: 10.0,
+            align: TextAlign::default(),
+        }
+    }
 }

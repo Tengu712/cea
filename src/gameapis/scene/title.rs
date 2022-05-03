@@ -9,7 +9,7 @@ impl Title {
         create_title_text(&mut world.emngr);
         world.systems.push(system_update_counter);
         world.systems.push(system_fpsmeasure);
-        world.systems.push(script_title_text);
+        world.systems.push(system_value_text);
         Box::new(Title)
     }
 }

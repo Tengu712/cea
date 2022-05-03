@@ -2,7 +2,7 @@ use super::*;
 
 pub fn create_title_text(emngr: &mut EntityManager) {
     let id = emngr.create_entity();
-    emngr.insert_scripted_id(id, type_name::<MarkerTitleText>());
+    emngr.coms.texts.insert(id, Text::default());
     emngr.coms.counters.insert(
         id,
         Counter {
@@ -11,9 +11,9 @@ pub fn create_title_text(emngr: &mut EntityManager) {
             count_max: std::i64::MAX,
         },
     );
-    emngr.coms.texts.insert(
+    emngr.coms.valuetexts.insert(
         id,
-        Text {
+        ValueText(Some(|n| Text {
             layer: -1.0,
             text: String::from("PRESS ANY KEY TO START"),
             rect: Rect {
@@ -22,10 +22,15 @@ pub fn create_title_text(emngr: &mut EntityManager) {
                 t: 720.0,
                 b: SCREEN_HEIGHT,
             },
-            rgba: COLOR_WHITE,
+            rgba: Vector4D {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+                w: (n.count as f32).to_radians().cos().abs(),
+            },
             fontname: "游明朝\0",
             size: 56.0,
             align: TextAlign::Center,
-        },
+        })),
     );
 }

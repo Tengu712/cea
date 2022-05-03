@@ -17,7 +17,7 @@ fn main() {
                 e.code().0,
                 e.message().to_string_lossy()
             );
-            println!("\nError! The game will not start.");
+            println!("\nError! The game has crashed!");
             println!("{}", message);
             show_messagebox(message, "Error")
         }
