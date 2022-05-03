@@ -13,6 +13,7 @@ pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: Z_VALUE,
             text: String::default(),
             rect: Rect {
                 l: 280.0,
@@ -30,6 +31,7 @@ pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
         id,
         ValueText {
             format: Some(|n| Text {
+                layer: Z_VALUE,
                 text: format!("{:>012}", n.count),
                 rect: Rect {
                     l: 280.0,

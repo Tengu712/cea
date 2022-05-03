@@ -2,13 +2,11 @@ use super::*;
 
 pub fn create_fps(emngr: &mut EntityManager) {
     let id = emngr.create_entity();
-    emngr
-        .coms
-        .fpsmeasures
-        .insert(id, FpsMeasure::default());
+    emngr.coms.fpsmeasures.insert(id, FpsMeasure::default());
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: Z_FPS,
             text: String::new(),
             rect: Rect {
                 l: 0.0,

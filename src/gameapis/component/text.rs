@@ -12,6 +12,7 @@ impl Default for TextAlign {
 }
 #[derive(Default)]
 pub struct Text {
+    pub layer: f32,
     pub text: String,
     pub rect: Rect,
     pub rgba: Vector4D,

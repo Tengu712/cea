@@ -11,11 +11,11 @@ impl Stage {
         let _ = create_floor(&mut world.emngr, 2);
         let _ = create_frame(&mut world.emngr);
         let enemy = create_enemy(&mut world.emngr);
-        let e_hp = create_enemy_hp(&mut world.emngr, 2000, enemy);
+        let e_hp = create_enemy_hp(&mut world.emngr, 2000);
         let player = create_player(&mut world.emngr);
         let player_slow1 = create_player_slow(&mut world.emngr, player, true);
         let player_slow2 = create_player_slow(&mut world.emngr, player, false);
-        let rate = create_player_rate(&mut world.emngr, player);
+        let rate = create_player_rate(&mut world.emngr);
         let rate_delay = create_delay_count(&mut world.emngr, 60);
         let snap_delay = create_delay_count(&mut world.emngr, 10);
         let score = create_score(&mut world.emngr, 0);

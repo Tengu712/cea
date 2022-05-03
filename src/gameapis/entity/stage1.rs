@@ -13,6 +13,7 @@ pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: Z_VALUE,
             text: String::from("0"),
             rect: Rect {
                 l: 0.0,
@@ -30,6 +31,7 @@ pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
         id,
         ValueText {
             format: Some(|n| Text {
+                layer: Z_VALUE,
                 text: format!("{}", (n.count_max - n.count) / 60),
                 rect: Rect {
                     l: 0.0,

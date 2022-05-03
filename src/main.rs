@@ -87,7 +87,6 @@ fn start_app() -> Result<(), windows::core::Error> {
         input.down = get_next_keystate(0x28, input.down);
         if let Some(next) = scene.as_mut().update(&mut world) {
             scene = next;
-            println!("aa");
         }
         world.update(&input);
         d3dapp.clear_rtv();
@@ -98,19 +97,19 @@ fn start_app() -> Result<(), windows::core::Error> {
                 world.emngr.camera.pos.x,
                 world.emngr.camera.pos.y,
                 world.emngr.camera.pos.z,
-                ],
-                [
-                    world.emngr.camera.rot.x,
-                    world.emngr.camera.rot.y,
-                    world.emngr.camera.rot.z,
-                    ],
-                );
-                cdata.mat_proj = mat_proj_3d.clone();
-                for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
-                    if !s.is_active() {
-                        continue;
-                    }
-                    match v.imgid {
+            ],
+            [
+                world.emngr.camera.rot.x,
+                world.emngr.camera.rot.y,
+                world.emngr.camera.rot.z,
+            ],
+        );
+        cdata.mat_proj = mat_proj_3d.clone();
+        for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
+            if !s.is_active() {
+                continue;
+            }
+            match v.imgid {
                 Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
                 None => cdata = d3dapp.set_d3dimage(None, cdata),
             }
@@ -118,49 +117,55 @@ fn start_app() -> Result<(), windows::core::Error> {
             d3dapp.set_cdata(&cdata)?;
             d3dapp.draw_model(&idea);
         }
-        // Draw 2d sprite
+        // Draw 2d objects
         d3dapp.set_rtv(false);
         cdata.mat_view = mat_view.clone();
         cdata.mat_proj = mat_proj.clone();
-        let mut sprites_t = Vec::with_capacity(world.emngr.coms.sprites.len());
+        let mut vec_2d =
+            Vec::with_capacity(world.emngr.coms.sprites.len() + world.emngr.coms.texts.len());
         for (k, s, v) in world.emngr.coms.sprites.iter() {
             if !s.is_active() {
                 continue;
             }
-            sprites_t.push((v.translation.z, k));
+            vec_2d.push((v.translation.z, Some(k), None));
         }
-        sprites_t.sort_by(|(z1, _), (z2, _)| z1.partial_cmp(z2).unwrap());
-        for (_, k) in sprites_t {
-            if let Some(v) = world.emngr.coms.sprites.get(k) {
-                match v.imgid {
-                    Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
-                    None => cdata = d3dapp.set_d3dimage(None, cdata),
-                }
-                cdata = apply_cdata_diff(cdata, v);
-                d3dapp.set_cdata(&cdata)?;
-                d3dapp.draw_model(&idea);
-            }
-        }
-        // Draw 2d text
-        for (_, s, v) in world.emngr.coms.texts.iter() {
+        for (k, s, v) in world.emngr.coms.texts.iter() {
             if !s.is_active() {
                 continue;
             }
-            let desc = TextDesc {
-                text: v.text.clone(),
-                rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],
-                rgba: [v.rgba.x, v.rgba.y, v.rgba.z, v.rgba.w],
-            };
-            let formatdesc = TextFormatDesc {
-                fontname: v.fontname,
-                size: v.size,
-                align: match v.align {
-                    TextAlign::Left => 0,
-                    TextAlign::Center => 1,
-                    TextAlign::Right => 2,
-                },
-            };
-            dwapp.draw_text(&desc, &formatdesc, None)?;
+            vec_2d.push((v.layer, None, Some(k)));
+        }
+        vec_2d.sort_by(|(z1, _, _), (z2, _, _)| z1.partial_cmp(z2).unwrap());
+        for (_, sprite, text) in vec_2d {
+            if let Some(sprite_id) = sprite {
+                if let Some(v) = world.emngr.coms.sprites.get(sprite_id) {
+                    match v.imgid {
+                        Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
+                        None => cdata = d3dapp.set_d3dimage(None, cdata),
+                    }
+                    cdata = apply_cdata_diff(cdata, v);
+                    d3dapp.set_cdata(&cdata)?;
+                    d3dapp.draw_model(&idea);
+                }
+            } else if let Some(text_id) = text {
+                if let Some(v) = world.emngr.coms.texts.get(text_id) {
+                    let desc = TextDesc {
+                        text: v.text.clone(),
+                        rect: [v.rect.l, v.rect.r, v.rect.t, v.rect.b],
+                        rgba: [v.rgba.x, v.rgba.y, v.rgba.z, v.rgba.w],
+                    };
+                    let formatdesc = TextFormatDesc {
+                        fontname: v.fontname,
+                        size: v.size,
+                        align: match v.align {
+                            TextAlign::Left => 0,
+                            TextAlign::Center => 1,
+                            TextAlign::Right => 2,
+                        },
+                    };
+                    dwapp.draw_text(&desc, &formatdesc, None)?;
+                }
+            }
         }
         d3dapp.swap()?;
     }

@@ -13,6 +13,7 @@ pub fn create_graze(emngr: &mut EntityManager, graze: i64) -> EntityID {
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: Z_VALUE,
             text: String::default(),
             rect: Rect {
                 l: 280.0,

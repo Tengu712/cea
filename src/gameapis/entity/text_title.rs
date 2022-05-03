@@ -14,6 +14,7 @@ pub fn create_title_text(emngr: &mut EntityManager) {
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: -1.0,
             text: String::from("PRESS ANY KEY TO START"),
             rect: Rect {
                 l: 0.0,

@@ -9,7 +9,7 @@ pub fn create_player_hp(emngr: &mut EntityManager, cnt: usize) -> EntityID {
             translation: Vector {
                 x: 290.0 + (cnt as f32) * 30.0 - SCREEN_WIDTH / 2.0,
                 y: -110.0 + SCREEN_HEIGHT / 2.0,
-                z: Z_HP,
+                z: Z_VALUE,
             },
             scaling: Vector {
                 x: 30.0,

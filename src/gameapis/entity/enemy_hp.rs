@@ -1,8 +1,7 @@
 use super::*;
 
-pub fn create_enemy_hp(emngr: &mut EntityManager, hp_max: i64, enemy_id: EntityID) -> EntityID {
+pub fn create_enemy_hp(emngr: &mut EntityManager, hp_max: i64) -> EntityID {
     let id = emngr.create_entity();
-    emngr.insert_scripted_id(id, type_name::<MarkerGage>());
     emngr.coms.counters.insert(
         id,
         Counter {
@@ -11,29 +10,25 @@ pub fn create_enemy_hp(emngr: &mut EntityManager, hp_max: i64, enemy_id: EntityI
             count_max: hp_max,
         },
     );
-    emngr.coms.positions.insert(
+    emngr.coms.sprites.insert(id, Sprite::default());
+    emngr.coms.valuesprites.insert(
         id,
-        Vector {
-            x: 0.0,
-            y: 0.0,
-            z: Z_GAGE,
-        },
-    );
-    emngr
-        .coms
-        .sameposition2ds
-        .insert(id, SamePosition2D(enemy_id));
-    emngr.coms.sprites.insert(
-        id,
-        Sprite {
-            imgid: Some(IMGID_HP),
-            scaling: Vector {
-                x: 280.0,
-                y: 280.0,
-                z: Z_GAGE,
-            },
-            color: COLOR_WHITE,
-            ..Default::default()
+        ValueSprite {
+            format: Some(|n| Sprite {
+                translation: Vector {
+                    x: 0.0,
+                    y: GAME_TOP,
+                    z: Z_VALUE,
+                },
+                scaling: Vector {
+                    x: (GAME_RIGHT - GAME_RIGHT)
+                        * (n.count.max(0) as f32 / n.count_max.max(1) as f32),
+                    y: 20.0,
+                    z: 1.0,
+                },
+                color: COLOR_WHITE,
+                ..Default::default()
+            }),
         },
     );
     id

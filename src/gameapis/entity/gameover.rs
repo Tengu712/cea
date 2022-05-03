@@ -13,6 +13,7 @@ pub fn create_gameover(emngr: &mut EntityManager) -> EntityID {
     emngr.coms.texts.insert(
         id,
         Text {
+            layer: Z_GAMEOVER,
             text: String::from("GAME OVER"),
             rect: Rect {
                 l: 0.0,
@@ -58,6 +59,7 @@ pub fn create_gameover(emngr: &mut EntityManager) -> EntityID {
         id,
         ValueText {
             format: Some(|n| Text {
+                layer: Z_GAMEOVER,
                 text: String::from("GAME OVER"),
                 rect: Rect {
                     l: 0.0,
