@@ -15,7 +15,14 @@ impl Title {
 }
 impl Scene for Title {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
-        if world.emngr.input.z == 1 {
+        if world.emngr.input.z == 1
+            || world.emngr.input.x == 1
+            || world.emngr.input.s == 1
+            || world.emngr.input.left == 1
+            || world.emngr.input.right == 1
+            || world.emngr.input.up == 1
+            || world.emngr.input.down == 1
+        {
             Some(super::stage::Stage::new(world))
         } else {
             None

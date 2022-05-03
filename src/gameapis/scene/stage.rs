@@ -37,10 +37,10 @@ impl Scene for Stage {
         // Check hit
         let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
         // Add rate
-        self.add_rate(world, msg_graze, is_snap);
+        let rate = self.add_rate(world, msg_graze, is_snap);
         // Subtraction of enemy hp
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
-            enemy_hp.count -= msg_enemy_hit;
+            enemy_hp.count -= ((2.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64 * msg_enemy_hit;
         }
         // Add graze
         if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
@@ -60,24 +60,6 @@ impl Scene for Stage {
             BULLET_MAX_NUM
         );
         println!(
-            "\x1b[2KRate : {:.0} %",
-            100.0
-                * world
-                    .emngr
-                    .coms
-                    .counters
-                    .get(&self.rate)
-                    .map(|n| n.count)
-                    .unwrap_or(0) as f32
-                / world
-                    .emngr
-                    .coms
-                    .counters
-                    .get(&self.rate)
-                    .map(|n| n.count_max)
-                    .unwrap_or(1) as f32
-        );
-        println!(
             "\x1b[2KEnemyHP : {} / {}",
             world
                 .emngr
@@ -94,7 +76,12 @@ impl Scene for Stage {
                 .map(|n| n.count_max)
                 .unwrap_or(0),
         );
-        println!("\x1b[4A");
+        println!("\x1b[2KRate : {} %", rate / 10);
+        println!(
+            "\x1b[2KDamageExpect : {}",
+            ((2.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64
+        );
+        println!("\x1b[5A");
         None
     }
 }
