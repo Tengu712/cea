@@ -29,22 +29,20 @@ pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
     );
     emngr.coms.valuetexts.insert(
         id,
-        ValueText {
-            format: Some(|n| Text {
-                layer: Z_VALUE,
-                text: format!("{}", (n.count_max - n.count) / 60),
-                rect: Rect {
-                    l: 0.0,
-                    r: SCREEN_WIDTH - 280.0,
-                    t: 0.0,
-                    b: SCREEN_HEIGHT,
-                },
-                size: 60.0,
-                rgba: COLOR_WHITE,
-                fontname: "Consolas\0",
-                align: TextAlign::Right,
-            }),
-        },
+        ValueText(Some(|n| Text {
+            layer: Z_VALUE,
+            text: format!("{}", (n.count_max - n.count) / 60),
+            rect: Rect {
+                l: 0.0,
+                r: SCREEN_WIDTH - 280.0,
+                t: 0.0,
+                b: SCREEN_HEIGHT,
+            },
+            size: 60.0,
+            rgba: COLOR_WHITE,
+            fontname: "Consolas\0",
+            align: TextAlign::Right,
+        })),
     );
     id
 }

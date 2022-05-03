@@ -1,6 +1,4 @@
 use super::*;
 
 #[derive(Default)]
-pub struct ValueText {
-    pub format: Option<fn(&Counter) -> Text>,
-}
+pub struct ValueText(pub Option<fn(&Counter) -> Text>);

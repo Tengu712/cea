@@ -1,6 +1,4 @@
 use super::*;
 
 #[derive(Default)]
-pub struct ValueSprite {
-    pub format: Option<fn(&Counter) -> Sprite>,
-}
+pub struct ValueSprite(pub Option<fn(&Counter) -> Sprite>);

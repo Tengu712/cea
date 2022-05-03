@@ -48,7 +48,6 @@ impl Stage {
         world.systems.push(unique_player_hit);
         world.systems.push(unique_player_shot);
         world.systems.push(script_player_slow);
-        world.systems.push(script_gage);
         // system
         world.systems.push(system_fpsmeasure);
         world.systems.push(system_update_counter);

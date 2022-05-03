@@ -8,7 +8,7 @@ pub fn system_value_sprite(emngr: &mut EntityManager) {
         }
         if let Some(counter) = emngr.coms.counters.get(k) {
             if let Some(n) = emngr.coms.sprites.get_mut(k) {
-                if let Some(f) = v.format {
+                if let Some(f) = v.0 {
                     *n = f(counter)
                 }
             }

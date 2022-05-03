@@ -29,22 +29,20 @@ pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
     );
     emngr.coms.valuetexts.insert(
         id,
-        ValueText {
-            format: Some(|n| Text {
-                layer: Z_VALUE,
-                text: format!("{:>012}", n.count),
-                rect: Rect {
-                    l: 280.0,
-                    r: SCREEN_WIDTH,
-                    t: 0.0,
-                    b: SCREEN_HEIGHT,
-                },
-                rgba: COLOR_WHITE,
-                fontname: "Consolas\0",
-                size: 60.0,
-                align: TextAlign::Left,
-            }),
-        },
+        ValueText(Some(|n| Text {
+            layer: Z_VALUE,
+            text: format!("{:>012}", n.count),
+            rect: Rect {
+                l: 280.0,
+                r: SCREEN_WIDTH,
+                t: 0.0,
+                b: SCREEN_HEIGHT,
+            },
+            rgba: COLOR_WHITE,
+            fontname: "Consolas\0",
+            size: 60.0,
+            align: TextAlign::Left,
+        })),
     );
     id
 }
