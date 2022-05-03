@@ -7,17 +7,18 @@ use super::*;
 
 #[derive(Default)]
 pub struct Stage {
-    pub player: EntityID,
-    pub player_slow1: EntityID,
-    pub player_slow2: EntityID,
-    pub score: EntityID,
-    pub graze: EntityID,
-    pub stage: EntityID,
-    pub e_hp: EntityID,
-    pub p_hp: Vec<EntityID>,
-    pub rate: EntityID,
-    pub rate_delay: EntityID,
-    pub snap_delay: EntityID,
+    player: EntityID,
+    player_slow1: EntityID,
+    player_slow2: EntityID,
+    score: EntityID,
+    graze: EntityID,
+    stage: EntityID,
+    e_hp: EntityID,
+    p_hp: Vec<EntityID>,
+    rate: EntityID,
+    rate_delay: EntityID,
+    snap_delay: EntityID,
+    gameover: EntityID,
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {

@@ -87,6 +87,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         input.down = get_next_keystate(0x28, input.down);
         if let Some(next) = scene.as_mut().update(&mut world) {
             scene = next;
+            println!("aa");
         }
         world.update(&input);
         d3dapp.clear_rtv();
@@ -97,19 +98,19 @@ fn start_app() -> Result<(), windows::core::Error> {
                 world.emngr.camera.pos.x,
                 world.emngr.camera.pos.y,
                 world.emngr.camera.pos.z,
-            ],
-            [
-                world.emngr.camera.rot.x,
-                world.emngr.camera.rot.y,
-                world.emngr.camera.rot.z,
-            ],
-        );
-        cdata.mat_proj = mat_proj_3d.clone();
-        for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
-            if !s.is_active() {
-                continue;
-            }
-            match v.imgid {
+                ],
+                [
+                    world.emngr.camera.rot.x,
+                    world.emngr.camera.rot.y,
+                    world.emngr.camera.rot.z,
+                    ],
+                );
+                cdata.mat_proj = mat_proj_3d.clone();
+                for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
+                    if !s.is_active() {
+                        continue;
+                    }
+                    match v.imgid {
                 Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
                 None => cdata = d3dapp.set_d3dimage(None, cdata),
             }

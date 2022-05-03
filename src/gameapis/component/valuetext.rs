@@ -2,5 +2,5 @@ use super::*;
 
 #[derive(Default)]
 pub struct ValueText {
-    pub format: Option<fn(&Counter) -> String>,
+    pub format: Option<fn(&Counter) -> Text>,
 }

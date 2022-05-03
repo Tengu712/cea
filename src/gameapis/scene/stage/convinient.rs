@@ -23,7 +23,8 @@ impl Stage {
             if let Some(n) = self.p_hp.pop() {
                 world.emngr.remove_entity(&n);
             } else {
-                // Game over
+                world.emngr.coms.counters.active(&self.gameover);
+                return 0;
             }
             self.player = create_player(&mut world.emngr);
             self.player_slow1 = create_player_slow(&mut world.emngr, self.player, true);

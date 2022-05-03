@@ -23,11 +23,13 @@ impl Stage {
         let stage = create_stage1(&mut world.emngr);
         let camera = create_camera(&mut world.emngr);
         let camera_lean = create_camera_lean(&mut world.emngr);
+        let gameover = create_gameover(&mut world.emngr);
         let mut p_hp = Vec::new();
         for i in 0..2 {
             p_hp.push(create_player_hp(&mut world.emngr, i));
         }
         world.emngr.coms.counters.disactive(&snap_delay);
+        world.emngr.coms.counters.disactive(&gameover);
         // Unique
         world.emngr.unique_ids.insert(UNIQUE_CAMERA, camera);
         world
@@ -55,6 +57,7 @@ impl Stage {
         world.systems.push(system_restrict_position);
         world.systems.push(system_same_position_2d);
         world.systems.push(system_position_sprite);
+        world.systems.push(system_value_sprite);
         world.systems.push(system_value_text);
         Box::new(Stage {
             player,
@@ -68,6 +71,7 @@ impl Stage {
             rate,
             rate_delay,
             snap_delay,
+            gameover,
         })
     }
 }

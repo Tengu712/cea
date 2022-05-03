@@ -4,6 +4,7 @@ pub mod fpsmeasure;
 pub mod sameposition2d;
 pub mod sprite;
 pub mod text;
+pub mod valuesprite;
 pub mod valuetext;
 pub mod velocity;
 
@@ -13,6 +14,7 @@ pub use fpsmeasure::*;
 pub use sameposition2d::*;
 pub use sprite::*;
 pub use text::*;
+pub use valuesprite::*;
 pub use valuetext::*;
 pub use velocity::*;
 
@@ -124,6 +126,7 @@ pub struct Components {
     pub sprites: CContainer<Sprite>,
     pub texts: CContainer<Text>,
     pub valuetexts: CContainer<ValueText>,
+    pub valuesprites: CContainer<ValueSprite>,
     pub velocities: CContainer<Velocity>,
 }
 impl Components {
