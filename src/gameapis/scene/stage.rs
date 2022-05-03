@@ -87,12 +87,11 @@ impl Scene for Stage {
                 .map(|n| n.count_max)
                 .unwrap_or(0),
         );
-        println!("\x1b[2KRate : {} %", rate / 10);
         println!(
             "\x1b[2KDamageExpect : {}",
             ((2.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64
         );
-        println!("\x1b[5A");
+        println!("\x1b[4A");
         None
     }
 }

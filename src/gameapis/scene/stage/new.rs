@@ -38,6 +38,7 @@ impl Stage {
             .insert(UNIQUE_CAMERA_LEAN, camera_lean);
         world.emngr.unique_ids.insert(UNIQUE_ENEMY, enemy);
         world.emngr.unique_ids.insert(UNIQUE_PLAYER, player);
+        world.emngr.unique_ids.insert(UNIQUE_PLAYER_RATE, rate);
         world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage);
         // script
         world.systems.push(unique_stage1_1);
@@ -47,6 +48,7 @@ impl Stage {
         world.systems.push(unique_enemy_hit);
         world.systems.push(unique_player_hit);
         world.systems.push(unique_player_shot);
+        world.systems.push(unique_player_rate);
         world.systems.push(script_player_slow);
         // system
         world.systems.push(system_fpsmeasure);

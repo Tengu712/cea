@@ -13,7 +13,7 @@ pub fn create_title_text(emngr: &mut EntityManager) {
     );
     emngr.coms.valuetexts.insert(
         id,
-        ValueText(Some(|n| Text {
+        ValueText(Some(|n, _| Text {
             layer: -1.0,
             text: String::from("PRESS ANY KEY TO START"),
             rect: Rect {

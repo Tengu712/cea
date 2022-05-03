@@ -18,17 +18,17 @@ pub fn create_enemy_hp(emngr: &mut EntityManager, hp_max: i64) -> EntityID {
     id
 }
 fn value_sprite_gage(n: &Counter) -> Sprite {
-    let width = (GAME_RIGHT - GAME_LEFT) * (n.count.max(0) as f32 / n.count_max.max(1) as f32);
+    let width = (GAME_RIGHT - GAME_LEFT) * (n.count.max(0) as f32 / n.count_max.max(1) as f32) - 100.0;
     Sprite {
         imgid: Some(IMGID_GAGE),
         translation: Vector {
-            x: GAME_LEFT + width / 2.0,
+            x: GAME_LEFT + width / 2.0 + 50.0,
             y: GAME_TOP - 10.0,
             z: Z_VALUE,
         },
         scaling: Vector {
             x: width,
-            y: 20.0,
+            y: 5.0,
             z: 1.0,
         },
         color: COLOR_WHITE,

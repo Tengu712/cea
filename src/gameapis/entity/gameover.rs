@@ -10,32 +10,11 @@ pub fn create_gameover(emngr: &mut EntityManager) -> EntityID {
             count_max: 300,
         },
     );
-    emngr.coms.texts.insert(
-        id,
-        Text {
-            layer: Z_GAMEOVER,
-            text: String::from("GAME OVER"),
-            rect: Rect {
-                l: 0.0,
-                r: SCREEN_WIDTH,
-                t: SCREEN_HEIGHT / 2.0 - 50.0,
-                b: SCREEN_HEIGHT,
-            },
-            rgba: Vector4D {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
-                w: 0.0,
-            },
-            size: 50.0,
-            fontname: "游明朝\0",
-            align: TextAlign::Center,
-        },
-    );
+    emngr.coms.texts.insert(id, Text::default());
     emngr.coms.sprites.insert(id, Sprite::default());
     emngr.coms.valuetexts.insert(
         id,
-        ValueText(Some(|n| Text {
+        ValueText(Some(|n, _| Text {
             layer: Z_GAMEOVER,
             text: String::from("GAME OVER"),
             rect: Rect {

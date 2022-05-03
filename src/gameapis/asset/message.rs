@@ -2,9 +2,9 @@ use super::*;
 
 pub const UNIQUE_CAMERA: EntityKey = "Camera";
 pub const UNIQUE_CAMERA_LEAN: EntityKey = "CameraLean";
-
 pub const UNIQUE_ENEMY: EntityKey = "Enemy";
 pub const UNIQUE_PLAYER: EntityKey = "Player";
+pub const UNIQUE_PLAYER_RATE: EntityKey = "PlayerRate";
 
 pub const UNIQUE_STAGE1: EntityKey = "Stage1";
 

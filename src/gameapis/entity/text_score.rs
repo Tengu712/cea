@@ -13,7 +13,7 @@ pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
     );
     emngr.coms.valuetexts.insert(
         id,
-        ValueText(Some(|n| Text {
+        ValueText(Some(|n, _| Text {
             layer: Z_VALUE,
             text: format!("{:>012}", n.count),
             rect: Rect {

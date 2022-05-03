@@ -33,6 +33,7 @@ impl Stage {
             self.player_slow2 = create_player_slow(&mut world.emngr, self.player, false);
             self.rate = create_player_rate(&mut world.emngr);
             world.emngr.unique_ids.insert(UNIQUE_PLAYER, self.player);
+            world.emngr.unique_ids.insert(UNIQUE_PLAYER_RATE, self.rate);
         } else if world.emngr.coms.counters.get(&self.snap_delay).is_some() {
             // If down Z key during delay, player regain moving and shooting.
             if world.emngr.input.z == 1 {

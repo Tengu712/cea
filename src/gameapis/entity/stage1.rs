@@ -13,7 +13,7 @@ pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
     );
     emngr.coms.valuetexts.insert(
         id,
-        ValueText(Some(|n| Text {
+        ValueText(Some(|n, _| Text {
             layer: Z_VALUE,
             text: format!("{}", (n.count_max - n.count) / 60),
             rect: Rect {

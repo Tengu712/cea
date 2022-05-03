@@ -7,6 +7,7 @@ pub mod unique_camera_lean;
 pub mod unique_enemy_hit;
 pub mod unique_player;
 pub mod unique_player_hit;
+pub mod unique_player_rate;
 pub mod unique_player_shot;
 pub mod unique_stage1_1;
 
@@ -19,6 +20,7 @@ pub use unique_camera_lean::*;
 pub use unique_enemy_hit::*;
 pub use unique_player::*;
 pub use unique_player_hit::*;
+pub use unique_player_rate::*;
 pub use unique_player_shot::*;
 pub use unique_stage1_1::*;
 

@@ -159,7 +159,7 @@ pub struct Vector4D {
     pub z: f32,
     pub w: f32,
 }
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Rect {
     pub l: f32,
     pub r: f32,
