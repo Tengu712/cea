@@ -65,6 +65,7 @@ impl Stage {
             score,
             graze,
             stage,
+            camera_lean,
             e_hp,
             p_hp,
             rate,

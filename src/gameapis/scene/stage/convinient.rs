@@ -24,6 +24,7 @@ impl Stage {
                 world.emngr.remove_entity(&n);
             } else {
                 world.emngr.coms.counters.active(&self.gameover);
+                world.emngr.remove_entity(&self.camera_lean);
                 world.emngr.remove_entity(&self.stage);
                 return 0;
             }

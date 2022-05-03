@@ -13,6 +13,7 @@ pub struct Stage {
     score: EntityID,
     graze: EntityID,
     stage: EntityID,
+    camera_lean: EntityID,
     e_hp: EntityID,
     p_hp: Vec<EntityID>,
     rate: EntityID,
