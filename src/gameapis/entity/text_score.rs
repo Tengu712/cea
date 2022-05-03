@@ -17,9 +17,9 @@ pub fn create_score(emngr: &mut EntityManager, score: i64) -> EntityID {
             layer: Z_VALUE,
             text: format!("{:>012}", n.count),
             rect: Rect {
-                l: 280.0,
+                l: SCREEN_WIDTH / 2.0 + GAME_LEFT,
                 r: SCREEN_WIDTH,
-                t: 0.0,
+                t: 12.0,
                 b: SCREEN_HEIGHT,
             },
             rgba: COLOR_WHITE,

@@ -7,7 +7,7 @@ pub fn create_gameover(emngr: &mut EntityManager) -> EntityID {
         Counter {
             speed: 1,
             count: 0,
-            count_max: 240,
+            count_max: 300,
         },
     );
     emngr.coms.texts.insert(

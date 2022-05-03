@@ -24,7 +24,7 @@ pub fn create_player(emngr: &mut EntityManager) -> EntityID {
             l: GAME_LEFT + 10.0,
             r: GAME_RIGHT - 10.0,
             t: GAME_TOP - 150.0,
-            b: GAME_BOTTOM + 20.0,
+            b: GAME_BOTTOM + 40.0,
             n: -1000.0,
             f: 1000.0,
         },

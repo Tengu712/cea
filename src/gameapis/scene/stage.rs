@@ -35,6 +35,15 @@ impl Scene for Stage {
             .remove(MESSAGE_PLAYER_GRAZE)
             .unwrap_or(0);
         let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Check gameovered
+        let is_gameovered = if let Some(n) = world.emngr.coms.counters.get(&self.gameover) {
+            n.count == n.count_max
+        } else {
+            false
+        };
+        if is_gameovered {
+            return Some(Title::new(world));
+        }
         // Check hit
         let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
         // Add rate

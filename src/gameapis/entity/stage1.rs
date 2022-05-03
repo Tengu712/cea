@@ -18,8 +18,8 @@ pub fn create_stage1(emngr: &mut EntityManager) -> EntityID {
             text: format!("{}", (n.count_max - n.count) / 60),
             rect: Rect {
                 l: 0.0,
-                r: SCREEN_WIDTH - 280.0,
-                t: 0.0,
+                r: SCREEN_WIDTH / 2.0 + GAME_RIGHT,
+                t: 12.0,
                 b: SCREEN_HEIGHT,
             },
             size: 60.0,
