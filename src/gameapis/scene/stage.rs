@@ -14,6 +14,7 @@ pub struct Stage {
     pub graze: EntityID,
     pub stage: EntityID,
     pub e_hp: EntityID,
+    pub p_hp: Vec<EntityID>,
     pub rate: EntityID,
     pub rate_delay: EntityID,
     pub snap_delay: EntityID,

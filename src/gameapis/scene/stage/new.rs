@@ -23,6 +23,11 @@ impl Stage {
         let stage = create_stage1(&mut world.emngr);
         let camera = create_camera(&mut world.emngr);
         let camera_lean = create_camera_lean(&mut world.emngr);
+        let mut p_hp = Vec::new();
+        for i in 0..2 {
+            p_hp.push(create_player_hp(&mut world.emngr, i));
+        }
+        world.emngr.coms.counters.disactive(&snap_delay);
         // Unique
         world.emngr.unique_ids.insert(UNIQUE_CAMERA, camera);
         world
@@ -59,6 +64,7 @@ impl Stage {
             graze,
             stage,
             e_hp,
+            p_hp,
             rate,
             rate_delay,
             snap_delay,

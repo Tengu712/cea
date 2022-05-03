@@ -28,4 +28,5 @@ pub const Z_PLAYER: f32 = -5.0;
 pub const Z_BULLET: f32 = -4.0;
 pub const Z_PLAYER_SLOW: f32 = -3.0;
 pub const Z_GAGE: f32 = -2.0;
+pub const Z_HP: f32 = -2.0;
 pub const Z_FRAME: f32 = -1.0;

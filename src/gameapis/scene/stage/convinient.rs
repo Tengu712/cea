@@ -19,6 +19,12 @@ impl Stage {
             world.emngr.remove_entity(&self.player_slow2);
             world.emngr.remove_entity(&self.rate);
             world.emngr.coms.counters.disactive(&self.snap_delay);
+            // Decrease player hp. Then, check gameover?
+            if let Some(n) = self.p_hp.pop() {
+                world.emngr.remove_entity(&n);
+            } else {
+                // Game over
+            }
             self.player = create_player(&mut world.emngr);
             self.player_slow1 = create_player_slow(&mut world.emngr, self.player, true);
             self.player_slow2 = create_player_slow(&mut world.emngr, self.player, false);
