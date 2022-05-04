@@ -24,4 +24,6 @@ pub fn unique_player_hit(emngr: &mut EntityManager) {
         MESSAGE_PLAYER_GRAZE,
         true,
     );
+    // Bonus
+    hit(emngr, &id, TEAM_BONUS, MESSAGE_BONUS, true);
 }

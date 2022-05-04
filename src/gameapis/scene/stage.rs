@@ -51,11 +51,25 @@ impl Scene for Stage {
         // Add rate
         let rate = self.add_rate(world, msg_graze, is_snap);
         // Subtraction of enemy hp and check defeat enemy
+        let mut flg_move_phase = 0;
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
             enemy_hp.count -= ((3.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64 * msg_enemy_hit;
             if enemy_hp.count <= 0 {
-                world.emngr.remove_entity(&self.e_hp);
-                world.emngr.remove_entity(&self.stage);
+                flg_move_phase = 1;
+            }
+        }
+        // Check time up
+        if let Some(stage_counter) = world.emngr.coms.counters.get(&self.stage) {
+            if stage_counter.count >= stage_counter.count_max {
+                flg_move_phase = 2;
+            }
+        }
+        // Move phase
+        if flg_move_phase > 0 {
+            world.emngr.remove_entity(&self.e_hp);
+            world.emngr.remove_entity(&self.stage);
+            if flg_move_phase == 1 {
+                self.remove_bullets(world);
             }
         }
         // Add graze

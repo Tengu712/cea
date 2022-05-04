@@ -54,6 +54,7 @@ impl Stage {
         world.systems.push(unique_player_hit);
         world.systems.push(unique_player_shot);
         world.systems.push(unique_player_rate);
+        world.systems.push(script_bonus);
         world.systems.push(script_player_hitcircle);
         world.systems.push(script_player_slow);
         // system
