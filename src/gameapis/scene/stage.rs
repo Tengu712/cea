@@ -10,6 +10,7 @@ pub struct Stage {
     player: EntityID,
     player_slow1: EntityID,
     player_slow2: EntityID,
+    player_hitcircle: EntityID,
     score: EntityID,
     graze: EntityID,
     stage: EntityID,

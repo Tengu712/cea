@@ -17,6 +17,7 @@ impl Stage {
             world.emngr.remove_entity(&self.player);
             world.emngr.remove_entity(&self.player_slow1);
             world.emngr.remove_entity(&self.player_slow2);
+            world.emngr.remove_entity(&self.player_hitcircle);
             world.emngr.remove_entity(&self.rate);
             world.emngr.coms.counters.disactive(&self.snap_delay);
             // Decrease player hp. Then, check gameover?
@@ -31,6 +32,7 @@ impl Stage {
             self.player = create_player(&mut world.emngr);
             self.player_slow1 = create_player_slow(&mut world.emngr, self.player, true);
             self.player_slow2 = create_player_slow(&mut world.emngr, self.player, false);
+            self.player_hitcircle = create_player_hitcircle(&mut world.emngr, self.player);
             self.rate = create_player_rate(&mut world.emngr);
             world.emngr.unique_ids.insert(UNIQUE_PLAYER, self.player);
             world.emngr.unique_ids.insert(UNIQUE_PLAYER_RATE, self.rate);

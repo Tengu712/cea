@@ -1,7 +1,5 @@
 use super::*;
 
-const FLOOR_SIZE: f32 = 350.0;
-
 pub fn create_floor(emngr: &mut EntityManager, cnt: u32) -> EntityID {
     let id = emngr.create_entity();
     emngr.coms.sprite3ds.insert(

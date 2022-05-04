@@ -91,7 +91,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         world.update(&input);
         d3dapp.clear_rtv();
         // Draw 3d sprite
-        d3dapp.set_rtv(true);
+        d3dapp.set_rtv(false);
         cdata.mat_view = Matrix4x4::new_view(
             [
                 world.emngr.camera.pos.x,
@@ -105,17 +105,24 @@ fn start_app() -> Result<(), windows::core::Error> {
             ],
         );
         cdata.mat_proj = mat_proj_3d.clone();
-        for (_, s, v) in world.emngr.coms.sprite3ds.iter() {
+        let mut vec_3d = Vec::with_capacity(world.emngr.coms.sprite3ds.len());
+        for (k, s, v) in world.emngr.coms.sprite3ds.iter() {
             if !s.is_active() {
                 continue;
             }
-            match v.imgid {
-                Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
-                None => cdata = d3dapp.set_d3dimage(None, cdata),
+            vec_3d.push((v.translation.z, k));
+        }
+        vec_3d.sort_by(|(z1, _), (z2, _)| (-z1).partial_cmp(&-(*z2)).unwrap());
+        for (_, k) in vec_3d {
+            if let Some(v) = world.emngr.coms.sprite3ds.get(k) {
+                match v.imgid {
+                    Some(imgid) => cdata = d3dapp.set_d3dimage(map_image.get(imgid), cdata),
+                    None => cdata = d3dapp.set_d3dimage(None, cdata),
+                }
+                cdata = apply_cdata_diff(cdata, v);
+                d3dapp.set_cdata(&cdata)?;
+                d3dapp.draw_model(&idea);
             }
-            cdata = apply_cdata_diff(cdata, v);
-            d3dapp.set_cdata(&cdata)?;
-            d3dapp.draw_model(&idea);
         }
         // Draw 2d objects
         d3dapp.set_rtv(false);

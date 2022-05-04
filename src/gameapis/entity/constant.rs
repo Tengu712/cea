@@ -12,6 +12,7 @@ pub const COLOR_WHITE: Vector4D = Vector4D {
     z: 1.0,
     w: 1.0,
 };
+pub const FLOOR_SIZE: f32 = 350.0;
 
 pub const BULLET_REMOVE_RECT: Rect3D = Rect3D {
     l: GAME_LEFT - 80.0,

@@ -15,11 +15,14 @@ pub const IMGID_REMILIA_ST0: &'static str = "st_remilia_0.png";
 // UI
 pub const IMGID_SLOWCIRCLE: &'static str = "ch_slowcircle.png";
 pub const IMGID_HITCIRCLE: &'static str = "ch_hitcircle.png";
+pub const IMGID_LIFE: &'static str = "ui_life.png";
 pub const IMGID_GAGE: &'static str = "ui_gage.png";
 pub const IMGID_FRAME: &'static str = "ui_frame.png";
 // Back ground
 pub const IMGID_FLOOR: &'static str = "bg_floor.png";
-pub const IMG_RESOURCE_SIZE: usize = 16;
+pub const IMGID_DECOLATION: &'static str = "bg_decolation.png";
+// Array
+pub const IMG_RESOURCE_SIZE: usize = 18;
 pub const IMGID_ARRAY: [&'static str; IMG_RESOURCE_SIZE] = [
     IMGID_BUL_FLAN,
     IMGID_BUL_CIRCLE,
@@ -34,7 +37,9 @@ pub const IMGID_ARRAY: [&'static str; IMG_RESOURCE_SIZE] = [
     IMGID_REMILIA_ST0,
     IMGID_SLOWCIRCLE,
     IMGID_HITCIRCLE,
+    IMGID_LIFE,
     IMGID_GAGE,
     IMGID_FRAME,
     IMGID_FLOOR,
+    IMGID_DECOLATION,
 ];
