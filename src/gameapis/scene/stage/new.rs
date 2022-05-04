@@ -23,6 +23,7 @@ impl Stage {
         let rate = create_player_rate(&mut world.emngr);
         let rate_delay = create_delay_count(&mut world.emngr, 60);
         let snap_delay = create_delay_count(&mut world.emngr, 10);
+        let logue = create_logue_text(&mut world.emngr);
         let score = create_score(&mut world.emngr, 0);
         let graze = create_graze(&mut world.emngr, 0);
         let stage = create_stage1(&mut world.emngr);
@@ -33,8 +34,11 @@ impl Stage {
         for i in 0..2 {
             p_hp.push(create_player_hp(&mut world.emngr, i));
         }
+        // Disactive
+        world.emngr.coms.counters.disactive(&player);
         world.emngr.coms.counters.disactive(&snap_delay);
         world.emngr.coms.counters.disactive(&gameover);
+        world.emngr.coms.counters.disactive(&stage);
         // Unique
         world.emngr.unique_ids.insert(UNIQUE_CAMERA, camera);
         world
@@ -45,8 +49,10 @@ impl Stage {
         world.emngr.unique_ids.insert(UNIQUE_PLAYER, player);
         world.emngr.unique_ids.insert(UNIQUE_PLAYER_RATE, rate);
         world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage);
+        world.emngr.unique_ids.insert(UNIQUE_LOGUE1, logue);
         // script
         world.systems.push(unique_stage1_1);
+        world.systems.push(unique_logue1);
         world.systems.push(unique_camera);
         world.systems.push(unique_camera_lean);
         world.systems.push(unique_player);

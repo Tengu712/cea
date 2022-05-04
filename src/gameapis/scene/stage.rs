@@ -1,7 +1,9 @@
 mod add_rate;
 mod check_hit;
+mod die_player;
 pub mod new;
 mod remove_bullets;
+mod spawn_player;
 
 pub use new::*;
 
@@ -40,6 +42,7 @@ impl Scene for Stage {
             .unwrap_or(0);
         let msg_bonus = world.emngr.messages.remove(MESSAGE_BONUS).unwrap_or(0);
         let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Talk
         // Check gameovered
         let is_gameovered = if let Some(n) = world.emngr.coms.counters.get(&self.gameover) {
             n.count == n.count_max
@@ -72,7 +75,7 @@ impl Scene for Stage {
             world.emngr.remove_entity(&self.e_hp);
             world.emngr.remove_entity(&self.stage);
             if flg_move_phase == 1 {
-                self.remove_bullets(world);
+                self.remove_bullets(&mut world.emngr);
             }
         }
         // Add graze
