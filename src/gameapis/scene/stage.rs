@@ -1,5 +1,7 @@
-mod convinient;
+mod add_rate;
+mod check_hit;
 pub mod new;
+mod remove_bullets;
 
 pub use new::*;
 
@@ -36,6 +38,7 @@ impl Scene for Stage {
             .messages
             .remove(MESSAGE_PLAYER_GRAZE)
             .unwrap_or(0);
+        let msg_bonus = world.emngr.messages.remove(MESSAGE_BONUS).unwrap_or(0);
         let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
         // Check gameovered
         let is_gameovered = if let Some(n) = world.emngr.coms.counters.get(&self.gameover) {
@@ -49,7 +52,7 @@ impl Scene for Stage {
         // Check hit
         let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
         // Add rate
-        let rate = self.add_rate(world, msg_graze, is_snap);
+        let rate = self.add_rate(world, msg_graze, msg_bonus, is_snap);
         // Subtraction of enemy hp and check defeat enemy
         let mut flg_move_phase = 0;
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {

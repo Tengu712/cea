@@ -1,4 +1,5 @@
 // Bullet
+pub const IMGID_BONUS: &'static str = "bu_bonus.png";
 pub const IMGID_BUL_FLAN: &'static str = "bu_flan.png";
 pub const IMGID_BUL_CIRCLE: &'static str = "bu_circle.png";
 pub const IMGID_BUL_CIRCLE_FRAGILE: &'static str = "bu_circle_fragile.png";
@@ -22,8 +23,9 @@ pub const IMGID_FRAME: &'static str = "ui_frame.png";
 pub const IMGID_FLOOR: &'static str = "bg_floor.png";
 pub const IMGID_DECOLATION: &'static str = "bg_decolation.png";
 // Array
-pub const IMG_RESOURCE_SIZE: usize = 18;
+pub const IMG_RESOURCE_SIZE: usize = 19;
 pub const IMGID_ARRAY: [&'static str; IMG_RESOURCE_SIZE] = [
+    IMGID_BONUS,
     IMGID_BUL_FLAN,
     IMGID_BUL_CIRCLE,
     IMGID_BUL_CIRCLE_FRAGILE,

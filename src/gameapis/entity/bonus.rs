@@ -11,7 +11,7 @@ pub fn create_bonus(emngr: &mut EntityManager, x: f32, y: f32) -> EntityID {
     emngr.coms.sprites.insert(
         id,
         Sprite {
-            imgid: None,
+            imgid: Some(IMGID_BONUS),
             scaling: Vector {
                 x: 20.0,
                 y: 20.0,
