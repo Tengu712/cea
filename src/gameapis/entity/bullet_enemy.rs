@@ -13,22 +13,12 @@ pub(super) const BUL_CIRCLE_FRAGILE: BulletKind = BulletKind {
     r: 10.0,
     is_fragile: true,
 };
-pub(super) const BUL_MID_CIRCLE: BulletKind = BulletKind {
-    imgid: IMGID_BUL_CIRCLE,
-    size: 50.0,
-    r: 20.0,
-    is_fragile: false,
-};
-pub(super) const BUL_MID_CIRCLE_FRAGILE: BulletKind = BulletKind {
-    imgid: IMGID_BUL_CIRCLE_FRAGILE,
-    size: 50.0,
-    r: 20.0,
-    is_fragile: true,
-};
 */
 
 pub enum BulletKind {
     BigCircle,
+    MidCircle,
+    Circle,
 }
 impl BulletKind {
     fn analyze(&self, is_fragile: bool) -> (f32, f32, &'static str) {
@@ -40,6 +30,24 @@ impl BulletKind {
                     IMGID_BUL_BIG_CIRCLE_FRAGILE
                 } else {
                     IMGID_BUL_BIG_CIRCLE
+                },
+            ),
+            BulletKind::MidCircle => (
+                50.0,
+                20.0,
+                if is_fragile {
+                    IMGID_BUL_CIRCLE_FRAGILE
+                } else {
+                    IMGID_BUL_CIRCLE
+                },
+            ),
+            BulletKind::Circle => (
+                30.0,
+                10.0,
+                if is_fragile {
+                    IMGID_BUL_CIRCLE_FRAGILE
+                } else {
+                    IMGID_BUL_CIRCLE
                 },
             ),
         }
