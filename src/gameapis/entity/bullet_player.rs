@@ -24,7 +24,7 @@ pub fn create_player_bullet(emngr: &mut EntityManager, x: f32, y: f32) -> Entity
     emngr.coms.collisions.insert(
         id,
         Collision {
-            r: 100.0,
+            r: 80.0,
             team: TEAM_PLAYER_BULLET,
         },
     );

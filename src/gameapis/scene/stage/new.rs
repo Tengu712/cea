@@ -15,7 +15,7 @@ impl Stage {
         }
         let _ = create_frame(&mut world.emngr);
         let enemy = create_enemy(&mut world.emngr);
-        let e_hp = create_enemy_hp(&mut world.emngr, 2000);
+        let e_hp = create_enemy_hp(&mut world.emngr, 30000);
         let player = create_player(&mut world.emngr);
         let player_slow1 = create_player_slow(&mut world.emngr, player, true);
         let player_slow2 = create_player_slow(&mut world.emngr, player, false);

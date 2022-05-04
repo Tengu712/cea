@@ -50,9 +50,13 @@ impl Scene for Stage {
         let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
         // Add rate
         let rate = self.add_rate(world, msg_graze, is_snap);
-        // Subtraction of enemy hp
+        // Subtraction of enemy hp and check defeat enemy
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
-            enemy_hp.count -= ((2.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64 * msg_enemy_hit;
+            enemy_hp.count -= ((3.0 * rate as f32 / 1000.0 + 1.0) * 100.0) as i64 * msg_enemy_hit;
+            if enemy_hp.count <= 0 {
+                world.emngr.remove_entity(&self.e_hp);
+                world.emngr.remove_entity(&self.stage);
+            }
         }
         // Add graze
         if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
