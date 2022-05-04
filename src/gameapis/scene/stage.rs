@@ -1,5 +1,6 @@
 mod add_rate;
 mod check_hit;
+mod check_logue;
 mod die_player;
 pub mod new;
 mod remove_bullets;
@@ -25,6 +26,7 @@ pub struct Stage {
     rate_delay: EntityID,
     snap_delay: EntityID,
     gameover: EntityID,
+    logue: EntityID,
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
@@ -42,7 +44,6 @@ impl Scene for Stage {
             .unwrap_or(0);
         let msg_bonus = world.emngr.messages.remove(MESSAGE_BONUS).unwrap_or(0);
         let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
-        // Talk
         // Check gameovered
         let is_gameovered = if let Some(n) = world.emngr.coms.counters.get(&self.gameover) {
             n.count == n.count_max
@@ -52,6 +53,8 @@ impl Scene for Stage {
         if is_gameovered {
             return Some(Title::new(world));
         }
+        // Check logue
+        self.check_logue(&mut world.emngr);
         // Check hit
         let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
         // Add rate

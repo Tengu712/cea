@@ -88,6 +88,7 @@ impl Stage {
             rate_delay,
             snap_delay,
             gameover,
+            logue,
         })
     }
 }
