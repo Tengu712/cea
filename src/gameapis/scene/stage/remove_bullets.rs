@@ -1,7 +1,7 @@
 use super::*;
 
 impl Stage {
-    pub(super) fn remove_bullets(&mut self, emngr: &mut EntityManager) {
+    pub(super) fn remove_bullets(&mut self, emngr: &mut EntityManager, bonus: bool) {
         let mut remove_ids = Vec::new();
         let mut positions = Vec::new();
         for (k, s, v) in emngr.coms.collisions.iter() {
@@ -13,7 +13,9 @@ impl Stage {
             }
             if let Some(n) = emngr.coms.positions.get(k) {
                 remove_ids.push(*k);
-                positions.push(n.clone());
+                if bonus {
+                    positions.push(n.clone());
+                }
             }
         }
         for i in remove_ids {

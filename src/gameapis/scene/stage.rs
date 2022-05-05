@@ -78,17 +78,23 @@ impl Scene for Stage {
             world.emngr.remove_entity(&self.e_hp);
             world.emngr.remove_entity(&self.stage);
             if flg_move_phase == 1 {
-                self.remove_bullets(&mut world.emngr);
+                self.remove_bullets(&mut world.emngr, true);
+            } else {
+                self.remove_bullets(&mut world.emngr, false);
             }
         }
         // Add graze
-        if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
-            graze_counter.count += msg_graze;
-            graze_counter.count_max += msg_graze;
-        }
+        let graze_count =
+            if let Some(graze_counter) = world.emngr.coms.counters.get_mut(&self.graze) {
+                graze_counter.count += msg_graze;
+                graze_counter.count_max += msg_graze;
+                graze_counter.count
+            } else {
+                0
+            };
         // Add score
         if let Some(score_counter) = world.emngr.coms.counters.get_mut(&self.score) {
-            let add = msg_graze * 30 + msg_enemy_hit * 10;
+            let add = msg_graze * 30 + msg_enemy_hit * 10 + (1000 + 10 * graze_count / 2) * msg_bonus;
             score_counter.count += add;
             score_counter.count_max += add;
         }

@@ -10,7 +10,7 @@ impl Stage {
         emngr.remove_entity(&self.rate);
         emngr.coms.counters.disactive(&self.snap_delay);
         // Remove bullets
-        self.remove_bullets(emngr);
+        self.remove_bullets(emngr, false);
         // Decrease player hp. Then, check gameover?
         if let Some(n) = self.p_hp.pop() {
             emngr.remove_entity(&n);

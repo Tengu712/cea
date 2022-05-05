@@ -7,6 +7,8 @@ pub const UNIQUE_PLAYER: EntityKey = "Player";
 pub const UNIQUE_PLAYER_RATE: EntityKey = "PlayerRate";
 
 pub const UNIQUE_LOGUE1: EntityKey = "Logue1";
+pub const UNIQUE_LOGUE_LEFT: EntityKey = "LogueLeft";
+pub const UNIQUE_LOGUE_RIGHT: EntityKey = "LogueRight";
 pub const UNIQUE_STAGE1: EntityKey = "Stage1";
 
 pub const MESSAGE_PLAYER_HIT: MessageKey = "PlayerHit";
