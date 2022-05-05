@@ -9,7 +9,7 @@ pub fn create_logue_text(emngr: &mut EntityManager) -> EntityID {
         Counter {
             speed: 0,
             count: 0,
-            count_max: 12,
+            count_max: 11,
         },
     );
     emngr.coms.texts.insert(

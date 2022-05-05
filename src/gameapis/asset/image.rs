@@ -10,6 +10,8 @@ pub const IMGID_FLAN_B0: &'static str = "ch_flan_b0.png";
 pub const IMGID_FLAN_L0: &'static str = "ch_flan_l0.png";
 pub const IMGID_FLAN_R0: &'static str = "ch_flan_r0.png";
 pub const IMGID_FLAN_ST0: &'static str = "st_flan_0.png";
+pub const IMGID_FLAN_ST1: &'static str = "st_flan_1.png";
+pub const IMGID_FLAN_ST2: &'static str = "st_flan_2.png";
 // Remilia
 pub const IMGID_REMILIA_F0: &'static str = "ch_remilia_f0.png";
 pub const IMGID_REMILIA_ST0: &'static str = "st_remilia_0.png";
@@ -23,7 +25,7 @@ pub const IMGID_FRAME: &'static str = "ui_frame.png";
 pub const IMGID_FLOOR: &'static str = "bg_floor.png";
 pub const IMGID_DECOLATION: &'static str = "bg_decolation.png";
 // Array
-pub const IMG_RESOURCE_SIZE: usize = 19;
+pub const IMG_RESOURCE_SIZE: usize = 21;
 pub const IMGID_ARRAY: [&'static str; IMG_RESOURCE_SIZE] = [
     IMGID_BONUS,
     IMGID_BUL_FLAN,
@@ -35,6 +37,8 @@ pub const IMGID_ARRAY: [&'static str; IMG_RESOURCE_SIZE] = [
     IMGID_FLAN_L0,
     IMGID_FLAN_R0,
     IMGID_FLAN_ST0,
+    IMGID_FLAN_ST1,
+    IMGID_FLAN_ST2,
     IMGID_REMILIA_F0,
     IMGID_REMILIA_ST0,
     IMGID_SLOWCIRCLE,

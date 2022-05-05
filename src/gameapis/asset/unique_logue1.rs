@@ -1,74 +1,68 @@
 use super::*;
 
-const LOG: [(&'static str, &'static str, &'static str, bool); 13] = [
+const LOG: [(&'static str, &'static str, &'static str, bool); 12] = [
     (
         "何？　突然弾幕ごっこがしたいなんて\nあいつにでも頼めばいいのに",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST2,
         IMGID_REMILIA_ST0,
         false,
     ),
     (
         "あなた最近身体を動かしていないでしょう？",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST2,
         IMGID_REMILIA_ST0,
         true,
     ),
     (
         "妹をペット扱いするのかしら",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         false,
     ),
     (
         "それなら世話の焼けるペットだわ",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         true,
     ),
     (
         "咲夜の仕事でしょ\n稀にしか顔を見せないのに",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST2,
         IMGID_REMILIA_ST0,
         false,
     ),
     (
         "普段寝ているじゃないの",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST2,
         IMGID_REMILIA_ST0,
         true,
     ),
     (
         "お姉さまも幽閉されてみる？",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         false,
     ),
     (
         "時代は変わるものよ\nだからこうして来たの",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         true,
     ),
     (
         "つまり遊びたいってわけね",
-        IMGID_FLAN_ST0,
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         false,
     ),
     (
-        "そういうことにするわ",
-        IMGID_FLAN_ST0,
+        "そういうこと\n退屈しのぎに遊びましょう？",
+        IMGID_FLAN_ST1,
         IMGID_REMILIA_ST0,
         true,
     ),
     (
-        "退屈しのぎに遊びましょう？",
-        IMGID_FLAN_ST0,
-        IMGID_REMILIA_ST0,
-        true,
-    ),
-    (
-        "久々に暴れられそうね",
+        "久々に暴れられそうだわ",
         IMGID_FLAN_ST0,
         IMGID_REMILIA_ST0,
         false,
@@ -82,7 +76,8 @@ const COLOR_DISACTIVE: Vector4D = Vector4D {
     w: 1.0,
 };
 
-/// Move count with input.
+/// Move count with input. Then, change text and images.
+/// It is proceeded to check end of talking at Stage.
 pub fn unique_logue1(emngr: &mut EntityManager) {
     let id = if let Some(n) = emngr.unique_ids.get(UNIQUE_LOGUE1) {
         *n
