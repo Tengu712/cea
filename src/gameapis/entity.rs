@@ -64,6 +64,7 @@ pub struct EntityManager {
     pub scripted_ids: HashMap<ScriptKey, HashSet<EntityID>>,
     pub input: Input,
     pub camera: Camera,
+    pub audio_set: HashSet<&'static str>,
 }
 impl EntityManager {
     pub fn create_entity(&mut self) -> EntityID {

@@ -2,3 +2,4 @@ pshader.cso
 vshader.cso
 *.exe
 /img/
+/snd/

@@ -5,7 +5,7 @@ mod winapis;
 
 use gameapis::{asset::*, component::*, scene::*, *};
 use std::collections::HashMap;
-use winapis::{direct3d::*, directwrite::*, math::*, winapi::*};
+use winapis::{audio::*, direct3d::*, directwrite::*, math::*, winapi::*};
 
 /// Entory point.
 fn main() {
@@ -48,10 +48,19 @@ fn start_app() -> Result<(), windows::core::Error> {
     println!(" - Load resources");
     let map_image = {
         let mut map = HashMap::new();
-        let res_dir = cur_dir + r"img\";
+        let res_dir = cur_dir.clone() + r"img\";
         for i in IMGID_ARRAY {
             print!("\r\x1b[2K    * {}", i);
             map.insert(i, d3dapp.create_image_from_file(res_dir.clone() + i)?);
+        }
+        map
+    };
+    let map_audio = {
+        let mut map = HashMap::new();
+        let res_dir = cur_dir.clone() + r"snd\";
+        for i in SNDID_ARRAY {
+            print!("\r\x1b[2K    * {}", i);
+            map.insert(i, open_audio(res_dir.clone() + i)?);
         }
         map
     };
@@ -174,6 +183,14 @@ fn start_app() -> Result<(), windows::core::Error> {
                 }
             }
         }
+        // Play audio
+        for i in world.emngr.audio_set.iter() {
+            if let Some(n) = map_audio.get(i) {
+                seek_start(n)?;
+                play_audio(n)?;
+            }
+        }
+        world.emngr.audio_set.clear();
         d3dapp.swap()?;
     }
     Ok(())

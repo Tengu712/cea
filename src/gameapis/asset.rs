@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod hit;
 pub mod image;
 pub mod message;
@@ -14,6 +15,7 @@ pub mod unique_player_rate;
 pub mod unique_player_shot;
 pub mod unique_stage1_1;
 
+pub use audio::*;
 use hit::*;
 pub use image::*;
 pub use message::*;
