@@ -16,6 +16,10 @@ impl Scene for Stage {
             .unwrap_or(0);
         let msg_bonus = world.emngr.messages.remove(MESSAGE_BONUS).unwrap_or(0);
         let msg_enemy_hit = world.emngr.messages.remove(MESSAGE_ENEMY_HIT).unwrap_or(0);
+        // Bonus sound
+        if msg_bonus > 0 {
+            world.emngr.audio_set.insert(SNDID_SHOT);
+        }
         // Check gameovered
         let is_gameovered = if let Some(n) = world.emngr.coms.counters.get(&self.gameover) {
             n.count == n.count_max

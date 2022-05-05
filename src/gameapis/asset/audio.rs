@@ -1,2 +1,3 @@
-pub const SNDID_STAGE: &'static str = "resultloop.mp3\0";
-pub const SNDID_ARRAY: [&'static str; 1] = [SNDID_STAGE];
+pub const SNDID_STAGE: &'static str = "hoge.wav";
+pub const SNDID_SHOT: &'static str = "shot.wav";
+pub const SNDID_ARRAY: [&'static str; 2] = [SNDID_STAGE, SNDID_SHOT];

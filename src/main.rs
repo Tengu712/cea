@@ -4,8 +4,9 @@ mod gameapis;
 mod winapis;
 
 use gameapis::{asset::*, component::*, scene::*, *};
+use soloud::*;
 use std::collections::HashMap;
-use winapis::{audio::*, direct3d::*, directwrite::*, math::*, winapi::*};
+use winapis::{direct3d::*, directwrite::*, math::*, winapi::*};
 
 /// Entory point.
 fn main() {
@@ -45,6 +46,16 @@ fn start_app() -> Result<(), windows::core::Error> {
     let d3dapp = D3DApplication::new(&winapp, WIDTH, HEIGHT, cur_dir.clone().as_str())?;
     println!(" - Create DirectWrite Components");
     let dwapp = d3dapp.create_text_module(&winapp)?;
+    println!(" - Initialize soloud crate object");
+    let sl = match Soloud::default() {
+        Ok(n) => n,
+        Err(e) => {
+            return Err(windows::core::Error::new(
+                windows::core::HRESULT(0x80004005u32 as i32),
+                windows::core::HSTRING::from(e.to_string()),
+            ))
+        }
+    };
     println!(" - Load resources");
     let map_image = {
         let mut map = HashMap::new();
@@ -60,7 +71,17 @@ fn start_app() -> Result<(), windows::core::Error> {
         let res_dir = cur_dir.clone() + r"snd\";
         for i in SNDID_ARRAY {
             print!("\r\x1b[2K    * {}", i);
-            map.insert(i, open_audio(res_dir.clone() + i)?);
+            let mut wav = soloud::audio::Wav::default();
+            match wav.load(&std::path::Path::new((res_dir.clone() + i).as_str())) {
+                Ok(_) => (),
+                Err(e) => {
+                    return Err(windows::core::Error::new(
+                        windows::core::HRESULT(0x80004005u32 as i32),
+                        windows::core::HSTRING::from(e.to_string()),
+                    ))
+                }
+            }
+            map.insert(i, wav);
         }
         map
     };
@@ -186,8 +207,7 @@ fn start_app() -> Result<(), windows::core::Error> {
         // Play audio
         for i in world.emngr.audio_set.iter() {
             if let Some(n) = map_audio.get(i) {
-                seek_start(n)?;
-                play_audio(n)?;
+                sl.play(n);
             }
         }
         world.emngr.audio_set.clear();

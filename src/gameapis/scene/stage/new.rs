@@ -74,7 +74,6 @@ impl Stage {
         world.systems.push(system_value_sprite);
         world.systems.push(system_value_text);
         // Finish
-        world.emngr.audio_set.insert(SNDID_STAGE);
         Box::new(stage)
     }
 }

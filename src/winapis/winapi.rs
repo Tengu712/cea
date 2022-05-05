@@ -162,7 +162,7 @@ impl WindowsApplication {
         false
     }
     /// Getter for window handle.
-    pub(super) fn get_window_handle(&self) -> &HWND {
+    pub fn get_window_handle(&self) -> &HWND {
         &self.0
     }
 }
