@@ -24,6 +24,8 @@ impl Stage {
         let rate_delay = create_delay_count(&mut world.emngr, 60);
         let snap_delay = create_delay_count(&mut world.emngr, 10);
         let logue = create_logue_text(&mut world.emngr);
+        let logue_left = create_logue_image(&mut world.emngr);
+        let logue_right = create_logue_image(&mut world.emngr);
         let score = create_score(&mut world.emngr, 0);
         let graze = create_graze(&mut world.emngr, 0);
         let stage = create_stage1(&mut world.emngr);
@@ -50,6 +52,8 @@ impl Stage {
         world.emngr.unique_ids.insert(UNIQUE_PLAYER_RATE, rate);
         world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage);
         world.emngr.unique_ids.insert(UNIQUE_LOGUE1, logue);
+        world.emngr.unique_ids.insert(UNIQUE_LOGUE_LEFT, logue_left);
+        world.emngr.unique_ids.insert(UNIQUE_LOGUE_RIGHT, logue_right);
         // script
         world.systems.push(unique_stage1_1);
         world.systems.push(unique_logue1);
@@ -89,6 +93,8 @@ impl Stage {
             snap_delay,
             gameover,
             logue,
+            logue_left,
+            logue_right,
         })
     }
 }

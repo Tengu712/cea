@@ -27,6 +27,8 @@ pub struct Stage {
     snap_delay: EntityID,
     gameover: EntityID,
     logue: EntityID,
+    logue_left: EntityID,
+    logue_right: EntityID,
 }
 impl Scene for Stage {
     fn update(&mut self, world: &mut World) -> Option<Box<dyn Scene>> {
@@ -94,7 +96,8 @@ impl Scene for Stage {
             };
         // Add score
         if let Some(score_counter) = world.emngr.coms.counters.get_mut(&self.score) {
-            let add = msg_graze * 30 + msg_enemy_hit * 10 + (1000 + 10 * graze_count / 2) * msg_bonus;
+            let add =
+                msg_graze * 30 + msg_enemy_hit * 10 + (1000 + 10 * graze_count / 2) * msg_bonus;
             score_counter.count += add;
             score_counter.count_max += add;
         }

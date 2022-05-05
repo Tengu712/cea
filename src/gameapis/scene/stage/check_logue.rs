@@ -8,6 +8,8 @@ impl Stage {
                 emngr.coms.counters.active(&self.player);
                 emngr.coms.counters.active(&self.stage);
                 emngr.remove_entity(&self.logue);
+                emngr.remove_entity(&self.logue_left);
+                emngr.remove_entity(&self.logue_right);
             }
         }
     }
