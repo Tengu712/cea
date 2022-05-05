@@ -16,28 +16,30 @@ impl Stage {
         // delay
         stage.rate_delay = create_delay_count(&mut world.emngr, 60);
         stage.snap_delay = create_delay_count(&mut world.emngr, 10);
+        stage.relaunch_delay = create_delay_count(&mut world.emngr, 60);
         world.emngr.coms.counters.disactive(&stage.snap_delay);
+        world.emngr.coms.counters.disactive(&stage.relaunch_delay);
         // value
         stage.score = create_score(&mut world.emngr, 0);
         stage.graze = create_graze(&mut world.emngr, 0);
         // logue
         stage.spawn_logue(&mut world.emngr);
         // Other
-        stage.camera_lean = create_camera_lean(&mut world.emngr);
         stage.stage = create_stage1(&mut world.emngr);
+        stage.gameover = create_gameover(&mut world.emngr);
+        stage.camera_lean = create_camera_lean(&mut world.emngr);
+        world.emngr.coms.counters.disactive(&stage.stage);
+        world.emngr.coms.counters.disactive(&stage.gameover);
+        world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage.stage);
         world
             .emngr
             .unique_ids
             .insert(UNIQUE_CAMERA_LEAN, stage.camera_lean);
-        world.emngr.coms.counters.disactive(&stage.stage);
-        world.emngr.unique_ids.insert(UNIQUE_STAGE1, stage.stage);
         // Unique but keep object
         let enemy = create_enemy(&mut world.emngr);
         let camera = create_camera(&mut world.emngr);
-        let gameover = create_gameover(&mut world.emngr);
         world.emngr.unique_ids.insert(UNIQUE_ENEMY, enemy);
         world.emngr.unique_ids.insert(UNIQUE_CAMERA, camera);
-        world.emngr.coms.counters.disactive(&gameover);
         // Common object
         let _ = create_fps(&mut world.emngr);
         let _ = create_frame(&mut world.emngr);

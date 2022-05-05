@@ -25,6 +25,7 @@ pub struct Stage {
     // delay
     snap_delay: EntityID,
     rate_delay: EntityID,
+    relaunch_delay: EntityID,
     // value
     score: EntityID,
     graze: EntityID,

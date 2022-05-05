@@ -28,9 +28,17 @@ impl Scene for Stage {
         // Check logue
         self.check_logue(&mut world.emngr);
         // Check hit
-        let is_snap = self.check_hit(world, msg_hit, msg_hit_fragile);
+        let is_snap = self.check_hit(&mut world.emngr, msg_hit, msg_hit_fragile);
         // Add rate
         let rate = self.add_rate(world, msg_graze, msg_bonus, is_snap);
+        // Relaunch delay
+        if let Some(counter) = world.emngr.coms.counters.get(&self.relaunch_delay) {
+            if counter.count == counter.count_max {
+                world.emngr.coms.counters.disactive(&self.relaunch_delay);
+            } else {
+                self.remove_bullets(&mut world.emngr, false);
+            }
+        }
         // Subtraction of enemy hp and check defeat enemy
         let mut flg_move_phase = 0;
         if let Some(enemy_hp) = world.emngr.coms.counters.get_mut(&self.e_hp) {
